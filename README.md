@@ -1,6 +1,6 @@
-# @fanly/docsjs
+# @coding01/docsjs
 
-`@fanly/docsjs` 是一个 Render-first 的 Word 高保真组件，目标是把 Word/WPS/Google Docs 内容以“先渲染、后编辑”的方式无损导入到 Web 端。
+`@coding01/docsjs` 是一个 Render-first 的 Word 高保真组件，目标是把 Word/WPS/Google Docs 内容以“先渲染、后编辑”的方式无损导入到 Web 端。
 
 当前提供：
 - Web Component 内核：`docs-word-editor`
@@ -10,7 +10,7 @@
 ## Installation
 
 ```bash
-npm i @fanly/docsjs
+npm i @coding01/docsjs
 ```
 
 ## Quick Start
@@ -18,7 +18,7 @@ npm i @fanly/docsjs
 ### React
 
 ```tsx
-import { WordFidelityEditorReact } from "@fanly/docsjs";
+import { WordFidelityEditorReact } from "@coding01/docsjs";
 
 export default function Page() {
   return (
@@ -42,7 +42,7 @@ export default function Page() {
 </template>
 
 <script setup lang="ts">
-import { WordFidelityEditorVue } from "@fanly/docsjs";
+import { WordFidelityEditorVue } from "@coding01/docsjs";
 
 const onChange = (payload: { htmlSnapshot: string }) => {
   console.log(payload.htmlSnapshot);
@@ -57,7 +57,7 @@ const onError = (payload: { message: string }) => {
 ### Web Component (Vanilla)
 
 ```ts
-import { defineDocsWordElement } from "@fanly/docsjs";
+import { defineDocsWordElement } from "@coding01/docsjs";
 
 defineDocsWordElement();
 const el = document.createElement("docs-word-editor");
