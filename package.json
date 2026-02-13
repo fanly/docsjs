@@ -1,0 +1,45 @@
+{
+  "name": "docsjs",
+  "version": "0.1.0",
+  "description": "Render-first Word fidelity React component for paste/upload workflows",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "word",
+    "docx",
+    "editor",
+    "fidelity",
+    "iframe",
+    "react"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vue": ">=3.4.0"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vue": "^3.5.13"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  }
+}
