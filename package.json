@@ -1,17 +1,26 @@
 {
   "name": "docsjs",
   "version": "0.1.0",
-  "description": "Render-first Word fidelity React component for paste/upload workflows",
+  "description": "Render-first Word fidelity component with Web Component core and React/Vue adapters",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "keywords": [
     "word",
@@ -19,8 +28,21 @@
     "editor",
     "fidelity",
     "iframe",
-    "react"
+    "react",
+    "vue",
+    "web-component"
   ],
+  "homepage": "https://github.com/fanly/docsjs#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fanly/docsjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fanly/docsjs/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",

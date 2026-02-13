@@ -138,6 +138,33 @@ npm run typecheck
 npm run build
 ```
 
+## Publish to npm
+
+### Manual publish
+
+```bash
+npm login
+npm version patch
+git push origin main --tags
+npm publish --access public
+```
+
+### GitHub Actions auto publish
+
+This repo includes `.github/workflows/publish.yml`:
+- Trigger: push tag `v*.*.*`
+- Steps: `npm ci` -> `typecheck` -> `build` -> `npm publish`
+
+Required GitHub secret:
+- `NPM_TOKEN`: npm access token with publish permission
+
+Release flow:
+
+```bash
+npm version patch
+git push origin main --follow-tags
+```
+
 ## Security Notes
 
 - 本组件默认不清洗 Word 内联样式（保真优先）。
