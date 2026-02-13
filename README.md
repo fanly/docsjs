@@ -155,8 +155,9 @@ This repo includes `.github/workflows/publish.yml`:
 - Trigger: push tag `v*.*.*`
 - Steps: `npm ci` -> `typecheck` -> `build` -> `npm publish`
 
-Required GitHub secret:
-- `NPM_TOKEN`: npm access token with publish permission
+Trusted Publishing (recommended):
+- No long-lived `NPM_TOKEN` secret required
+- Uses GitHub OIDC (`id-token: write`) to publish
 
 Release flow:
 
