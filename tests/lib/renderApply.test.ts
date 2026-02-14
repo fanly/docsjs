@@ -86,4 +86,20 @@ describe("applyWordRenderModel", () => {
     expect(marker1?.getAttribute("data-word-list-marker")).toBe("1");
     expect(marker2?.getAttribute("data-word-list-marker")).toBe("1");
   });
+
+  it("inserts pagination spacer before page-break paragraph", () => {
+    document.body.innerHTML = `<p id="a">A</p><p id="b">B</p>`;
+    const profile = makeProfile([
+      makeParagraphProfile(0, "A", { afterPx: 0 }),
+      makeParagraphProfile(1, "B", { pageBreakBefore: true, afterPx: 0 })
+    ]);
+    profile.pageHeightPx = 200;
+    profile.pageMarginTopPx = 10;
+    profile.pageMarginBottomPx = 10;
+
+    applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
+    const b = document.getElementById("b");
+    const prev = b?.previousElementSibling as HTMLElement | null;
+    expect(prev?.dataset.wordPageSpacer).toBe("1");
+  });
 });

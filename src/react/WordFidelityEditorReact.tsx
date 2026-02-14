@@ -11,13 +11,14 @@ import type {
 defineDocsWordElement();
 
 export interface WordFidelityEditorReactProps {
+  lang?: "zh" | "en";
   onChange?: (payload: DocsWordEditorChangeDetail) => void;
   onError?: (payload: DocsWordEditorErrorDetail) => void;
   onReady?: (payload: DocsWordEditorReadyDetail) => void;
   editorRef?: (el: DocsWordEditorElementApi | null) => void;
 }
 
-export function WordFidelityEditorReact({ onChange, onError, onReady, editorRef }: WordFidelityEditorReactProps) {
+export function WordFidelityEditorReact({ lang, onChange, onError, onReady, editorRef }: WordFidelityEditorReactProps) {
   const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -49,5 +50,5 @@ export function WordFidelityEditorReact({ onChange, onError, onReady, editorRef 
     };
   }, [editorRef, onChange, onError, onReady]);
 
-  return React.createElement("docs-word-editor", { ref: ref as unknown as Ref<HTMLElement> });
+  return React.createElement("docs-word-editor", { ref: ref as unknown as Ref<HTMLElement>, lang });
 }

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "paragraph-basic",
+    "width": 960,
+    "height": 720,
+    "html": "<!doctype html><html><body><h1>Title</h1><p>Paragraph line one.</p><p>Paragraph line two.</p></body></html>"
+  },
+  {
+    "id": "table-list",
+    "width": 960,
+    "height": 720,
+    "html": "<!doctype html><html><body><p><span class='__word-list-marker'>1.</span> Item A</p><p><span class='__word-list-marker'>2.</span> Item B</p><table style='border-collapse:collapse;width:100%'><tr><td style='border:1px solid #222'>A</td><td style='border:1px solid #222'>B</td></tr></table></body></html>"
+  },
+  {
+    "id": "notes-and-revisions",
+    "width": 960,
+    "height": 720,
+    "html": "<!doctype html><html><body><p><ins data-word-revision='ins'>Inserted</ins> <del data-word-revision='del'>Deleted</del></p><p>Commented<sup data-word-comment-ref='1'>[c1]</sup></p><section data-word-comments='1'><hr><ol><li data-word-comment-id='1'>Review note</li></ol></section></body></html>"
+  }
+]

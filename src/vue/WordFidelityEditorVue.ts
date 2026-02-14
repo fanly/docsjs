@@ -11,8 +11,14 @@ defineDocsWordElement();
 
 export const WordFidelityEditorVue = defineComponent({
   name: "WordFidelityEditorVue",
+  props: {
+    lang: {
+      type: String as () => "zh" | "en",
+      default: "zh"
+    }
+  },
   emits: ["change", "error", "ready"],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const elRef = ref<DocsWordEditorElementApi | null>(null);
 
     const onChange = (event: Event) => {
@@ -37,6 +43,6 @@ export const WordFidelityEditorVue = defineComponent({
       elRef.value?.removeEventListener("docsjs-ready", onReady);
     });
 
-    return () => h("docs-word-editor", { ref: elRef });
+    return () => h("docs-word-editor", { ref: elRef, lang: props.lang });
   }
 });

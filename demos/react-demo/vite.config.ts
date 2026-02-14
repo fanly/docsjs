@@ -5,10 +5,11 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      "@coding01/docsjs/react": path.resolve(__dirname, "../../src/react/WordFidelityEditorReact.tsx"),
-      "@coding01/docsjs/types": path.resolve(__dirname, "../../src/core/types.ts")
-    }
+    alias: [
+      { find: /^@coding01\/docsjs$/, replacement: path.resolve(__dirname, "../../src/index.ts") },
+      { find: /^@coding01\/docsjs\/react$/, replacement: path.resolve(__dirname, "../../src/react/WordFidelityEditorReact.tsx") },
+      { find: /^@coding01\/docsjs\/types$/, replacement: path.resolve(__dirname, "../../src/core/types.ts") }
+    ]
   },
   server: {
     port: 5173

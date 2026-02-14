@@ -308,7 +308,34 @@ function parseNumberingMap(numberingXml: Document | null): Map<string, Numbering
     const lvlMap = abstractMap.get(absId);
     if (!lvlMap) continue;
     for (const [lvl, spec] of lvlMap.entries()) {
-      levelMap.set(`${numId}:${lvl}`, spec);
+      levelMap.set(`${numId}:${lvl}`, { ...spec });
+    }
+
+    const lvlOverrides = queryAllByLocalName(num, "lvlOverride");
+    for (const override of lvlOverrides) {
+      const ilvl = toInt(getAttr(override, "w:ilvl") ?? getAttr(override, "ilvl"));
+      if (ilvl === null) continue;
+      const key = `${numId}:${ilvl}`;
+      const base = levelMap.get(key) ?? { numFmt: null, lvlText: null, startAt: 1 };
+
+      const overrideStart = toInt(
+        getAttr(queryAllByLocalName(override, "startOverride")[0] ?? null, "w:val") ??
+        getAttr(queryAllByLocalName(override, "startOverride")[0] ?? null, "val")
+      );
+
+      const overrideLvl = queryAllByLocalName(override, "lvl")[0] ?? null;
+      const overrideNumFmtNode = overrideLvl ? queryAllByLocalName(overrideLvl, "numFmt")[0] ?? null : null;
+      const overrideLvlTextNode = overrideLvl ? queryAllByLocalName(overrideLvl, "lvlText")[0] ?? null : null;
+      const overrideLvlStart = toInt(
+        getAttr(queryAllByLocalName(overrideLvl ?? override, "start")[0] ?? null, "w:val") ??
+        getAttr(queryAllByLocalName(overrideLvl ?? override, "start")[0] ?? null, "val")
+      );
+
+      levelMap.set(key, {
+        numFmt: getAttr(overrideNumFmtNode, "w:val") ?? getAttr(overrideNumFmtNode, "val") ?? base.numFmt,
+        lvlText: getAttr(overrideLvlTextNode, "w:val") ?? getAttr(overrideLvlTextNode, "val") ?? base.lvlText,
+        startAt: overrideStart ?? overrideLvlStart ?? base.startAt
+      });
     }
   }
 
@@ -621,7 +648,8 @@ function inferTitleFontFamily(families: string[]): string {
 }
 
 export async function parseDocxStyleProfile(file: File): Promise<WordStyleProfile> {
-  const buffer = await file.arrayBuffer();
+  const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
+  const buffer = maybeArrayBuffer ? await maybeArrayBuffer.call(file) : await new Response(file).arrayBuffer();
   const zip = await JSZip.loadAsync(buffer);
 
   const documentXmlText = await zip.file("word/document.xml")?.async("string");

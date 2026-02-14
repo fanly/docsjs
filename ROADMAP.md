@@ -1,31 +1,58 @@
 # docsjs Roadmap
 
-目标：在浏览器中实现 Word 内容“无损粘贴 + 无损上传”的 render-first 高保真组件。
+Goal: build a practical, benchmarked Word fidelity pipeline for global developers.
 
-## Milestone A (Now)
+## Current Status
 
-- [x] Web Component 内核
-- [x] React/Vue 适配
-- [x] 粘贴与 DOCX 上传双入口
-- [x] OIDC Trusted Publishing
-- [x] React demo (runnable)
-- [x] Vue demo (runnable)
+- [x] Web Component core (`docs-word-editor`)
+- [x] React/Vue adapters
+- [x] Paste + `.docx` dual import pipeline
+- [x] OIDC trusted npm publishing
+- [x] Runnable React demo
+- [x] Runnable Vue demo
+- [x] Baseline tests (`pastePipeline`, `renderApply`)
+- [ ] Fidelity benchmark corpus and scorecard
 
-## Milestone B (Next)
+## P0 (Next 2-4 weeks)
 
-- [ ] 列表完整保真（跨级连续编号、复杂模板）
-- [ ] 表格完整保真（merge cell, nested table, fixed layout）
-- [ ] 图片完整保真（floating anchor, wrap mode, crop）
-- [ ] 字体完整保真（fontTable + fallback mapping + async loading）
+- [ ] Build a fidelity benchmark suite
+  - [ ] Add `fixtures/` corpus: contract, resume, report, mixed-language document
+  - [ ] Add semantic diff tests: list/tree/table/image stats
+  - [ ] Add visual regression tests (Playwright screenshot compare)
+  - [ ] Output Fidelity Score: structure/style/pagination
+- [ ] Deep list fidelity
+  - [ ] `lvlOverride/startOverride` support
+  - [ ] Cross-section numbering continuity mode
+  - [ ] Multi-level marker template edge cases (`%1.%2.%3`, legal/roman/letter)
+- [ ] Deep table fidelity
+  - [ ] `vMerge/gridSpan` merged cell mapping
+  - [ ] Nested table rendering
+  - [ ] `tblGrid/tcW` width and fixed layout restoration
 
-## Milestone C (Advanced)
+## P1 (4-8 weeks)
 
-- [ ] 分页规则精度（widow/orphan, keep with next, table split）
-- [ ] 高级对象（OMML, chart, SmartArt）
-- [ ] 协同编辑适配（CRDT events）
+- [ ] Image and floating object fidelity
+  - [ ] `wp:anchor` absolute/relative positioning
+  - [ ] Text wrap modes (`square`, `tight`, `topAndBottom`)
+  - [ ] Crop/rotation/flip mapping
+- [ ] Advanced semantics (read-only first)
+  - [ ] footnotes/endnotes
+  - [ ] comments
+  - [ ] track changes overlays
+- [ ] Pagination precision
+  - [ ] widow/orphan
+  - [ ] keep-with-next + table split interaction
+
+## P2 (Advanced)
+
+- [ ] OMML equation fallback and plugin extension point
+- [ ] chart/SmartArt fallback rendering
+- [ ] collaboration adapter hooks (CRDT-friendly event model)
+- [ ] optional host-side sanitization profile (`fidelity-first` vs `strict`)
 
 ## Definition of Done
 
-1. 同一测试文档在 Word 与 docsjs 的核心版式偏差可控（行距/段距/版心）。
-2. 关键结构（列表、表格、图片）不丢失语义与视觉关系。
-3. 可通过自动化回归（基准文档 + 快照对比 + 语义统计）。
+1. Core layout deviations are measurable and bounded against reference Word output.
+2. Lists/tables/images preserve both semantics and visual relationships in benchmark fixtures.
+3. CI gates regression with semantic + visual checks before release.
+4. README/API examples stay aligned with released package behavior.

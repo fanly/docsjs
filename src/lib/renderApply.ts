@@ -16,7 +16,7 @@ function escapeHtml(text: string): string {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll("\"", "&quot;");
+    .replaceAll('"', "&quot;");
 }
 
 function runStyleToCss(run: RunStyleProfile): string {
@@ -47,7 +47,7 @@ function paragraphToRunHtml(runs: RunStyleProfile[]): string {
       const parts = run.text.split("\n");
       const html = parts.map((part) => escapeHtml(part)).join("<br/>");
       if (!css) return html;
-      return `<span style=\"${css}\">${html}</span>`;
+      return `<span style="${css}">${html}</span>`;
     })
     .join("");
 }

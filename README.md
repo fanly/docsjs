@@ -1,11 +1,17 @@
 # @coding01/docsjs
 
-`@coding01/docsjs` 是一个 Render-first 的 Word 高保真组件，目标是把 Word/WPS/Google Docs 内容无损粘贴/上传到 Web 并保持版式一致。
+Render-first Word fidelity component for the web.  
+Import Word/WPS/Google Docs content from paste or `.docx` while preserving structure and layout as much as possible.
 
-当前提供：
-- Web Component 内核：`docs-word-editor`
-- React 适配组件：`WordFidelityEditorReact`
-- Vue 适配组件：`WordFidelityEditorVue`
+[中文文档](./README.zh-CN.md)
+
+## What You Get
+
+- Web Component core: `docs-word-editor`
+- React adapter: `WordFidelityEditorReact`
+- Vue adapter: `WordFidelityEditorVue`
+- Import pipeline: clipboard paste + `.docx` upload
+- HTML snapshot output for downstream rendering/storage
 
 ## Installation
 
@@ -23,12 +29,8 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 export default function Page() {
   return (
     <WordFidelityEditorReact
-      onChange={(payload) => {
-        console.log(payload.htmlSnapshot);
-      }}
-      onError={(payload) => {
-        console.error(payload.message);
-      }}
+      onChange={(payload) => console.log(payload.htmlSnapshot)}
+      onError={(payload) => console.error(payload.message)}
     />
   );
 }
@@ -43,18 +45,12 @@ export default function Page() {
 
 <script setup lang="ts">
 import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
-
-const onChange = (payload: { htmlSnapshot: string }) => {
-  console.log(payload.htmlSnapshot);
-};
-
-const onError = (payload: { message: string }) => {
-  console.error(payload.message);
-};
+const onChange = (payload: { htmlSnapshot: string }) => console.log(payload.htmlSnapshot);
+const onError = (payload: { message: string }) => console.error(payload.message);
 </script>
 ```
 
-### Web Component (Vanilla)
+### Web Component
 
 ```ts
 import { defineDocsWordElement } from "@coding01/docsjs";
@@ -71,105 +67,88 @@ el.addEventListener("docsjs-change", (e) => {
 
 ## API
 
-### Component Events
+### Events
 
 - `docsjs-change`
   - payload: `{ htmlSnapshot: string; source: "paste" | "upload" | "api" | "clear"; fileName?: string }`
-  - 触发时机：粘贴、上传 Word、手动 API 导入、清空
 - `docsjs-error`
   - payload: `{ message: string }`
-  - 触发时机：剪贴板读取失败、DOCX 解析失败等
 - `docsjs-ready`
   - payload: `{ version: string }`
-  - 触发时机：组件挂载完成
 
-### Web Component Methods
+### Methods
 
 - `loadHtml(rawHtml: string): void`
-  - 将外部 HTML 快照注入渲染层（等价于 `setSnapshot`）
 - `loadDocx(file: File): Promise<void>`
-  - 直接导入 Word 文件
 - `loadClipboard(): Promise<void>`
-  - 主动读取系统剪贴板导入
 - `getSnapshot(): string`
-  - 获取当前完整 HTML 快照
 - `clear(): void`
-  - 清空当前文档
 
 ### Attributes
 
 - `lang="zh|en"`
-  - 控制组件内置按钮文案
 - `show-toolbar="true|false|1|0"`
-  - 控制工具栏显示隐藏
 
-## Semantic Coverage
+## Feature Checklist
 
-下表描述“语义与格式覆盖”当前状态。
+- ✅ Web Component core (`docs-word-editor`)
+- ✅ React adapter (`@coding01/docsjs/react`)
+- ✅ Vue adapter (`@coding01/docsjs/vue`)
+- ✅ Paste import (`text/html`, `text/plain`)
+- ✅ Clipboard image hydration (`file:/blob:/cid:/mhtml:` to data URL)
+- ✅ `.docx` upload and parse
+- ✅ Basic paragraph semantics (alignment, headings, line break)
+- ✅ Basic run styles (bold/italic/underline/strike/color/highlight/super/sub)
+- ✅ List reconstruction (`numId` + `ilvl` + `lvlText`)
+- ✅ Basic table structure (`table/tr/td`)
+- ✅ Embedded image relationship mapping (`rId -> media`)
+- ✅ Page geometry mapping (page height, margins, content width)
+- ✅ Runtime render fixes (`mso-*` compatibility, pagination spacer, empty paragraph normalization)
+- ✅ Events and public methods
+- ✅ React and Vue runnable demos
+- ✅ npm publish workflow with OIDC trusted publishing
+- ⏳ Floating anchors (`wp:anchor`) full layout fidelity
+- ⏳ Merged cells / nested tables full fidelity
+- ⏳ Footnotes / endnotes / comments / track changes
+- ⏳ OMML / charts / SmartArt
+- ⏳ Automated fidelity benchmark scorecard
 
-### Completed
+## What's New in v0.1.3
 
-- 输入链路
-  - 粘贴：Word / WPS / Google Docs HTML
-  - 上传：`.docx` 文件解析并渲染
-- 页面模型
-  - A4 页高/页边距/版心宽度映射
-- 段落语义
-  - 对齐、段前段后、行距（`auto` / `exact` / `atLeast`）
-  - 缩进（left/right/firstLine/hanging）
-  - keep 规则（`keepNext` / `keepLines` / `pageBreakBefore` / `lastRenderedPageBreak`）
-- Run 语义
-  - 字号、字体、颜色、粗体、斜体、下划线、删除线
-  - 高亮、底纹、上下标、字距、阴影
-- 列表语义
-  - 多级编号（`numId` + `ilvl`）
-  - `numFmt` 和 `lvlText` 模板（如 `%1.%2.`）
-  - section break 计数重置
-- 表格语义
-  - `table/tr/td` 结构保留
-  - 单元格段落保留与边框/基础 padding 映射
-- 图片语义
-  - 提取关系映射（`rId -> media`）
-  - `wp:extent` 尺寸映射为像素（稳定布局）
+- Added deep DOCX semantics:
+  - numbering overrides (`lvlOverride/startOverride`)
+  - merged cells (`vMerge/gridSpan`) and nested tables
+  - footnotes and endnotes (read-only rendering)
+  - comments (read-only rendering)
+  - revisions insert/delete markers (read-only rendering)
+  - page break semantic markers (`w:br type=page`, `lastRenderedPageBreak`)
+- Added floating image MVP:
+  - anchor position mapping (`wp:anchor`)
+  - wrap mode markers (`square`, `tight`, `topAndBottom`, `none`)
+- Added fidelity tooling:
+  - semantic stats collector
+  - fidelity score calculator
+  - baseline regression framework (config-driven)
+  - visual regression workflow scaffold (Playwright + diff artifacts)
+- Added engineering quality gates:
+  - ESLint + strict verify pipeline (`lint`, `typecheck`, `test`, `build`, `sizecheck`)
+  - CI workflow for mandatory quality checks
+  - contribution/rules/deep-plan docs
+- Demo upgrades:
+  - React and Vue demos now include bilingual toggle (`zh` / `en`)
+  - component inner toolbar language follows selected locale
+  - semantic dashboard expanded with new indicators (anchor/wrap/comments/revisions/page-break)
 
-### In Progress / Not Completed
-
-- 复杂 Word 对象
-  - 浮动锚点对象（复杂 `wp:anchor`）
-  - 图表、SmartArt、公式（OMML）深层渲染
-- 文档语义高级能力
-  - Track Changes / Comments / Footnotes / Endnotes
-  - 域代码（目录、页码域）刷新
-- 分页精度
-  - widow/orphan 规则完整覆盖
-  - 跨页表格与复杂 keep 组合场景
-- 编辑能力
-  - 当前提供的是渲染导入组件，完整富文本编辑工具栏与协同编辑仍在规划中
-
-## Task Board (In Progress)
-
-当前任务清单见 `ROADMAP.md`，包含：
-- `Milestone A`: 组件可用性与 demos
-- `Milestone B`: 复杂列表/表格/图片高保真
-- `Milestone C`: 高级对象与协同扩展
-
-当前状态：
-- ✅ 核心导入链路（粘贴 + 上传）可用
-- ✅ React/Vue 适配可用
-- ✅ npm 自动发布链路可用
-- ✅ React runnable demo
-- ✅ Vue runnable demo
-- ⏳ 列表/表格/图片复杂语义深度保真
-
-## Build & Local Develop
+## Development
 
 ```bash
 npm install
 npm run typecheck
+npm run test
 npm run build
 ```
 
-## Runnable Demos
+## Demos
 
 ### React demo
 
@@ -187,35 +166,37 @@ npm install
 npm run dev
 ```
 
-## Publish to npm
+## Publishing
 
-### Manual publish
+### Manual
 
 ```bash
 npm login
 npm version patch
-git push origin main --tags
+git push origin main --follow-tags
 npm publish --access public
 ```
 
-### GitHub Actions auto publish
+### GitHub Actions
 
-This repo includes `.github/workflows/publish.yml`:
+Workflow: `.github/workflows/publish.yml`
+
 - Trigger: push tag `v*.*.*`
-- Steps: `npm ci` -> `typecheck` -> `build` -> `npm publish`
+- Steps: `npm ci` -> `npm run typecheck` -> `npm run build` -> `npm publish --provenance`
 
-Trusted Publishing (recommended):
-- No long-lived `NPM_TOKEN` secret required
-- Uses GitHub OIDC (`id-token: write`) to publish
+## Roadmap
 
-Release flow:
-
-```bash
-npm version patch
-git push origin main --follow-tags
-```
+See [ROADMAP.md](./ROADMAP.md) for prioritized execution plan (P0/P1/P2) and acceptance criteria.
 
 ## Security Notes
 
-- 本组件默认不清洗 Word 内联样式（保真优先）。
-- 生产环境请在宿主应用侧配置 CSP、iframe sandbox 和上传白名单策略。
+- Default mode is fidelity-first and keeps Word inline styles.
+- In production, configure CSP, iframe sandbox, file upload allowlist, and optional host-side sanitization.
+
+## Support This Project
+
+If this project saves your time, a small tip is appreciated.
+
+![Support docsjs](https://image.coding01.cn/Coding01%20%E8%B5%9E%E8%B5%8F%E7%A0%81.png)
+
+`“加个鸡腿💪(ﾟωﾟ💪)”`
