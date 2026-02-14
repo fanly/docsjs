@@ -1,6 +1,6 @@
 {
   "name": "@coding01/docsjs",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "Render-first Word fidelity component with Web Component core and React/Vue adapters",
   "license": "MIT",
   "type": "module",
