@@ -1,14 +1,19 @@
 import { defineComponent, h, onBeforeUnmount, onMounted, ref } from "vue";
 import { defineDocsWordElement } from "../core/DocsWordElement";
-import type { DocsWordEditorChangeDetail, DocsWordEditorErrorDetail } from "../core/types";
+import type {
+  DocsWordEditorChangeDetail,
+  DocsWordEditorElementApi,
+  DocsWordEditorErrorDetail,
+  DocsWordEditorReadyDetail
+} from "../core/types";
 
 defineDocsWordElement();
 
 export const WordFidelityEditorVue = defineComponent({
   name: "WordFidelityEditorVue",
-  emits: ["change", "error"],
+  emits: ["change", "error", "ready"],
   setup(_, { emit }) {
-    const elRef = ref<HTMLElement | null>(null);
+    const elRef = ref<DocsWordEditorElementApi | null>(null);
 
     const onChange = (event: Event) => {
       emit("change", (event as CustomEvent<DocsWordEditorChangeDetail>).detail);
@@ -16,15 +21,20 @@ export const WordFidelityEditorVue = defineComponent({
     const onError = (event: Event) => {
       emit("error", (event as CustomEvent<DocsWordEditorErrorDetail>).detail);
     };
+    const onReady = (event: Event) => {
+      emit("ready", (event as CustomEvent<DocsWordEditorReadyDetail>).detail);
+    };
 
     onMounted(() => {
       elRef.value?.addEventListener("docsjs-change", onChange);
       elRef.value?.addEventListener("docsjs-error", onError);
+      elRef.value?.addEventListener("docsjs-ready", onReady);
     });
 
     onBeforeUnmount(() => {
       elRef.value?.removeEventListener("docsjs-change", onChange);
       elRef.value?.removeEventListener("docsjs-error", onError);
+      elRef.value?.removeEventListener("docsjs-ready", onReady);
     });
 
     return () => h("docs-word-editor", { ref: elRef });

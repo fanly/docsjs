@@ -12,6 +12,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./vue": {
+      "types": "./dist/vue.d.ts",
+      "import": "./dist/vue.js",
+      "require": "./dist/vue.cjs"
     }
   },
   "files": [
@@ -19,6 +29,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run build"
   },
@@ -57,6 +68,8 @@
     "@types/react-dom": "^19.0.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3",
+    "vitest": "^3.2.4",
+    "jsdom": "^26.0.0",
     "vue": "^3.5.13"
   },
   "peerDependenciesMeta": {

@@ -1,4 +1,4 @@
-export { defineDocsWordElement, DocsWordElement } from "./core/DocsWordElement";
+export { WordFidelityEditorVue } from "./vue/WordFidelityEditorVue";
 export type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,

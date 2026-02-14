@@ -4,6 +4,61 @@ import { extractFromClipboardDataTransfer, extractFromClipboardItems } from "../
 import { applyWordRenderModel } from "../lib/renderApply";
 import { parseDocxStyleProfile, type WordStyleProfile } from "../lib/styleProfile";
 
+const VERSION = "0.1.2";
+
+type Locale = "zh" | "en";
+type ChangeSource = "paste" | "upload" | "api" | "clear";
+
+const MESSAGES: Record<Locale, {
+  readClipboard: string;
+  uploadWord: string;
+  clear: string;
+  pastePlaceholder: string;
+  waitImport: string;
+  loadedHtml: string;
+  cleared: string;
+  loadedWord: (name: string) => string;
+  importedClipboard: string;
+  noContent: string;
+  noClipboardRead: string;
+  parseFailed: string;
+  clipboardReadFailed: string;
+  errorPrefix: string;
+}> = {
+  zh: {
+    readClipboard: "从系统剪贴板读取",
+    uploadWord: "上传 Word",
+    clear: "清空",
+    pastePlaceholder: "在此处粘贴 Word/WPS/Google Docs 内容（Ctrl/Cmd+V）",
+    waitImport: "等待内容导入",
+    loadedHtml: "已加载 HTML 快照",
+    cleared: "文档已清空",
+    loadedWord: (name) => `已加载 Word 文件: ${name}`,
+    importedClipboard: "已导入剪贴板内容",
+    noContent: "未检测到可导入内容",
+    noClipboardRead: "当前浏览器不支持 clipboard.read",
+    parseFailed: "Word 解析失败",
+    clipboardReadFailed: "读取剪贴板失败",
+    errorPrefix: "错误: "
+  },
+  en: {
+    readClipboard: "Read clipboard",
+    uploadWord: "Upload Word",
+    clear: "Clear",
+    pastePlaceholder: "Paste Word/WPS/Google Docs content here (Ctrl/Cmd+V)",
+    waitImport: "Waiting for input",
+    loadedHtml: "HTML snapshot loaded",
+    cleared: "Document cleared",
+    loadedWord: (name) => `Word file loaded: ${name}`,
+    importedClipboard: "Clipboard content imported",
+    noContent: "No importable content detected",
+    noClipboardRead: "navigator.clipboard.read is not supported in this browser",
+    parseFailed: "Word parse failed",
+    clipboardReadFailed: "Failed to read clipboard",
+    errorPrefix: "Error: "
+  }
+};
+
 const BASE_CSS = `
 :host{display:block;border:1px solid #d8deea;border-radius:12px;background:#fff;overflow:hidden;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid #e8edf6;background:#f8faff}
@@ -15,6 +70,10 @@ iframe{width:100%;min-height:760px;border:0}
 
 export class DocsWordElement extends HTMLElement {
   private rootRef: ShadowRoot;
+  private toolbar: HTMLDivElement;
+  private btnRead: HTMLButtonElement;
+  private btnUpload: HTMLButtonElement;
+  private btnClear: HTMLButtonElement;
   private frame: HTMLIFrameElement;
   private pasteArea: HTMLTextAreaElement;
   private fileInput: HTMLInputElement;
@@ -22,29 +81,28 @@ export class DocsWordElement extends HTMLElement {
   private htmlSnapshot: string;
   private styleProfile: WordStyleProfile | null = null;
   private frameHeight = 0;
+  private locale: Locale = "zh";
 
   constructor() {
     super();
     this.rootRef = this.attachShadow({ mode: "open" });
+    this.locale = this.parseLocale(this.getAttribute("lang"));
     this.htmlSnapshot = buildHtmlSnapshot("<p><br/></p>");
 
     const style = document.createElement("style");
     style.textContent = BASE_CSS;
 
-    const toolbar = document.createElement("div");
-    toolbar.className = "toolbar";
+    this.toolbar = document.createElement("div");
+    this.toolbar.className = "toolbar";
 
-    const btnRead = document.createElement("button");
-    btnRead.textContent = "从系统剪贴板读取";
-    btnRead.onclick = () => void this.readClipboard();
+    this.btnRead = document.createElement("button");
+    this.btnRead.onclick = () => void this.loadClipboard();
 
-    const btnUpload = document.createElement("button");
-    btnUpload.textContent = "上传 Word";
-    btnUpload.onclick = () => this.fileInput.click();
+    this.btnUpload = document.createElement("button");
+    this.btnUpload.onclick = () => this.fileInput.click();
 
-    const btnClear = document.createElement("button");
-    btnClear.textContent = "清空";
-    btnClear.onclick = () => this.clear();
+    this.btnClear = document.createElement("button");
+    this.btnClear.onclick = () => this.clear();
 
     this.fileInput = document.createElement("input");
     this.fileInput.type = "file";
@@ -52,11 +110,11 @@ export class DocsWordElement extends HTMLElement {
     this.fileInput.style.display = "none";
     this.fileInput.onchange = () => void this.onUpload();
 
-    toolbar.append(btnRead, btnUpload, btnClear, this.fileInput);
+    this.toolbar.append(this.btnRead, this.btnUpload, this.btnClear, this.fileInput);
 
     this.pasteArea = document.createElement("textarea");
     this.pasteArea.className = "paste";
-    this.pasteArea.placeholder = "在此处粘贴 Word/WPS/Google Docs 内容（Ctrl/Cmd+V）";
+    this.pasteArea.placeholder = "";
     this.pasteArea.onpaste = (event) => {
       event.preventDefault();
       void this.applyFromClipboardData(event.clipboardData);
@@ -64,38 +122,73 @@ export class DocsWordElement extends HTMLElement {
 
     this.hint = document.createElement("span");
     this.hint.className = "hint";
-    this.hint.textContent = "等待内容导入";
+    this.hint.textContent = "";
 
     this.frame = document.createElement("iframe");
     this.frame.sandbox.add("allow-same-origin", "allow-scripts");
     this.frame.onload = () => this.onFrameLoad();
 
-    this.rootRef.append(style, toolbar, this.pasteArea, this.hint, this.frame);
+    this.rootRef.append(style, this.toolbar, this.pasteArea, this.hint, this.frame);
+    this.syncLocaleText();
+    this.syncToolbarVisibility();
+  }
+
+  static get observedAttributes(): string[] {
+    return ["lang", "show-toolbar"];
+  }
+
+  attributeChangedCallback(name: string, _: string | null, newValue: string | null): void {
+    if (name === "lang") {
+      this.locale = this.parseLocale(newValue);
+      this.syncLocaleText();
+      return;
+    }
+    if (name === "show-toolbar") {
+      this.syncToolbarVisibility();
+    }
   }
 
   connectedCallback(): void {
     this.renderSnapshot();
+    this.dispatchEvent(new CustomEvent("docsjs-ready", { detail: { version: VERSION } }));
   }
 
   public setSnapshot(rawHtml: string): void {
+    this.loadHtml(rawHtml);
+  }
+
+  public loadHtml(rawHtml: string): void {
     this.styleProfile = null;
     this.htmlSnapshot = buildHtmlSnapshot(rawHtml);
     this.renderSnapshot();
-    this.hint.textContent = "已加载 HTML 快照";
-    this.emitChange();
+    this.setHint(MESSAGES[this.locale].loadedHtml);
+    this.emitChange("api");
+  }
+
+  public getSnapshot(): string {
+    return this.htmlSnapshot;
   }
 
   public clear(): void {
     this.styleProfile = null;
     this.htmlSnapshot = buildHtmlSnapshot("<p><br/></p>");
     this.renderSnapshot();
-    this.hint.textContent = "文档已清空";
-    this.emitChange();
+    this.setHint(MESSAGES[this.locale].cleared);
+    this.emitChange("clear");
+  }
+
+  public async loadDocx(file: File): Promise<void> {
+    await this.applyDocx(file);
   }
 
   private async onUpload(): Promise<void> {
     const file = this.fileInput.files?.[0];
     if (!file) return;
+    await this.applyDocx(file);
+    this.fileInput.value = "";
+  }
+
+  private async applyDocx(file: File): Promise<void> {
     try {
       const [snapshot, profile] = await Promise.all([
         parseDocxToHtmlSnapshot(file),
@@ -104,18 +197,16 @@ export class DocsWordElement extends HTMLElement {
       this.styleProfile = profile;
       this.htmlSnapshot = snapshot;
       this.renderSnapshot();
-      this.hint.textContent = `已加载 Word 文件: ${profile.sourceFileName}`;
-      this.emitChange();
+      this.setHint(MESSAGES[this.locale].loadedWord(profile.sourceFileName));
+      this.emitChange("upload", profile.sourceFileName);
     } catch (error) {
-      this.emitError(error instanceof Error ? error.message : "Word 解析失败");
-    } finally {
-      this.fileInput.value = "";
+      this.emitError(error instanceof Error ? error.message : MESSAGES[this.locale].parseFailed);
     }
   }
 
-  private async readClipboard(): Promise<void> {
+  public async loadClipboard(): Promise<void> {
     if (!navigator.clipboard?.read) {
-      this.emitError("当前浏览器不支持 clipboard.read");
+      this.emitError(MESSAGES[this.locale].noClipboardRead);
       return;
     }
     try {
@@ -123,7 +214,7 @@ export class DocsWordElement extends HTMLElement {
       const payload = await extractFromClipboardItems(items);
       this.applyPayload(payload.html, payload.text);
     } catch (error) {
-      this.emitError(error instanceof Error ? error.message : "读取剪贴板失败");
+      this.emitError(error instanceof Error ? error.message : MESSAGES[this.locale].clipboardReadFailed);
     }
   }
 
@@ -140,12 +231,12 @@ export class DocsWordElement extends HTMLElement {
     } else if (text.trim()) {
       this.htmlSnapshot = buildHtmlSnapshot(`<p>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</p>`);
     } else {
-      this.hint.textContent = "未检测到可导入内容";
+      this.setHint(MESSAGES[this.locale].noContent);
       return;
     }
     this.renderSnapshot();
-    this.hint.textContent = "已导入剪贴板内容";
-    this.emitChange();
+    this.setHint(MESSAGES[this.locale].importedClipboard);
+    this.emitChange("paste");
   }
 
   private onFrameLoad(): void {
@@ -176,13 +267,38 @@ export class DocsWordElement extends HTMLElement {
     this.frame.srcdoc = this.htmlSnapshot;
   }
 
-  private emitChange(): void {
-    this.dispatchEvent(new CustomEvent("docsjs-change", { detail: { htmlSnapshot: this.htmlSnapshot } }));
+  private emitChange(source: ChangeSource, fileName?: string): void {
+    this.dispatchEvent(new CustomEvent("docsjs-change", { detail: { htmlSnapshot: this.htmlSnapshot, source, fileName } }));
   }
 
   private emitError(message: string): void {
     this.dispatchEvent(new CustomEvent("docsjs-error", { detail: { message } }));
-    this.hint.textContent = `错误: ${message}`;
+    this.setHint(`${MESSAGES[this.locale].errorPrefix}${message}`);
+  }
+
+  private setHint(text: string): void {
+    this.hint.textContent = text;
+  }
+
+  private parseLocale(value: string | null): Locale {
+    return value?.toLowerCase() === "en" ? "en" : "zh";
+  }
+
+  private syncToolbarVisibility(): void {
+    const raw = this.getAttribute("show-toolbar");
+    const show = raw === null || raw === "" || raw === "1" || raw.toLowerCase() === "true";
+    this.toolbar.style.display = show ? "flex" : "none";
+  }
+
+  private syncLocaleText(): void {
+    const t = MESSAGES[this.locale];
+    this.btnRead.textContent = t.readClipboard;
+    this.btnUpload.textContent = t.uploadWord;
+    this.btnClear.textContent = t.clear;
+    this.pasteArea.placeholder = t.pastePlaceholder;
+    if (!this.hint.textContent || this.hint.textContent === MESSAGES.en.waitImport || this.hint.textContent === MESSAGES.zh.waitImport) {
+      this.hint.textContent = t.waitImport;
+    }
   }
 }
 

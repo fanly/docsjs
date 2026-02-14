@@ -1,6 +1,6 @@
 # @coding01/docsjs
 
-`@coding01/docsjs` 是一个 Render-first 的 Word 高保真组件，目标是把 Word/WPS/Google Docs 内容以“先渲染、后编辑”的方式无损导入到 Web 端。
+`@coding01/docsjs` 是一个 Render-first 的 Word 高保真组件，目标是把 Word/WPS/Google Docs 内容无损粘贴/上传到 Web 并保持版式一致。
 
 当前提供：
 - Web Component 内核：`docs-word-editor`
@@ -18,7 +18,7 @@ npm i @coding01/docsjs
 ### React
 
 ```tsx
-import { WordFidelityEditorReact } from "@coding01/docsjs";
+import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 
 export default function Page() {
   return (
@@ -42,7 +42,7 @@ export default function Page() {
 </template>
 
 <script setup lang="ts">
-import { WordFidelityEditorVue } from "@coding01/docsjs";
+import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
 
 const onChange = (payload: { htmlSnapshot: string }) => {
   console.log(payload.htmlSnapshot);
@@ -74,18 +74,34 @@ el.addEventListener("docsjs-change", (e) => {
 ### Component Events
 
 - `docsjs-change`
-  - payload: `{ htmlSnapshot: string }`
-  - 触发时机：粘贴、上传 Word、手动 `setSnapshot`、`clear`
+  - payload: `{ htmlSnapshot: string; source: "paste" | "upload" | "api" | "clear"; fileName?: string }`
+  - 触发时机：粘贴、上传 Word、手动 API 导入、清空
 - `docsjs-error`
   - payload: `{ message: string }`
   - 触发时机：剪贴板读取失败、DOCX 解析失败等
+- `docsjs-ready`
+  - payload: `{ version: string }`
+  - 触发时机：组件挂载完成
 
 ### Web Component Methods
 
-- `setSnapshot(rawHtml: string): void`
-  - 将外部 HTML 快照注入渲染层
+- `loadHtml(rawHtml: string): void`
+  - 将外部 HTML 快照注入渲染层（等价于 `setSnapshot`）
+- `loadDocx(file: File): Promise<void>`
+  - 直接导入 Word 文件
+- `loadClipboard(): Promise<void>`
+  - 主动读取系统剪贴板导入
+- `getSnapshot(): string`
+  - 获取当前完整 HTML 快照
 - `clear(): void`
   - 清空当前文档
+
+### Attributes
+
+- `lang="zh|en"`
+  - 控制组件内置按钮文案
+- `show-toolbar="true|false|1|0"`
+  - 控制工具栏显示隐藏
 
 ## Semantic Coverage
 
@@ -130,12 +146,45 @@ el.addEventListener("docsjs-change", (e) => {
 - 编辑能力
   - 当前提供的是渲染导入组件，完整富文本编辑工具栏与协同编辑仍在规划中
 
+## Task Board (In Progress)
+
+当前任务清单见 `ROADMAP.md`，包含：
+- `Milestone A`: 组件可用性与 demos
+- `Milestone B`: 复杂列表/表格/图片高保真
+- `Milestone C`: 高级对象与协同扩展
+
+当前状态：
+- ✅ 核心导入链路（粘贴 + 上传）可用
+- ✅ React/Vue 适配可用
+- ✅ npm 自动发布链路可用
+- ✅ React runnable demo
+- ✅ Vue runnable demo
+- ⏳ 列表/表格/图片复杂语义深度保真
+
 ## Build & Local Develop
 
 ```bash
 npm install
 npm run typecheck
 npm run build
+```
+
+## Runnable Demos
+
+### React demo
+
+```bash
+cd demos/react-demo
+npm install
+npm run dev
+```
+
+### Vue demo
+
+```bash
+cd demos/vue-demo
+npm install
+npm run dev
 ```
 
 ## Publish to npm

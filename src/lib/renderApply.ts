@@ -361,6 +361,7 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile): 
       if (!alreadyHasMarker) {
         const marker = doc.createElement("span");
         marker.className = "__word-list-marker";
+        marker.setAttribute("data-word-list-marker", "1");
         marker.textContent = `${markerText} `;
         marker.style.display = "inline-block";
         marker.style.minWidth = "1.8em";
