@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>docsjs | Word Fidelity for Web</title>
+    <meta
+      name="description"
+      content="Render-first Word fidelity for web apps. Paste or upload .docx and preserve structure, styles, and layout semantics."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f8fbf8;
+        --panel: #ffffff;
+        --ink: #172126;
+        --muted: #53626e;
+        --line: #d8e2e0;
+        --brand: #0e8b78;
+        --brand-strong: #0b6f60;
+        --accent: #ff9f43;
+        --accent-soft: #fff2e1;
+        --ok: #1e9e57;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(1200px 500px at 85% -10%, #d8f4ee 0%, transparent 60%),
+          radial-gradient(900px 420px at -5% 8%, #fff2dd 0%, transparent 58%),
+          var(--bg);
+        font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+      }
+
+      .wrap {
+        width: min(1140px, 92vw);
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #e5eeeb;
+        background: rgba(248, 251, 248, 0.92);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--ink);
+      }
+
+      .logo-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        color: #fff;
+        background: linear-gradient(145deg, #0e8b78, #0b6f60);
+        font-weight: 700;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .logo-text {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 20px;
+        letter-spacing: 0.3px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .seg {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        border-radius: 999px;
+        font-size: 13px;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .seg.active {
+        color: #fff;
+        border-color: var(--brand);
+        background: var(--brand);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 22px;
+        padding: 36px 0 20px;
+      }
+
+      .hero-card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--panel);
+        padding: 24px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eaf7f3;
+        color: var(--brand-strong);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: 0.2px;
+      }
+
+      h1 {
+        margin-top: 12px;
+        font-size: clamp(32px, 5.3vw, 58px);
+        line-height: 1.03;
+      }
+
+      .lead {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px 14px;
+        border: 1px solid transparent;
+      }
+
+      .btn.primary {
+        color: #fff;
+        background: linear-gradient(130deg, var(--brand), var(--brand-strong));
+      }
+
+      .btn.ghost {
+        border-color: #bdd6d0;
+        color: var(--brand-strong);
+        background: #fff;
+      }
+
+      .hero-kpi {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .kpi {
+        border: 1px solid #e5eeeb;
+        border-radius: 12px;
+        background: #fbfefd;
+        padding: 12px;
+      }
+
+      .kpi strong {
+        display: block;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 25px;
+      }
+
+      .kpi span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .terminal {
+        border: 1px solid #1f2a30;
+        border-radius: 14px;
+        background: #10181c;
+        color: #d5f3ec;
+        overflow: hidden;
+      }
+
+      .terminal-hd {
+        display: flex;
+        gap: 6px;
+        padding: 10px;
+        border-bottom: 1px solid #27363d;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+      }
+
+      .dot:nth-child(1) {
+        background: #ff6b5f;
+      }
+      .dot:nth-child(2) {
+        background: #f9c23c;
+      }
+      .dot:nth-child(3) {
+        background: #3fd05e;
+      }
+
+      .terminal pre {
+        margin: 0;
+        padding: 14px;
+        overflow-x: auto;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      section {
+        margin-top: 22px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        padding: 14px;
+      }
+
+      .card h3 {
+        font-size: 18px;
+      }
+
+      .card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .status {
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 12px;
+        background: #ecf9f1;
+        color: #177a42;
+      }
+
+      .status.progress {
+        color: #9a5d12;
+        background: var(--accent-soft);
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .panel-hd {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e8efed;
+        background: #fbfefd;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .tab {
+        border: 1px solid #cfded9;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        color: #fff;
+        border-color: var(--brand);
+        background: var(--brand);
+      }
+
+      .codebox {
+        position: relative;
+        border-top: 1px solid #ecf1ef;
+      }
+
+      .copy {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        border: 1px solid #38514a;
+        border-radius: 8px;
+        color: #d4f4ec;
+        background: #1c2a2f;
+        font-size: 12px;
+        padding: 5px 8px;
+        cursor: pointer;
+      }
+
+      .codebox pre {
+        margin: 0;
+        overflow-x: auto;
+        background: #11191d;
+        color: #d4ece5;
+        font-size: 13px;
+        line-height: 1.65;
+        padding: 18px 14px 14px;
+      }
+
+      .api-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .api-list {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .api-list li {
+        margin: 0;
+        padding: 9px 0;
+        border-bottom: 1px dashed #d5e1de;
+        font-size: 14px;
+        color: #374852;
+      }
+
+      .api-list code {
+        color: #0d6658;
+      }
+
+      .case-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .case {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .case-hd {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e7eeec;
+        background: #fbfefd;
+      }
+
+      .case-hd strong {
+        display: block;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .case-hd span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .case pre {
+        margin: 0;
+        font-size: 12px;
+        padding: 12px 14px;
+        overflow-x: auto;
+        background: #f7fbf9;
+        color: #1f2b31;
+      }
+
+      .foot {
+        margin: 30px 0 36px;
+        border: 1px solid #d8e2df;
+        border-radius: 16px;
+        background: #fff;
+        padding: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .foot small {
+        color: var(--muted);
+      }
+
+      @media (max-width: 960px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .feature-grid,
+        .api-grid,
+        .case-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="logo" href="#">
+          <span class="logo-mark">D</span>
+          <span class="logo-text">docsjs</span>
+        </a>
+        <div class="toolbar">
+          <button id="lang-en" class="seg active">EN</button>
+          <button id="lang-zh" class="seg">中文</button>
+          <a class="seg" href="https://github.com/fanly/docsjs" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="badge" data-i18n="badge">DOCX Fidelity Engine</span>
+          <h1 data-i18n="heroTitle">Paste Word. Keep Structure. Ship Faster.</h1>
+          <p class="lead" data-i18n="heroLead">
+            docsjs is a render-first Word pipeline for frontend teams. Import clipboard or .docx into clean HTML snapshots
+            with advanced semantics: lists, merged tables, anchored media, notes, revisions, formulas, charts, and SmartArt
+            fallback.
+          </p>
+          <div class="cta">
+            <a class="btn primary" href="https://www.npmjs.com/package/@coding01/docsjs" target="_blank" rel="noreferrer"
+              >npm @coding01/docsjs</a
+            >
+            <a class="btn ghost" href="https://github.com/fanly/docsjs" target="_blank" rel="noreferrer" data-i18n="viewRepo"
+              >View Repository</a
+            >
+          </div>
+          <div class="hero-kpi">
+            <div class="kpi">
+              <strong>47</strong>
+              <span data-i18n="kpiTests">automated tests passing</span>
+            </div>
+            <div class="kpi">
+              <strong>v0.1.5</strong>
+              <span data-i18n="kpiVersion">current release line</span>
+            </div>
+            <div class="kpi">
+              <strong>6</strong>
+              <span data-i18n="kpiTracks">deep-fidelity tracks delivered</span>
+            </div>
+            <div class="kpi">
+              <strong>CI + Bench</strong>
+              <span data-i18n="kpiQuality">quality gates and benchmark trend</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-card terminal">
+          <div class="terminal-hd">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <pre id="terminal-snippet">npm i @coding01/docsjs
+
+import { WordFidelityEditorReact } from "@coding01/docsjs/react";
+
+&lt;WordFidelityEditorReact
+  lang="en"
+  onChange={(payload) =&gt; console.log(payload.htmlSnapshot)}
+  onError={(payload) =&gt; console.error(payload.message)}
+/&gt;</pre>
+        </div>
+      </section>
+
+      <section>
+        <h2 data-i18n="tracksTitle">Deep-Fidelity Tracks</h2>
+        <div class="grid feature-grid" style="margin-top: 12px">
+          <article class="card">
+            <h3 data-i18n="f1t">Anchor Layout v1</h3>
+            <p data-i18n="f1d">`wp:anchor` with relative references, overlap policy, z-layer, and wrap distance markers.</p>
+            <span class="status">✅ done</span>
+          </article>
+          <article class="card">
+            <h3 data-i18n="f2t">Table Fidelity v1</h3>
+            <p data-i18n="f2d">`tblGrid/tcW`, merge spans, `tblBorders/tcBorders`, `tblCellSpacing`, and layout mode mapping.</p>
+            <span class="status">✅ done</span>
+          </article>
+          <article class="card">
+            <h3 data-i18n="f3t">OMML / Chart / SmartArt</h3>
+            <p data-i18n="f3d">Semantic fallback output for formulas, charts, and diagram nodes to keep downstream processing stable.</p>
+            <span class="status">✅ done</span>
+          </article>
+          <article class="card">
+            <h3 data-i18n="f4t">Golden Benchmark</h3>
+            <p data-i18n="f4d">Corpus-driven fidelity score and trend artifacts in CI for release confidence.</p>
+            <span class="status">✅ done</span>
+          </article>
+          <article class="card">
+            <h3 data-i18n="f5t">Anchor Collision Parity</h3>
+            <p data-i18n="f5d">Pixel-level text wrapping collision parity with desktop Word.</p>
+            <span class="status progress">⏳ next</span>
+          </article>
+          <article class="card">
+            <h3 data-i18n="f6t">Math High Fidelity</h3>
+            <p data-i18n="f6d">OMML to MathML/KaTeX pipeline for production rendering quality.</p>
+            <span class="status progress">⏳ next</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-hd">
+          <h2 data-i18n="quickStartTitle">Quick Start</h2>
+          <div class="tabs">
+            <button class="tab active" data-tab="react">React</button>
+            <button class="tab" data-tab="vue">Vue</button>
+            <button class="tab" data-tab="wc">Web Component</button>
+          </div>
+        </div>
+        <div class="codebox">
+          <button id="copy-code" class="copy" data-i18n="copy">Copy</button>
+          <pre id="code-panel"></pre>
+        </div>
+      </section>
+
+      <section class="api-grid">
+        <article class="card">
+          <h3 data-i18n="apiEvents">Events</h3>
+          <ul class="api-list">
+            <li><code>docsjs-change</code>: <code>{ htmlSnapshot, source, fileName? }</code></li>
+            <li><code>docsjs-error</code>: <code>{ message }</code></li>
+            <li><code>docsjs-ready</code>: <code>{ version }</code></li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3 data-i18n="apiMethods">Methods</h3>
+          <ul class="api-list">
+            <li><code>loadHtml(rawHtml: string): void</code></li>
+            <li><code>loadDocx(file: File): Promise&lt;void&gt;</code></li>
+            <li><code>loadClipboard(): Promise&lt;void&gt;</code></li>
+            <li><code>getSnapshot(): string</code></li>
+            <li><code>clear(): void</code></li>
+          </ul>
+        </article>
+      </section>
+
+      <section>
+        <h2 data-i18n="casesTitle">Docs Cases Showcase</h2>
+        <div class="case-grid" style="margin-top: 12px">
+          <article class="case">
+            <div class="case-hd">
+              <strong data-i18n="c1t">Case A: Notes + Revisions + Page Break</strong>
+              <span data-i18n="c1s">semantic markers for downstream review systems</span>
+            </div>
+            <pre>&lt;sup data-word-comment-ref="5"&gt;[c5]&lt;/sup&gt;
+&lt;ins data-word-revision="ins" data-word-revision-author="Alice"&gt;...&lt;/ins&gt;
+&lt;del data-word-revision="del" data-word-revision-author="Bob"&gt;...&lt;/del&gt;
+&lt;span data-word-page-break="1"&gt;&lt;/span&gt;</pre>
+          </article>
+          <article class="case">
+            <div class="case-hd">
+              <strong data-i18n="c2t">Case B: Tables + Anchors + Advanced Semantics</strong>
+              <span data-i18n="c2s">layout features with fallback compatibility</span>
+            </div>
+            <pre>&lt;table style="table-layout:auto;border-collapse:separate;..."&gt;...&lt;/table&gt;
+&lt;img data-word-anchor="1" data-word-wrap="square" data-word-anchor-relh="page" /&gt;
+&lt;span data-word-omml="1"&gt;x^(2)&lt;/span&gt;
+&lt;figure data-word-chart="1" data-word-chart-type="bar"&gt;...&lt;/figure&gt;
+&lt;figure data-word-smartart="1"&gt;...&lt;/figure&gt;</pre>
+          </article>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <small data-i18n="foot">
+          Built for global engineers. React/Vue demos, CI quality gates, release workflows, and benchmark reports are all in repo.
+        </small>
+        <div class="cta" style="margin: 0">
+          <a class="btn ghost" href="https://github.com/fanly/docsjs/actions" target="_blank" rel="noreferrer" data-i18n="viewActions"
+            >View Actions</a
+          >
+          <a class="btn ghost" href="https://github.com/fanly/docsjs/tree/main/demos" target="_blank" rel="noreferrer" data-i18n="viewDemos"
+            >View Demos</a
+          >
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      const state = {
+        lang: "en",
+        tab: "react"
+      };
+
+      const snippets = {
+        react: `npm i @coding01/docsjs
+
+import { WordFidelityEditorReact } from "@coding01/docsjs/react";
+
+export default function Page() {
+  return (
+    <WordFidelityEditorReact
+      lang="en"
+      onChange={(payload) => console.log(payload.htmlSnapshot)}
+      onError={(payload) => console.error(payload.message)}
+    />
+  );
+}`,
+        vue: `npm i @coding01/docsjs
+
+<template>
+  <WordFidelityEditorVue lang="en" @change="onChange" @error="onError" />
+</template>
+
+<script setup lang="ts">
+import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
+const onChange = (payload: { htmlSnapshot: string }) => console.log(payload.htmlSnapshot);
+const onError = (payload: { message: string }) => console.error(payload.message);
+</script>`,
+        wc: `npm i @coding01/docsjs
+
+import { defineDocsWordElement } from "@coding01/docsjs";
+defineDocsWordElement();
+
+const el = document.createElement("docs-word-editor");
+el.setAttribute("lang", "en");
+document.body.appendChild(el);
+
+el.addEventListener("docsjs-change", (event) => {
+  const detail = event.detail;
+  console.log(detail.htmlSnapshot);
+});`
+      };
+
+      const i18n = {
+        en: {
+          badge: "DOCX Fidelity Engine",
+          heroTitle: "Paste Word. Keep Structure. Ship Faster.",
+          heroLead:
+            "docsjs is a render-first Word pipeline for frontend teams. Import clipboard or .docx into clean HTML snapshots with advanced semantics: lists, merged tables, anchored media, notes, revisions, formulas, charts, and SmartArt fallback.",
+          viewRepo: "View Repository",
+          kpiTests: "automated tests passing",
+          kpiVersion: "current release line",
+          kpiTracks: "deep-fidelity tracks delivered",
+          kpiQuality: "quality gates and benchmark trend",
+          tracksTitle: "Deep-Fidelity Tracks",
+          f1t: "Anchor Layout v1",
+          f1d: "`wp:anchor` with relative references, overlap policy, z-layer, and wrap distance markers.",
+          f2t: "Table Fidelity v1",
+          f2d: "`tblGrid/tcW`, merge spans, `tblBorders/tcBorders`, `tblCellSpacing`, and layout mode mapping.",
+          f3t: "OMML / Chart / SmartArt",
+          f3d: "Semantic fallback output for formulas, charts, and diagram nodes to keep downstream processing stable.",
+          f4t: "Golden Benchmark",
+          f4d: "Corpus-driven fidelity score and trend artifacts in CI for release confidence.",
+          f5t: "Anchor Collision Parity",
+          f5d: "Pixel-level text wrapping collision parity with desktop Word.",
+          f6t: "Math High Fidelity",
+          f6d: "OMML to MathML/KaTeX pipeline for production rendering quality.",
+          quickStartTitle: "Quick Start",
+          copy: "Copy",
+          apiEvents: "Events",
+          apiMethods: "Methods",
+          casesTitle: "Docs Cases Showcase",
+          c1t: "Case A: Notes + Revisions + Page Break",
+          c1s: "semantic markers for downstream review systems",
+          c2t: "Case B: Tables + Anchors + Advanced Semantics",
+          c2s: "layout features with fallback compatibility",
+          foot: "Built for global engineers. React/Vue demos, CI quality gates, release workflows, and benchmark reports are all in repo.",
+          viewActions: "View Actions",
+          viewDemos: "View Demos"
+        },
+        zh: {
+          badge: "DOCX 高保真引擎",
+          heroTitle: "粘贴 Word，保留结构，快速上线。",
+          heroLead:
+            "docsjs 是面向前端团队的 render-first Word 导入链路。支持剪贴板和 .docx，输出结构化 HTML 快照，覆盖列表、合并表格、浮动对象、批注修订、公式、图表与 SmartArt 降级。",
+          viewRepo: "查看仓库",
+          kpiTests: "自动化测试通过",
+          kpiVersion: "当前发布线",
+          kpiTracks: "深度保真能力已交付",
+          kpiQuality: "质量门禁与基准趋势",
+          tracksTitle: "深度能力进展",
+          f1t: "锚点布局 v1",
+          f1d: "`wp:anchor` 已支持定位参照、重叠策略、层级和绕排距离标记。",
+          f2t: "表格保真 v1",
+          f2d: "支持 `tblGrid/tcW`、合并单元格、`tblBorders/tcBorders`、`tblCellSpacing`、布局模式映射。",
+          f3t: "OMML / 图表 / SmartArt",
+          f3d: "提供稳定语义降级输出，保障业务侧后续处理和渲染。",
+          f4t: "Golden 基准体系",
+          f4d: "基于语料的保真评分与趋势产物，纳入 CI。",
+          f5t: "锚点碰撞一致性",
+          f5d: "与桌面 Word 的文字绕排碰撞像素级一致。",
+          f6t: "公式高保真渲染",
+          f6d: "构建 OMML -> MathML/KaTeX 渲染链路。",
+          quickStartTitle: "快速开始",
+          copy: "复制",
+          apiEvents: "事件",
+          apiMethods: "方法",
+          casesTitle: "文档案例展示",
+          c1t: "案例 A：批注 + 修订 + 分页",
+          c1s: "为评审、审阅系统提供稳定语义标记",
+          c2t: "案例 B：表格 + 浮动图 + 高级语义",
+          c2s: "复杂版式下的语义兼容输出",
+          foot: "面向全球工程师构建。React/Vue demo、CI 质量门、发布流程与基准报告均在仓库内。",
+          viewActions: "查看流水线",
+          viewDemos: "查看 Demo"
+        }
+      };
+
+      const codePanel = document.getElementById("code-panel");
+      const copyBtn = document.getElementById("copy-code");
+
+      function renderCode() {
+        codePanel.textContent = snippets[state.tab];
+      }
+
+      function renderI18n() {
+        const dict = i18n[state.lang];
+        document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
+        document.querySelectorAll("[data-i18n]").forEach((node) => {
+          const key = node.getAttribute("data-i18n");
+          if (!key || !dict[key]) return;
+          node.textContent = dict[key];
+        });
+      }
+
+      document.querySelectorAll(".tab").forEach((tabNode) => {
+        tabNode.addEventListener("click", () => {
+          state.tab = tabNode.getAttribute("data-tab");
+          document.querySelectorAll(".tab").forEach((el) => el.classList.remove("active"));
+          tabNode.classList.add("active");
+          renderCode();
+        });
+      });
+
+      document.getElementById("lang-en").addEventListener("click", () => {
+        state.lang = "en";
+        document.getElementById("lang-en").classList.add("active");
+        document.getElementById("lang-zh").classList.remove("active");
+        renderI18n();
+      });
+
+      document.getElementById("lang-zh").addEventListener("click", () => {
+        state.lang = "zh";
+        document.getElementById("lang-zh").classList.add("active");
+        document.getElementById("lang-en").classList.remove("active");
+        renderI18n();
+      });
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(codePanel.textContent || "");
+          const original = copyBtn.textContent;
+          copyBtn.textContent = state.lang === "zh" ? "已复制" : "Copied";
+          setTimeout(() => {
+            copyBtn.textContent = original;
+          }, 900);
+        } catch (_) {
+          copyBtn.textContent = state.lang === "zh" ? "复制失败" : "Copy failed";
+        }
+      });
+
+      renderCode();
+      renderI18n();
+    </script>
+  </body>
+</html>

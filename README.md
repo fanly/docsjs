@@ -6,8 +6,15 @@ Import Word/WPS/Google Docs content from paste or `.docx` while preserving struc
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![npm downloads](https://img.shields.io/npm/dm/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
+[![Pages](https://github.com/fanly/docsjs/actions/workflows/pages.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/pages.yml)
 
 [中文文档](./README.zh-CN.md)
+
+## GitHub Pages
+
+- Product page: [https://fanly.github.io/docsjs/](https://fanly.github.io/docsjs/)
+- Source: `docs/index.html`
+- Deploy workflow: `.github/workflows/pages.yml`
 
 ## What You Get
 

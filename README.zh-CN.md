@@ -6,8 +6,15 @@
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![npm downloads](https://img.shields.io/npm/dm/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
+[![Pages](https://github.com/fanly/docsjs/actions/workflows/pages.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/pages.yml)
 
 [English README](./README.md)
+
+## GitHub Pages
+
+- 产品单页: [https://fanly.github.io/docsjs/](https://fanly.github.io/docsjs/)
+- 页面源码: `docs/index.html`
+- 自动部署: `.github/workflows/pages.yml`
 
 ## 核心能力
 
