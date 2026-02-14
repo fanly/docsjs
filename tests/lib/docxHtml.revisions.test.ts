@@ -72,4 +72,42 @@ describe("parseDocxToHtmlSnapshot revisions", () => {
     expect(snapshot).toContain(`data-word-revision="ins"`);
     expect(snapshot).toContain("font-weight:700");
   });
+
+  it("keeps revision metadata attributes from ins/del container", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:body>
+          <w:p>
+            <w:ins w:id="11" w:author="Alice" w:date="2026-02-14T12:00:00Z">
+              <w:r><w:t>InsMeta</w:t></w:r>
+            </w:ins>
+            <w:del w:id="12" w:author="Bob" w:date="2026-02-14T13:00:00Z">
+              <w:r><w:delText>DelMeta</w:delText></w:r>
+            </w:del>
+          </w:p>
+        </w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    );
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "revisions-meta.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-revision-id="11"`);
+    expect(snapshot).toContain(`data-word-revision-author="Alice"`);
+    expect(snapshot).toContain(`data-word-revision-date="2026-02-14T12:00:00Z"`);
+    expect(snapshot).toContain(`data-word-revision-id="12"`);
+    expect(snapshot).toContain(`data-word-revision-author="Bob"`);
+    expect(snapshot).toContain(`data-word-revision-date="2026-02-14T13:00:00Z"`);
+  });
 });

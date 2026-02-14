@@ -29,8 +29,11 @@ export function calculateFidelityScore(expected: SemanticStats, actual: Semantic
       ratioScore(actual.tableCount, expected.tableCount) +
       ratioScore(actual.tableCellCount, expected.tableCellCount) +
       ratioScore(actual.imageCount, expected.imageCount) +
+      ratioScore(actual.ommlCount, expected.ommlCount) +
+      ratioScore(actual.chartCount, expected.chartCount) +
+      ratioScore(actual.smartArtCount, expected.smartArtCount) +
       ratioScore(actual.listParagraphCount, expected.listParagraphCount)
-    ) / 6
+    ) / 9
   );
 
   const styleProxy = clamp01(ratioScore(actual.textCharCount, expected.textCharCount));

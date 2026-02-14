@@ -21,6 +21,9 @@ describe("collectSemanticStatsFromHtml", () => {
     expect(stats.imageCount).toBe(1);
     expect(stats.anchorImageCount).toBe(0);
     expect(stats.wrappedImageCount).toBe(0);
+    expect(stats.ommlCount).toBe(0);
+    expect(stats.chartCount).toBe(0);
+    expect(stats.smartArtCount).toBe(0);
     expect(stats.textCharCount).toBeGreaterThan(0);
   });
 
@@ -68,5 +71,18 @@ describe("collectSemanticStatsFromHtml", () => {
       </body>
     `);
     expect(stats.pageBreakCount).toBe(2);
+  });
+
+  it("counts omml/chart/smartart semantic markers", () => {
+    const stats = collectSemanticStatsFromHtml(`
+      <body>
+        <span data-word-omml="1">x^2</span>
+        <figure data-word-chart="1"></figure>
+        <figure data-word-smartart="1"></figure>
+      </body>
+    `);
+    expect(stats.ommlCount).toBe(1);
+    expect(stats.chartCount).toBe(1);
+    expect(stats.smartArtCount).toBe(1);
   });
 });

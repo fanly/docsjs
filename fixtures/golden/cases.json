@@ -1,0 +1,48 @@
+[
+  {
+    "id": "basic-structure",
+    "htmlFile": "fixtures/golden/basic-structure.html",
+    "expected": {
+      "paragraphCount": 2,
+      "headingCount": 1,
+      "tableCount": 1,
+      "tableCellCount": 2,
+      "imageCount": 1,
+      "anchorImageCount": 0,
+      "wrappedImageCount": 0,
+      "ommlCount": 0,
+      "chartCount": 0,
+      "smartArtCount": 0,
+      "listParagraphCount": 1,
+      "commentRefCount": 0,
+      "revisionInsCount": 0,
+      "revisionDelCount": 0,
+      "pageBreakCount": 0,
+      "pageSpacerCount": 0,
+      "textCharCount": 17
+    }
+  },
+  {
+    "id": "advanced-semantics",
+    "htmlFile": "fixtures/golden/advanced-semantics.html",
+    "expected": {
+      "paragraphCount": 3,
+      "headingCount": 0,
+      "tableCount": 0,
+      "tableCellCount": 0,
+      "imageCount": 1,
+      "anchorImageCount": 1,
+      "wrappedImageCount": 1,
+      "ommlCount": 1,
+      "chartCount": 1,
+      "smartArtCount": 1,
+      "listParagraphCount": 0,
+      "commentRefCount": 1,
+      "revisionInsCount": 1,
+      "revisionDelCount": 1,
+      "pageBreakCount": 1,
+      "pageSpacerCount": 1,
+      "textCharCount": 40
+    }
+  }
+]

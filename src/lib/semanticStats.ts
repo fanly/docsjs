@@ -6,6 +6,9 @@ export interface SemanticStats {
   imageCount: number;
   anchorImageCount: number;
   wrappedImageCount: number;
+  ommlCount: number;
+  chartCount: number;
+  smartArtCount: number;
   listParagraphCount: number;
   commentRefCount: number;
   revisionInsCount: number;
@@ -39,6 +42,9 @@ export function collectSemanticStatsFromDocument(doc: Document): SemanticStats {
     imageCount: countElements(doc, "img"),
     anchorImageCount: countElements(doc, 'img[data-word-anchor="1"]'),
     wrappedImageCount: countElements(doc, "img[data-word-wrap]"),
+    ommlCount: countElements(doc, "[data-word-omml]"),
+    chartCount: countElements(doc, "[data-word-chart]"),
+    smartArtCount: countElements(doc, "[data-word-smartart]"),
     listParagraphCount,
     commentRefCount: countElements(doc, "[data-word-comment-ref]"),
     revisionInsCount: countElements(doc, '[data-word-revision="ins"]'),

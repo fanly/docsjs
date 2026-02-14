@@ -7,6 +7,7 @@ export interface DocxFactoryInput {
   endnotesXml?: string;
   commentsXml?: string;
   media?: Record<string, Uint8Array>;
+  files?: Record<string, string | Uint8Array>;
   name?: string;
 }
 
@@ -23,6 +24,9 @@ export async function makeDocxFile(input: DocxFactoryInput): Promise<File> {
 
   for (const [path, bytes] of Object.entries(input.media ?? {})) {
     zip.file(`word/${path}`, bytes);
+  }
+  for (const [path, payload] of Object.entries(input.files ?? {})) {
+    zip.file(path, payload);
   }
 
   const bytes = await zip.generateAsync({ type: "uint8array" });

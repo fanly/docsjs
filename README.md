@@ -3,6 +3,10 @@
 Render-first Word fidelity component for the web.  
 Import Word/WPS/Google Docs content from paste or `.docx` while preserving structure and layout as much as possible.
 
+[![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
+[![npm downloads](https://img.shields.io/npm/dm/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
+[![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
+
 [中文文档](./README.zh-CN.md)
 
 ## What You Get
@@ -101,17 +105,24 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ Basic run styles (bold/italic/underline/strike/color/highlight/super/sub)
 - ✅ List reconstruction (`numId` + `ilvl` + `lvlText`)
 - ✅ Basic table structure (`table/tr/td`)
+- ✅ Table merge + nested table read-only fidelity (`vMerge/gridSpan`)
+- ✅ Table width mapping (`tblGrid/gridCol`, `tcW`)
 - ✅ Embedded image relationship mapping (`rId -> media`)
 - ✅ Page geometry mapping (page height, margins, content width)
 - ✅ Runtime render fixes (`mso-*` compatibility, pagination spacer, empty paragraph normalization)
 - ✅ Events and public methods
 - ✅ React and Vue runnable demos
 - ✅ npm publish workflow with OIDC trusted publishing
-- ⏳ Floating anchors (`wp:anchor`) full layout fidelity
-- ⏳ Merged cells / nested tables full fidelity
-- ⏳ Footnotes / endnotes / comments / track changes
-- ⏳ OMML / charts / SmartArt
-- ⏳ Automated fidelity benchmark scorecard
+- ✅ Footnotes / endnotes / comments / track changes read-only semantics
+- ✅ Comment range markers (`commentRangeStart/commentRangeEnd`)
+- ✅ Revision metadata markers (`id/author/date`)
+- ✅ Floating anchors (`wp:anchor`) v1 fidelity (position ref / overlap / layer / wrap distance markers)
+- ✅ Word table v1 fidelity (border model / cell spacing / table-layout mapping)
+- ✅ OMML / charts / SmartArt semantic fallback rendering (v1)
+- ✅ Automated fidelity benchmark v1 (golden corpus + CI trend artifacts)
+- ⏳ Floating anchor text-wrap collision fidelity (pixel-level)
+- ⏳ Word table auto layout parity with desktop Word
+- ⏳ OMML high-fidelity renderer (MathML/KaTeX pipeline)
 
 ## What's New in v0.1.3
 
@@ -121,15 +132,21 @@ el.addEventListener("docsjs-change", (e) => {
   - footnotes and endnotes (read-only rendering)
   - comments (read-only rendering)
   - revisions insert/delete markers (read-only rendering)
+  - comment range markers and revision metadata attributes
   - page break semantic markers (`w:br type=page`, `lastRenderedPageBreak`)
+  - table width mapping (`tblGrid/gridCol`, `tcW`)
+  - table border model / cell spacing / table-layout mapping
+  - OMML formula fallback rendering and chart/SmartArt semantic fallback
 - Added floating image MVP:
   - anchor position mapping (`wp:anchor`)
   - wrap mode markers (`square`, `tight`, `topAndBottom`, `none`)
+  - anchor layout metadata (`relativeFrom`, `behindDoc`, `allowOverlap`, `layoutInCell`, `relativeHeight`, `dist*`)
 - Added fidelity tooling:
   - semantic stats collector
   - fidelity score calculator
   - baseline regression framework (config-driven)
   - visual regression workflow scaffold (Playwright + diff artifacts)
+  - golden corpus benchmark + trend report workflow (`fidelity-benchmark.yml`)
 - Added engineering quality gates:
   - ESLint + strict verify pipeline (`lint`, `typecheck`, `test`, `build`, `sizecheck`)
   - CI workflow for mandatory quality checks
@@ -146,6 +163,7 @@ npm install
 npm run typecheck
 npm run test
 npm run build
+npm run benchmark:fidelity
 ```
 
 ## Demos
@@ -183,6 +201,15 @@ Workflow: `.github/workflows/publish.yml`
 
 - Trigger: push tag `v*.*.*`
 - Steps: `npm ci` -> `npm run typecheck` -> `npm run build` -> `npm publish --provenance`
+
+### GitHub Packages (repo sidebar "Packages")
+
+Workflow: `.github/workflows/publish-github-packages.yml`
+
+- Trigger: push tag `v*.*.*` or manual run
+- Target registry: `https://npm.pkg.github.com`
+- Package name in GitHub Packages: `@fanly/docsjs`
+- Note: GitHub sidebar "Packages" only shows packages published to GitHub Packages, not npmjs
 
 ## Roadmap
 

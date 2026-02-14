@@ -88,4 +88,68 @@ describe("parseDocxToHtmlSnapshot table fidelity", () => {
     expect(snapshot).toContain(">Inner<");
     expect(snapshot.match(/<table /g)?.length ?? 0).toBeGreaterThanOrEqual(2);
   });
+
+  it("maps tblGrid and tcW to css widths", async () => {
+    const file = await makeDocxFile(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:body>
+          <w:tbl>
+            <w:tblGrid>
+              <w:gridCol w:w="2400"/>
+              <w:gridCol w:w="4800"/>
+            </w:tblGrid>
+            <w:tr>
+              <w:tc>
+                <w:tcPr><w:tcW w:type="dxa" w:w="2400"/></w:tcPr>
+                <w:p><w:r><w:t>A</w:t></w:r></w:p>
+              </w:tc>
+              <w:tc>
+                <w:p><w:r><w:t>B</w:t></w:r></w:p>
+              </w:tc>
+            </w:tr>
+          </w:tbl>
+        </w:body>
+      </w:document>`);
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`width:480.00px`);
+    expect(snapshot).toContain(`width:160.00px`);
+    expect(snapshot).toContain(`width:320.00px`);
+  });
+
+  it("maps table layout, cell spacing and border model", async () => {
+    const file = await makeDocxFile(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:body>
+          <w:tbl>
+            <w:tblPr>
+              <w:tblLayout w:type="autofit"/>
+              <w:tblCellSpacing w:type="dxa" w:w="120"/>
+              <w:tblBorders>
+                <w:top w:val="single" w:sz="12" w:color="FF0000"/>
+                <w:insideH w:val="single" w:sz="8" w:color="00AA00"/>
+                <w:insideV w:val="single" w:sz="8" w:color="0000AA"/>
+              </w:tblBorders>
+            </w:tblPr>
+            <w:tr>
+              <w:tc><w:p><w:r><w:t>A</w:t></w:r></w:p></w:tc>
+              <w:tc>
+                <w:tcPr>
+                  <w:tcBorders>
+                    <w:top w:val="single" w:sz="16" w:color="111111"/>
+                  </w:tcBorders>
+                </w:tcPr>
+                <w:p><w:r><w:t>B</w:t></w:r></w:p>
+              </w:tc>
+            </w:tr>
+          </w:tbl>
+        </w:body>
+      </w:document>`);
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("table-layout:auto");
+    expect(snapshot).toContain("border-collapse:separate");
+    expect(snapshot).toContain("border-spacing:8.00px");
+    expect(snapshot).toContain("border:2.00px solid #FF0000");
+    expect(snapshot).toContain("border-top:2.67px solid #111111");
+  });
 });

@@ -24,6 +24,13 @@ interface CommentMap {
   [id: string]: CommentInfo;
 }
 
+interface RevisionMeta {
+  type: "ins" | "del";
+  id: string | null;
+  author: string | null;
+  date: string | null;
+}
+
 function escapeHtml(text: string): string {
   return text
     .replaceAll("&", "&amp;")
@@ -56,6 +63,10 @@ function getAttr(node: Element | null, name: string): string | null {
 
 function emuToPx(emu: number): number {
   return (emu * 96) / 914400;
+}
+
+function twipToPx(twip: number): number {
+  return (twip * 96) / 1440;
 }
 
 function parseDrawingSizePx(drawing: Element): DrawingSizePx {
@@ -98,10 +109,22 @@ interface AnchorPositionPx {
 
 type AnchorWrapMode = "square" | "tight" | "topAndBottom" | "none" | null;
 
-function parseAnchorPositionPx(drawing: Element): AnchorPositionPx {
-  const anchor = directChildrenByLocalName(drawing, "anchor")[0] ?? null;
-  if (!anchor) return { leftPx: null, topPx: null };
+interface AnchorMeta {
+  position: AnchorPositionPx;
+  wrapMode: AnchorWrapMode;
+  distTPx: number | null;
+  distBPx: number | null;
+  distLPx: number | null;
+  distRPx: number | null;
+  relativeFromH: string | null;
+  relativeFromV: string | null;
+  behindDoc: boolean;
+  allowOverlap: boolean;
+  layoutInCell: boolean;
+  relativeHeight: number | null;
+}
 
+function parseAnchorPositionPx(anchor: Element): AnchorPositionPx {
   let leftPx: number | null = null;
   let topPx: number | null = null;
 
@@ -120,9 +143,7 @@ function parseAnchorPositionPx(drawing: Element): AnchorPositionPx {
   return { leftPx, topPx };
 }
 
-function parseAnchorWrapMode(drawing: Element): AnchorWrapMode {
-  const anchor = directChildrenByLocalName(drawing, "anchor")[0] ?? null;
-  if (!anchor) return null;
+function parseAnchorWrapMode(anchor: Element): AnchorWrapMode {
   if (directChildrenByLocalName(anchor, "wrapSquare")[0]) return "square";
   if (directChildrenByLocalName(anchor, "wrapTight")[0]) return "tight";
   if (directChildrenByLocalName(anchor, "wrapTopAndBottom")[0]) return "topAndBottom";
@@ -130,28 +151,85 @@ function parseAnchorWrapMode(drawing: Element): AnchorWrapMode {
   return null;
 }
 
-function mergeImageStyle(baseAttrs: string, anchorPos: AnchorPositionPx, wrapMode: AnchorWrapMode): string {
-  if (anchorPos.leftPx === null && anchorPos.topPx === null) return baseAttrs;
+function parseAnchorMeta(drawing: Element): AnchorMeta | null {
+  const anchor = directChildrenByLocalName(drawing, "anchor")[0] ?? null;
+  if (!anchor) return null;
+
+  const positionH = directChildrenByLocalName(anchor, "positionH")[0] ?? null;
+  const positionV = directChildrenByLocalName(anchor, "positionV")[0] ?? null;
+  const relativeFromH = getAttr(positionH, "relativeFrom");
+  const relativeFromV = getAttr(positionV, "relativeFrom");
+
+  const parseDistPx = (name: string): number | null => {
+    const raw = getAttr(anchor, name);
+    const emu = raw ? Number.parseInt(raw, 10) : Number.NaN;
+    return Number.isFinite(emu) && emu >= 0 ? emuToPx(emu) : null;
+  };
+
+  const rawHeight = getAttr(anchor, "relativeHeight");
+  const parsedHeight = rawHeight ? Number.parseInt(rawHeight, 10) : Number.NaN;
+
+  const boolAttr = (name: string, fallback: boolean): boolean => {
+    const raw = (getAttr(anchor, name) ?? "").toLowerCase();
+    if (raw === "1" || raw === "true" || raw === "on") return true;
+    if (raw === "0" || raw === "false" || raw === "off") return false;
+    return fallback;
+  };
+
+  return {
+    position: parseAnchorPositionPx(anchor),
+    wrapMode: parseAnchorWrapMode(anchor),
+    distTPx: parseDistPx("distT"),
+    distBPx: parseDistPx("distB"),
+    distLPx: parseDistPx("distL"),
+    distRPx: parseDistPx("distR"),
+    relativeFromH,
+    relativeFromV,
+    behindDoc: boolAttr("behindDoc", false),
+    allowOverlap: boolAttr("allowOverlap", true),
+    layoutInCell: boolAttr("layoutInCell", true),
+    relativeHeight: Number.isFinite(parsedHeight) ? parsedHeight : null
+  };
+}
+
+function mergeImageStyle(baseAttrs: string, anchorMeta: AnchorMeta | null): string {
+  if (!anchorMeta) return baseAttrs;
+  const { position, wrapMode } = anchorMeta;
+  if (position.leftPx === null && position.topPx === null) return baseAttrs;
   const styleParts = [
     "position:absolute",
-    anchorPos.leftPx !== null ? `left:${anchorPos.leftPx.toFixed(2)}px` : "",
-    anchorPos.topPx !== null ? `top:${anchorPos.topPx.toFixed(2)}px` : "",
-    "z-index:3"
+    position.leftPx !== null ? `left:${position.leftPx.toFixed(2)}px` : "",
+    position.topPx !== null ? `top:${position.topPx.toFixed(2)}px` : "",
+    `z-index:${anchorMeta.behindDoc ? 0 : anchorMeta.relativeHeight ?? 3}`,
+    anchorMeta.distTPx !== null ? `margin-top:${anchorMeta.distTPx.toFixed(2)}px` : "",
+    anchorMeta.distBPx !== null ? `margin-bottom:${anchorMeta.distBPx.toFixed(2)}px` : "",
+    anchorMeta.distLPx !== null ? `margin-left:${anchorMeta.distLPx.toFixed(2)}px` : "",
+    anchorMeta.distRPx !== null ? `margin-right:${anchorMeta.distRPx.toFixed(2)}px` : ""
   ].filter((x) => x.length > 0);
 
   if (wrapMode === "topAndBottom") {
-    styleParts.push("display:block");
+    styleParts.push("display:block", "clear:both");
   }
 
+  const anchorAttrs = [
+    `data-word-anchor="1"`,
+    wrapMode ? `data-word-wrap="${wrapMode}"` : "",
+    anchorMeta.relativeFromH ? `data-word-anchor-relh="${escapeHtml(anchorMeta.relativeFromH)}"` : "",
+    anchorMeta.relativeFromV ? `data-word-anchor-relv="${escapeHtml(anchorMeta.relativeFromV)}"` : "",
+    anchorMeta.behindDoc ? `data-word-anchor-behind="1"` : `data-word-anchor-behind="0"`,
+    anchorMeta.allowOverlap ? `data-word-anchor-overlap="1"` : `data-word-anchor-overlap="0"`,
+    anchorMeta.layoutInCell ? `data-word-anchor-layout-cell="1"` : `data-word-anchor-layout-cell="0"`
+  ]
+    .filter((x) => x.length > 0)
+    .join(" ");
+
   if (!baseAttrs.includes("style=")) {
-    const wrapAttr = wrapMode ? ` data-word-wrap="${wrapMode}"` : "";
-    return `${baseAttrs} style="${styleParts.join(";")}" data-word-anchor="1"${wrapAttr}`;
+    return `${baseAttrs} style="${styleParts.join(";")}" ${anchorAttrs}`;
   }
 
   return baseAttrs.replace(/style="([^"]*)"/, (_m, styleText: string) => {
     const merged = [styleText, ...styleParts].filter((x) => x.length > 0).join(";");
-    const wrapAttr = wrapMode ? ` data-word-wrap="${wrapMode}"` : "";
-    return `style="${merged}" data-word-anchor="1"${wrapAttr}`;
+    return `style="${merged}" ${anchorAttrs}`;
   });
 }
 
@@ -180,17 +258,84 @@ function extToMime(ext: string): string {
   return "application/octet-stream";
 }
 
+function normalizeWordPath(relTarget: string): string {
+  const normalized = relTarget.replace(/\\/g, "/").replace(/^\/+/, "");
+  if (normalized.startsWith("word/")) return normalized;
+  if (normalized.startsWith("../")) return `word/${normalized.replace(/^(\.\.\/)+/, "")}`;
+  return `word/${normalized}`;
+}
+
 async function imageRidToDataUrl(zip: JSZip, relMap: RelMap, rid: string): Promise<string | null> {
   const relTarget = relMap[rid];
   if (!relTarget) return null;
-  const normalized = relTarget.replace(/^\/+/, "");
-  const path = normalized.startsWith("word/") ? normalized : `word/${normalized}`;
+  const path = normalizeWordPath(relTarget);
   const file = zip.file(path);
   if (!file) return null;
   const base64 = await file.async("base64");
   const ext = path.split(".").pop() ?? "bin";
   const mime = extToMime(ext);
   return `data:${mime};base64,${base64}`;
+}
+
+async function readXmlByRid(zip: JSZip, relMap: RelMap, rid: string): Promise<string | null> {
+  const relTarget = relMap[rid];
+  if (!relTarget) return null;
+  const path = normalizeWordPath(relTarget);
+  const file = zip.file(path);
+  return file ? file.async("string") : null;
+}
+
+function parseChartType(chartDoc: Document): string {
+  const known = ["barChart", "lineChart", "pieChart", "areaChart", "scatterChart", "radarChart", "doughnutChart"];
+  for (const type of known) {
+    if (queryByLocalName(chartDoc, type)) return type.replace(/Chart$/, "");
+  }
+  return "unknown";
+}
+
+function parseChartSummary(chartXmlText: string): { title: string; type: string; seriesCount: number; pointCount: number } {
+  const chartDoc = parseXml(chartXmlText);
+  const title = queryAllByLocalName(chartDoc, "t")
+    .map((n) => (n.textContent ?? "").trim())
+    .find((v) => v.length > 0) ?? "Chart";
+  const seriesCount = queryAllByLocalName(chartDoc, "ser").length;
+  const pointCount = queryAllByLocalName(chartDoc, "pt").length;
+  const type = parseChartType(chartDoc);
+  return { title, type, seriesCount, pointCount };
+}
+
+function extractSmartArtText(diagramXmlText: string): string[] {
+  const diagramDoc = parseXml(diagramXmlText);
+  return queryAllByLocalName(diagramDoc, "t")
+    .map((n) => (n.textContent ?? "").trim())
+    .filter((v) => v.length > 0)
+    .slice(0, 12);
+}
+
+function ommlNodeToText(node: Element): string {
+  if (node.localName === "t") return node.textContent ?? "";
+  if (node.localName === "f") {
+    const num = queryByLocalName(node, "num");
+    const den = queryByLocalName(node, "den");
+    return `(${num ? ommlNodeToText(num) : "?"})/(${den ? ommlNodeToText(den) : "?"})`;
+  }
+  if (node.localName === "sSup") {
+    const e = queryByLocalName(node, "e");
+    const sup = queryByLocalName(node, "sup");
+    return `${e ? ommlNodeToText(e) : ""}^(${sup ? ommlNodeToText(sup) : ""})`;
+  }
+  if (node.localName === "sSub") {
+    const e = queryByLocalName(node, "e");
+    const sub = queryByLocalName(node, "sub");
+    return `${e ? ommlNodeToText(e) : ""}_(${sub ? ommlNodeToText(sub) : ""})`;
+  }
+  if (node.localName === "rad") {
+    const e = queryByLocalName(node, "e");
+    return `sqrt(${e ? ommlNodeToText(e) : ""})`;
+  }
+  return Array.from(node.children)
+    .map((child) => ommlNodeToText(child))
+    .join("");
 }
 
 function runStyleToCss(rPr: Element | null): string {
@@ -345,17 +490,45 @@ async function paragraphToHtml(
   const tag = paragraphTag(paragraph);
   const alignStyle = paragraphAlignStyle(paragraph);
   const dataAttr = paragraphDataAttr(paragraphIndex);
-  const runs = queryAllByLocalName(paragraph, "r");
-  if (runs.length === 0) {
+  const hasRenderableNode =
+    queryAllByLocalName(paragraph, "r").length > 0 ||
+    queryAllByLocalName(paragraph, "oMath").length > 0 ||
+    queryAllByLocalName(paragraph, "oMathPara").length > 0;
+  if (!hasRenderableNode) {
     return `<${tag}${dataAttr}${alignStyle ? ` style="${alignStyle}"` : ""}><br/></${tag}>`;
   }
 
-  const parts: string[] = [];
-  const renderedPageBreakCount = queryAllByLocalName(paragraph, "lastRenderedPageBreak").length;
-  for (let i = 0; i < renderedPageBreakCount; i += 1) {
-    parts.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
+  function parseRevisionMeta(node: Element, type: "ins" | "del"): RevisionMeta {
+    return {
+      type,
+      id: getAttr(node, "w:id") ?? getAttr(node, "id"),
+      author: getAttr(node, "w:author") ?? getAttr(node, "author"),
+      date: getAttr(node, "w:date") ?? getAttr(node, "date")
+    };
   }
-  for (const run of runs) {
+
+  function inferRevisionMeta(run: Element, fallback: RevisionMeta | null): RevisionMeta | null {
+    if (fallback) return fallback;
+    let cursor: Element | null = run;
+    while (cursor) {
+      if (cursor.localName === "ins") return parseRevisionMeta(cursor, "ins");
+      if (cursor.localName === "del") return parseRevisionMeta(cursor, "del");
+      if (cursor.localName === "p") break;
+      cursor = cursor.parentElement;
+    }
+    return null;
+  }
+
+  function revisionMetaAttrs(meta: RevisionMeta): string {
+    const attrs: string[] = [`data-word-revision="${meta.type}"`];
+    if (meta.id) attrs.push(`data-word-revision-id="${escapeHtml(meta.id)}"`);
+    if (meta.author) attrs.push(`data-word-revision-author="${escapeHtml(meta.author)}"`);
+    if (meta.date) attrs.push(`data-word-revision-date="${escapeHtml(meta.date)}"`);
+    return attrs.join(" ");
+  }
+
+  async function runToHtml(run: Element, revisionFallback: RevisionMeta | null): Promise<string[]> {
+    const result: string[] = [];
     const rPr = queryByLocalName(run, "rPr");
     const css = runStyleToCss(rPr);
 
@@ -363,30 +536,30 @@ async function paragraphToHtml(
     const footnoteId = getAttr(footnoteRef, "w:id") ?? getAttr(footnoteRef, "id");
     if (footnoteId && footnotesMap[footnoteId]) {
       usedFootnoteIds.push(footnoteId);
-      parts.push(
+      result.push(
         `<sup data-word-footnote-ref="${footnoteId}"><a href="#word-footnote-${footnoteId}">[${footnoteId}]</a></sup>`
       );
-      continue;
+      return result;
     }
 
     const endnoteRef = queryByLocalName(run, "endnoteReference");
     const endnoteId = getAttr(endnoteRef, "w:id") ?? getAttr(endnoteRef, "id");
     if (endnoteId && endnotesMap[endnoteId]) {
       usedEndnoteIds.push(endnoteId);
-      parts.push(
+      result.push(
         `<sup data-word-endnote-ref="${endnoteId}"><a href="#word-endnote-${endnoteId}">[${endnoteId}]</a></sup>`
       );
-      continue;
+      return result;
     }
 
     const commentRef = queryByLocalName(run, "commentReference");
     const commentId = getAttr(commentRef, "w:id") ?? getAttr(commentRef, "id");
     if (commentId && commentsMap[commentId]) {
       usedCommentIds.push(commentId);
-      parts.push(
+      result.push(
         `<sup data-word-comment-ref="${commentId}"><a href="#word-comment-${commentId}">[c${commentId}]</a></sup>`
       );
-      continue;
+      return result;
     }
 
     const drawing = queryByLocalName(run, "drawing");
@@ -398,12 +571,41 @@ async function paragraphToHtml(
         if (src) {
           const imageSize = parseDrawingSizePx(drawing);
           const dimensionAttrs = imageDimensionAttributes(imageSize);
-          const anchorPos = parseAnchorPositionPx(drawing);
-          const wrapMode = parseAnchorWrapMode(drawing);
-          const attrs = mergeImageStyle(dimensionAttrs, anchorPos, wrapMode);
-          parts.push(`<img src="${src}" alt="word-image"${attrs}/>`);
-          continue;
+          const anchorMeta = parseAnchorMeta(drawing);
+          const attrs = mergeImageStyle(dimensionAttrs, anchorMeta);
+          result.push(`<img src="${src}" alt="word-image"${attrs}/>`);
+          return result;
         }
+      }
+
+      const chartRef = queryByLocalName(drawing, "chart");
+      const chartRid = getAttr(chartRef, "r:id") ?? getAttr(chartRef, "id");
+      if (chartRid) {
+        const chartXmlText = await readXmlByRid(zip, relMap, chartRid);
+        if (chartXmlText) {
+          const summary = parseChartSummary(chartXmlText);
+          result.push(
+            `<figure data-word-chart="1" data-word-chart-type="${summary.type}" data-word-chart-series="${summary.seriesCount}" data-word-chart-points="${summary.pointCount}">` +
+              `<figcaption>${escapeHtml(summary.title)}</figcaption>` +
+              `<div>Chart(${escapeHtml(summary.type)}): series=${summary.seriesCount}, points=${summary.pointCount}</div>` +
+              `</figure>`
+          );
+          return result;
+        }
+      }
+
+      const smartArtRef = queryByLocalName(drawing, "relIds");
+      const smartArtRid = getAttr(smartArtRef, "r:dm") ?? getAttr(smartArtRef, "dm");
+      if (smartArtRid) {
+        const diagramXmlText = await readXmlByRid(zip, relMap, smartArtRid);
+        const textItems = diagramXmlText ? extractSmartArtText(diagramXmlText) : [];
+        const preview = textItems.length > 0 ? `: ${escapeHtml(textItems.join(" / "))}` : "";
+        result.push(
+          `<figure data-word-smartart="1" data-word-smartart-items="${textItems.length}">` +
+            `<figcaption>SmartArt fallback${preview}</figcaption>` +
+            `</figure>`
+        );
+        return result;
       }
     }
 
@@ -416,42 +618,69 @@ async function paragraphToHtml(
     }).length;
     const lineBreakCount = Math.max(0, brNodes.length - pageBreakCount);
     const runText = `${escapeHtml(texts || delTexts)}${"<br/>".repeat(lineBreakCount)}`;
-    if (!runText) continue;
-
-    let revisionType: "ins" | "del" | null = null;
-    let cursor: Element | null = run;
-    while (cursor) {
-      if (cursor.localName === "ins") {
-        revisionType = "ins";
-        break;
-      }
-      if (cursor.localName === "del") {
-        revisionType = "del";
-        break;
-      }
-      if (cursor.localName === "p") break;
-      cursor = cursor.parentElement;
-    }
-    if (css) {
-      const span = `<span style="${css}">${runText}</span>`;
-      if (revisionType) {
-        const tag = revisionType === "ins" ? "ins" : "del";
-        parts.push(`<${tag} data-word-revision="${revisionType}">${span}</${tag}>`);
+    if (runText) {
+      const revisionMeta = inferRevisionMeta(run, revisionFallback);
+      if (css) {
+        const span = `<span style="${css}">${runText}</span>`;
+        if (revisionMeta) {
+          const tagName = revisionMeta.type === "ins" ? "ins" : "del";
+          result.push(`<${tagName} ${revisionMetaAttrs(revisionMeta)}>${span}</${tagName}>`);
+        } else {
+          result.push(span);
+        }
+      } else if (revisionMeta) {
+        const tagName = revisionMeta.type === "ins" ? "ins" : "del";
+        result.push(`<${tagName} ${revisionMetaAttrs(revisionMeta)}>${runText}</${tagName}>`);
       } else {
-        parts.push(span);
-      }
-    } else {
-      if (revisionType) {
-        const tag = revisionType === "ins" ? "ins" : "del";
-        parts.push(`<${tag} data-word-revision="${revisionType}">${runText}</${tag}>`);
-      } else {
-        parts.push(runText);
+        result.push(runText);
       }
     }
 
     for (let i = 0; i < pageBreakCount; i += 1) {
-      parts.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
+      result.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
     }
+    return result;
+  }
+
+  async function nodeToHtml(node: Element, revisionFallback: RevisionMeta | null): Promise<string[]> {
+    if (node.localName === "commentRangeStart") {
+      const id = getAttr(node, "w:id") ?? getAttr(node, "id");
+      return id ? [`<span data-word-comment-range-start="${id}"></span>`] : [];
+    }
+    if (node.localName === "commentRangeEnd") {
+      const id = getAttr(node, "w:id") ?? getAttr(node, "id");
+      return id ? [`<span data-word-comment-range-end="${id}"></span>`] : [];
+    }
+    if (node.localName === "r") {
+      return runToHtml(node, revisionFallback);
+    }
+    if (node.localName === "oMath" || node.localName === "oMathPara") {
+      const linear = ommlNodeToText(node).trim();
+      if (!linear) return [];
+      return [`<span data-word-omml="1">${escapeHtml(linear)}</span>`];
+    }
+    if (node.localName === "ins" || node.localName === "del") {
+      const scopedMeta = parseRevisionMeta(node, node.localName === "ins" ? "ins" : "del");
+      const nested: string[] = [];
+      for (const child of Array.from(node.children)) {
+        nested.push(...(await nodeToHtml(child, scopedMeta)));
+      }
+      return nested;
+    }
+    const nested: string[] = [];
+    for (const child of Array.from(node.children)) {
+      nested.push(...(await nodeToHtml(child, revisionFallback)));
+    }
+    return nested;
+  }
+
+  const parts: string[] = [];
+  const renderedPageBreakCount = queryAllByLocalName(paragraph, "lastRenderedPageBreak").length;
+  for (let i = 0; i < renderedPageBreakCount; i += 1) {
+    parts.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
+  }
+  for (const child of Array.from(paragraph.children)) {
+    parts.push(...(await nodeToHtml(child, null)));
   }
 
   const content = parts.join("") || "<br/>";
@@ -487,6 +716,123 @@ function parseTcVMerge(tc: Element): "none" | "restart" | "continue" {
   return rawVal === "restart" ? "restart" : "continue";
 }
 
+function parseTblGridWidthsPx(table: Element): number[] {
+  const grid = directChildrenByLocalName(table, "tblGrid")[0] ?? null;
+  if (!grid) return [];
+  return directChildrenByLocalName(grid, "gridCol")
+    .map((col) => {
+      const raw = getAttr(col, "w:w") ?? getAttr(col, "w");
+      const twip = raw ? Number.parseInt(raw, 10) : Number.NaN;
+      return Number.isFinite(twip) && twip > 0 ? twipToPx(twip) : 0;
+    })
+    .filter((px) => px > 0);
+}
+
+function borderSizeToPx(size: number): number {
+  return size / 6;
+}
+
+function parseBorderCss(borderNode: Element | null): string | null {
+  if (!borderNode) return null;
+  const val = (getAttr(borderNode, "w:val") ?? getAttr(borderNode, "val") ?? "").toLowerCase();
+  if (!val || val === "nil" || val === "none") return "none";
+  const color = (getAttr(borderNode, "w:color") ?? getAttr(borderNode, "color") ?? "222222").replace(/^#/, "");
+  const rawSize = getAttr(borderNode, "w:sz") ?? getAttr(borderNode, "sz");
+  const size = rawSize ? Number.parseInt(rawSize, 10) : Number.NaN;
+  const px = Number.isFinite(size) && size > 0 ? borderSizeToPx(size) : 1;
+  const style = val === "single" ? "solid" : val;
+  return `${px.toFixed(2)}px ${style} #${color}`;
+}
+
+interface TableStyleProfile {
+  tableLayout: "fixed" | "auto";
+  borderCollapse: "collapse" | "separate";
+  borderSpacingPx: number;
+  borderCss: string;
+  insideHCss: string | null;
+  insideVCss: string | null;
+}
+
+function parseTableStyleProfile(table: Element): TableStyleProfile {
+  const tblPr = directChildrenByLocalName(table, "tblPr")[0] ?? null;
+  const tblBorders = tblPr ? directChildrenByLocalName(tblPr, "tblBorders")[0] ?? null : null;
+  const layout = tblPr ? directChildrenByLocalName(tblPr, "tblLayout")[0] ?? null : null;
+  const spacing = tblPr ? directChildrenByLocalName(tblPr, "tblCellSpacing")[0] ?? null : null;
+  const spacingType = (getAttr(spacing, "w:type") ?? getAttr(spacing, "type") ?? "dxa").toLowerCase();
+  const spacingRaw = getAttr(spacing, "w:w") ?? getAttr(spacing, "w");
+  const spacingVal = spacingRaw ? Number.parseFloat(spacingRaw) : Number.NaN;
+  const borderSpacingPx =
+    spacingType === "dxa" && Number.isFinite(spacingVal) && spacingVal > 0 ? twipToPx(spacingVal) : 0;
+  const borderCollapse = borderSpacingPx > 0 ? "separate" : "collapse";
+  const tableLayout = (getAttr(layout, "w:type") ?? getAttr(layout, "type") ?? "").toLowerCase() === "autofit" ? "auto" : "fixed";
+
+  const top = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "top")[0] ?? null : null);
+  const bottom = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "bottom")[0] ?? null : null);
+  const left = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "left")[0] ?? null : null);
+  const right = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "right")[0] ?? null : null);
+  const insideH = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "insideH")[0] ?? null : null);
+  const insideV = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "insideV")[0] ?? null : null);
+  const borderCss = top ?? right ?? bottom ?? left ?? "1px solid #222";
+
+  return {
+    tableLayout,
+    borderCollapse,
+    borderSpacingPx,
+    borderCss,
+    insideHCss: insideH,
+    insideVCss: insideV
+  };
+}
+
+function parseTableWidthStyle(table: Element, gridWidthsPx: number[]): string {
+  const tblPr = directChildrenByLocalName(table, "tblPr")[0] ?? null;
+  const tblW = tblPr ? directChildrenByLocalName(tblPr, "tblW")[0] ?? null : null;
+  const type = (getAttr(tblW, "w:type") ?? getAttr(tblW, "type") ?? "").toLowerCase();
+  const rawVal = getAttr(tblW, "w:w") ?? getAttr(tblW, "w");
+  const numericVal = rawVal ? Number.parseFloat(rawVal) : Number.NaN;
+  if (type === "dxa" && Number.isFinite(numericVal) && numericVal > 0) {
+    return `width:${twipToPx(numericVal).toFixed(2)}px`;
+  }
+  if (type === "pct" && Number.isFinite(numericVal) && numericVal > 0) {
+    return `width:${(numericVal / 50).toFixed(2)}%`;
+  }
+  const gridTotal = gridWidthsPx.reduce((sum, item) => sum + item, 0);
+  if (gridTotal > 0) return `width:${gridTotal.toFixed(2)}px;max-width:100%`;
+  return "width:100%";
+}
+
+function parseCellWidthStyle(cell: Element, colCursor: number, colSpan: number, gridWidthsPx: number[]): string {
+  const tcPr = directChildrenByLocalName(cell, "tcPr")[0] ?? null;
+  const tcW = tcPr ? directChildrenByLocalName(tcPr, "tcW")[0] ?? null : null;
+  const type = (getAttr(tcW, "w:type") ?? getAttr(tcW, "type") ?? "").toLowerCase();
+  const rawVal = getAttr(tcW, "w:w") ?? getAttr(tcW, "w");
+  const numericVal = rawVal ? Number.parseFloat(rawVal) : Number.NaN;
+
+  if (type === "dxa" && Number.isFinite(numericVal) && numericVal > 0) {
+    return `width:${twipToPx(numericVal).toFixed(2)}px`;
+  }
+  if (type === "pct" && Number.isFinite(numericVal) && numericVal > 0) {
+    return `width:${(numericVal / 50).toFixed(2)}%`;
+  }
+  const width = gridWidthsPx.slice(colCursor, colCursor + colSpan).reduce((sum, item) => sum + item, 0);
+  if (width > 0) return `width:${width.toFixed(2)}px`;
+  return "";
+}
+
+function parseCellBorderStyle(cell: Element, tableStyle: TableStyleProfile): string {
+  const tcPr = directChildrenByLocalName(cell, "tcPr")[0] ?? null;
+  const tcBorders = tcPr ? directChildrenByLocalName(tcPr, "tcBorders")[0] ?? null : null;
+  if (!tcBorders) {
+    const fallback = tableStyle.insideHCss ?? tableStyle.insideVCss ?? tableStyle.borderCss;
+    return `border:${fallback}`;
+  }
+  const top = parseBorderCss(directChildrenByLocalName(tcBorders, "top")[0] ?? null) ?? tableStyle.insideHCss ?? tableStyle.borderCss;
+  const right = parseBorderCss(directChildrenByLocalName(tcBorders, "right")[0] ?? null) ?? tableStyle.insideVCss ?? tableStyle.borderCss;
+  const bottom = parseBorderCss(directChildrenByLocalName(tcBorders, "bottom")[0] ?? null) ?? tableStyle.insideHCss ?? tableStyle.borderCss;
+  const left = parseBorderCss(directChildrenByLocalName(tcBorders, "left")[0] ?? null) ?? tableStyle.insideVCss ?? tableStyle.borderCss;
+  return `border-top:${top};border-right:${right};border-bottom:${bottom};border-left:${left}`;
+}
+
 function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>): string {
   const blocks: string[] = [];
   for (const child of Array.from(cell.children)) {
@@ -509,6 +855,8 @@ function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>): 
 
 function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): string {
   const rows = directChildrenByLocalName(table, "tr");
+  const gridWidthsPx = parseTblGridWidthsPx(table);
+  const tableStyle = parseTableStyleProfile(table);
 
   type MergeOrigin = {
     id: string;
@@ -554,6 +902,8 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): s
 
       const html = tableCellHtml(cell, paragraphIndexMap);
       const attrs: string[] = [];
+      const widthStyle = parseCellWidthStyle(cell, colCursor, colSpan, gridWidthsPx);
+      const borderStyle = parseCellBorderStyle(cell, tableStyle);
       if (vMerge === "restart") {
         const origin: MergeOrigin = {
           id: `m${nextOriginId}`,
@@ -572,7 +922,7 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): s
 
       if (colSpan > 1) attrs.push(`colspan="${colSpan}"`);
       emittedCells.push(
-        `<td${attrs.length > 0 ? ` ${attrs.join(" ")}` : ""} style="border:1px solid #222;vertical-align:top;">${html}</td>`
+        `<td${attrs.length > 0 ? ` ${attrs.join(" ")}` : ""} style="${borderStyle};vertical-align:top;${widthStyle}">${html}</td>`
       );
       colCursor += colSpan;
     }
@@ -595,7 +945,9 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): s
     merged = merged.replace(marker, replacement).replace(/\s{2,}/g, " ");
   }
 
-  return `<table style="border-collapse:collapse;table-layout:fixed;width:100%;border:1px solid #222;">${merged}</table>`;
+  const tableWidthStyle = parseTableWidthStyle(table, gridWidthsPx);
+  const spacing = tableStyle.borderSpacingPx > 0 ? `border-spacing:${tableStyle.borderSpacingPx.toFixed(2)}px;` : "";
+  return `<table style="border-collapse:${tableStyle.borderCollapse};${spacing}table-layout:${tableStyle.tableLayout};${tableWidthStyle};border:${tableStyle.borderCss};">${merged}</table>`;
 }
 
 export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
