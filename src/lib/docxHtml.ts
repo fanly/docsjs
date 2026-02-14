@@ -31,6 +31,45 @@ interface RevisionMeta {
   date: string | null;
 }
 
+export interface DocxParseFeatureCounts {
+  hyperlinkCount: number;
+  anchorImageCount: number;
+  chartCount: number;
+  smartArtCount: number;
+  ommlCount: number;
+  tableCount: number;
+  footnoteRefCount: number;
+  endnoteRefCount: number;
+  commentRefCount: number;
+  revisionCount: number;
+  pageBreakCount: number;
+}
+
+export interface DocxParseReport {
+  elapsedMs: number;
+  features: DocxParseFeatureCounts;
+}
+
+interface ParseContext {
+  features: DocxParseFeatureCounts;
+}
+
+function createEmptyFeatureCounts(): DocxParseFeatureCounts {
+  return {
+    hyperlinkCount: 0,
+    anchorImageCount: 0,
+    chartCount: 0,
+    smartArtCount: 0,
+    ommlCount: 0,
+    tableCount: 0,
+    footnoteRefCount: 0,
+    endnoteRefCount: 0,
+    commentRefCount: 0,
+    revisionCount: 0,
+    pageBreakCount: 0
+  };
+}
+
 function escapeHtml(text: string): string {
   return text
     .replaceAll("&", "&amp;")
@@ -265,6 +304,25 @@ function normalizeWordPath(relTarget: string): string {
   return `word/${normalized}`;
 }
 
+function resolveHyperlinkHref(relMap: RelMap, rid: string | null, anchor: string | null): string | null {
+  if (anchor && anchor.trim()) return `#${encodeURIComponent(anchor.trim())}`;
+  if (!rid) return null;
+  const relTarget = relMap[rid];
+  if (!relTarget) return null;
+  const trimmed = relTarget.trim();
+  if (!trimmed) return null;
+  const lower = trimmed.toLowerCase();
+  if (
+    lower.startsWith("http://") ||
+    lower.startsWith("https://") ||
+    lower.startsWith("mailto:") ||
+    lower.startsWith("tel:")
+  ) {
+    return trimmed;
+  }
+  return trimmed.startsWith("#") ? trimmed : `#${encodeURIComponent(trimmed)}`;
+}
+
 async function imageRidToDataUrl(zip: JSZip, relMap: RelMap, rid: string): Promise<string | null> {
   const relTarget = relMap[rid];
   if (!relTarget) return null;
@@ -478,6 +536,7 @@ function renderEndnotesSection(usedIds: string[], endnotesMap: FootnoteMap): str
 async function paragraphToHtml(
   zip: JSZip,
   relMap: RelMap,
+  context: ParseContext,
   paragraph: Element,
   paragraphIndex: number | null,
   footnotesMap: FootnoteMap,
@@ -535,6 +594,7 @@ async function paragraphToHtml(
     const footnoteRef = queryByLocalName(run, "footnoteReference");
     const footnoteId = getAttr(footnoteRef, "w:id") ?? getAttr(footnoteRef, "id");
     if (footnoteId && footnotesMap[footnoteId]) {
+      context.features.footnoteRefCount += 1;
       usedFootnoteIds.push(footnoteId);
       result.push(
         `<sup data-word-footnote-ref="${footnoteId}"><a href="#word-footnote-${footnoteId}">[${footnoteId}]</a></sup>`
@@ -545,6 +605,7 @@ async function paragraphToHtml(
     const endnoteRef = queryByLocalName(run, "endnoteReference");
     const endnoteId = getAttr(endnoteRef, "w:id") ?? getAttr(endnoteRef, "id");
     if (endnoteId && endnotesMap[endnoteId]) {
+      context.features.endnoteRefCount += 1;
       usedEndnoteIds.push(endnoteId);
       result.push(
         `<sup data-word-endnote-ref="${endnoteId}"><a href="#word-endnote-${endnoteId}">[${endnoteId}]</a></sup>`
@@ -555,6 +616,7 @@ async function paragraphToHtml(
     const commentRef = queryByLocalName(run, "commentReference");
     const commentId = getAttr(commentRef, "w:id") ?? getAttr(commentRef, "id");
     if (commentId && commentsMap[commentId]) {
+      context.features.commentRefCount += 1;
       usedCommentIds.push(commentId);
       result.push(
         `<sup data-word-comment-ref="${commentId}"><a href="#word-comment-${commentId}">[c${commentId}]</a></sup>`
@@ -573,6 +635,7 @@ async function paragraphToHtml(
           const dimensionAttrs = imageDimensionAttributes(imageSize);
           const anchorMeta = parseAnchorMeta(drawing);
           const attrs = mergeImageStyle(dimensionAttrs, anchorMeta);
+          if (anchorMeta) context.features.anchorImageCount += 1;
           result.push(`<img src="${src}" alt="word-image"${attrs}/>`);
           return result;
         }
@@ -584,6 +647,7 @@ async function paragraphToHtml(
         const chartXmlText = await readXmlByRid(zip, relMap, chartRid);
         if (chartXmlText) {
           const summary = parseChartSummary(chartXmlText);
+          context.features.chartCount += 1;
           result.push(
             `<figure data-word-chart="1" data-word-chart-type="${summary.type}" data-word-chart-series="${summary.seriesCount}" data-word-chart-points="${summary.pointCount}">` +
               `<figcaption>${escapeHtml(summary.title)}</figcaption>` +
@@ -599,6 +663,7 @@ async function paragraphToHtml(
       if (smartArtRid) {
         const diagramXmlText = await readXmlByRid(zip, relMap, smartArtRid);
         const textItems = diagramXmlText ? extractSmartArtText(diagramXmlText) : [];
+        context.features.smartArtCount += 1;
         const preview = textItems.length > 0 ? `: ${escapeHtml(textItems.join(" / "))}` : "";
         result.push(
           `<figure data-word-smartart="1" data-word-smartart-items="${textItems.length}">` +
@@ -623,12 +688,14 @@ async function paragraphToHtml(
       if (css) {
         const span = `<span style="${css}">${runText}</span>`;
         if (revisionMeta) {
+          context.features.revisionCount += 1;
           const tagName = revisionMeta.type === "ins" ? "ins" : "del";
           result.push(`<${tagName} ${revisionMetaAttrs(revisionMeta)}>${span}</${tagName}>`);
         } else {
           result.push(span);
         }
       } else if (revisionMeta) {
+        context.features.revisionCount += 1;
         const tagName = revisionMeta.type === "ins" ? "ins" : "del";
         result.push(`<${tagName} ${revisionMetaAttrs(revisionMeta)}>${runText}</${tagName}>`);
       } else {
@@ -637,6 +704,7 @@ async function paragraphToHtml(
     }
 
     for (let i = 0; i < pageBreakCount; i += 1) {
+      context.features.pageBreakCount += 1;
       result.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
     }
     return result;
@@ -654,9 +722,25 @@ async function paragraphToHtml(
     if (node.localName === "r") {
       return runToHtml(node, revisionFallback);
     }
+    if (node.localName === "hyperlink") {
+      const rid = getAttr(node, "r:id") ?? getAttr(node, "id");
+      const anchor = getAttr(node, "w:anchor") ?? getAttr(node, "anchor");
+      const href = resolveHyperlinkHref(relMap, rid, anchor);
+      const nested: string[] = [];
+      for (const child of Array.from(node.children)) {
+        nested.push(...(await nodeToHtml(child, revisionFallback)));
+      }
+      const content = nested.join("") || escapeHtml(node.textContent ?? "");
+      if (!href) return content ? [content] : [];
+      context.features.hyperlinkCount += 1;
+      return [
+        `<a data-word-hyperlink="1" href="${escapeHtml(href)}" rel="noreferrer noopener" target="_blank">${content}</a>`
+      ];
+    }
     if (node.localName === "oMath" || node.localName === "oMathPara") {
       const linear = ommlNodeToText(node).trim();
       if (!linear) return [];
+      context.features.ommlCount += 1;
       return [`<span data-word-omml="1">${escapeHtml(linear)}</span>`];
     }
     if (node.localName === "ins" || node.localName === "del") {
@@ -677,6 +761,7 @@ async function paragraphToHtml(
   const parts: string[] = [];
   const renderedPageBreakCount = queryAllByLocalName(paragraph, "lastRenderedPageBreak").length;
   for (let i = 0; i < renderedPageBreakCount; i += 1) {
+    context.features.pageBreakCount += 1;
     parts.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
   }
   for (const child of Array.from(paragraph.children)) {
@@ -833,7 +918,7 @@ function parseCellBorderStyle(cell: Element, tableStyle: TableStyleProfile): str
   return `border-top:${top};border-right:${right};border-bottom:${bottom};border-left:${left}`;
 }
 
-function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>): string {
+function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>, context: ParseContext): string {
   const blocks: string[] = [];
   for (const child of Array.from(cell.children)) {
     if (child.localName === "tcPr") continue;
@@ -843,7 +928,7 @@ function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>): 
       continue;
     }
     if (child.localName === "tbl") {
-      blocks.push(tableToHtml(child, paragraphIndexMap));
+      blocks.push(tableToHtml(child, paragraphIndexMap, context));
       continue;
     }
   }
@@ -853,7 +938,8 @@ function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>): 
   return escapeHtml(text) || "<br/>";
 }
 
-function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): string {
+function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, context: ParseContext): string {
+  context.features.tableCount += 1;
   const rows = directChildrenByLocalName(table, "tr");
   const gridWidthsPx = parseTblGridWidthsPx(table);
   const tableStyle = parseTableStyleProfile(table);
@@ -900,7 +986,7 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): s
         colCursor += 1;
       }
 
-      const html = tableCellHtml(cell, paragraphIndexMap);
+      const html = tableCellHtml(cell, paragraphIndexMap, context);
       const attrs: string[] = [];
       const widthStyle = parseCellWidthStyle(cell, colCursor, colSpan, gridWidthsPx);
       const borderStyle = parseCellBorderStyle(cell, tableStyle);
@@ -950,7 +1036,11 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>): s
   return `<table style="border-collapse:${tableStyle.borderCollapse};${spacing}table-layout:${tableStyle.tableLayout};${tableWidthStyle};border:${tableStyle.borderCss};">${merged}</table>`;
 }
 
-export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
+export async function parseDocxToHtmlSnapshotWithReport(
+  file: File
+): Promise<{ htmlSnapshot: string; report: DocxParseReport }> {
+  const startedAt = Date.now();
+  const context: ParseContext = { features: createEmptyFeatureCounts() };
   const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
   const buffer = maybeArrayBuffer ? await maybeArrayBuffer.call(file) : await new Response(file).arrayBuffer();
   const zip = await JSZip.loadAsync(buffer);
@@ -990,6 +1080,7 @@ export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
         await paragraphToHtml(
           zip,
           relMap,
+          context,
           child,
           paragraphIndex,
           footnotesMap,
@@ -1003,7 +1094,7 @@ export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
       continue;
     }
     if (child.localName === "tbl") {
-      blockHtml.push(tableToHtml(child, paragraphIndexMap));
+      blockHtml.push(tableToHtml(child, paragraphIndexMap, context));
       continue;
     }
   }
@@ -1011,5 +1102,16 @@ export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
   blockHtml.push(renderFootnotesSection(usedFootnoteIds, footnotesMap));
   blockHtml.push(renderEndnotesSection(usedEndnoteIds, endnotesMap));
   blockHtml.push(renderCommentsSection(usedCommentIds, commentsMap));
-  return buildHtmlSnapshot(blockHtml.join("\n"));
+  return {
+    htmlSnapshot: buildHtmlSnapshot(blockHtml.join("\n")),
+    report: {
+      elapsedMs: Date.now() - startedAt,
+      features: context.features
+    }
+  };
+}
+
+export async function parseDocxToHtmlSnapshot(file: File): Promise<string> {
+  const result = await parseDocxToHtmlSnapshotWithReport(file);
+  return result.htmlSnapshot;
 }

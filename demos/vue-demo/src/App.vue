@@ -17,7 +17,7 @@
 
     <WordFidelityEditorVue ref="editor" :lang="lang" @change="onChange" @error="onError" @ready="onReady" />
 
-    <div class="meta">{{ t.source }}: {{ source }} | {{ t.snapshotLength }}: {{ length }}</div>
+    <div class="meta">{{ t.source }}: {{ source }} | {{ t.snapshotLength }}: {{ length }} | strict | {{ t.parseElapsed }}: {{ report?.elapsedMs ?? "-" }}</div>
     <div class="stats">
       <div>{{ t.paragraphCount }}: {{ stats.paragraphCount }}</div>
       <div>{{ t.headingCount }}: {{ stats.headingCount }}</div>
@@ -27,6 +27,9 @@
       <div>{{ t.imageCount }}: {{ stats.imageCount }}</div>
       <div>{{ t.anchorImageCount }}: {{ stats.anchorImageCount }}</div>
       <div>{{ t.wrappedImageCount }}: {{ stats.wrappedImageCount }}</div>
+      <div>{{ t.ommlCount }}: {{ stats.ommlCount }}</div>
+      <div>{{ t.chartCount }}: {{ stats.chartCount }}</div>
+      <div>{{ t.smartArtCount }}: {{ stats.smartArtCount }}</div>
       <div>{{ t.commentRefCount }}: {{ stats.commentRefCount }}</div>
       <div>{{ t.revisionInsCount }}: {{ stats.revisionInsCount }}</div>
       <div>{{ t.revisionDelCount }}: {{ stats.revisionDelCount }}</div>
@@ -45,6 +48,7 @@ import {
 import { collectSemanticStatsFromHtml } from "@coding01/docsjs";
 import type { DocsWordEditorElementApi } from "@coding01/docsjs/types";
 import type { SemanticStats } from "@coding01/docsjs";
+import type { DocxParseReport } from "@coding01/docsjs";
 
 type Lang = "zh" | "en";
 const lang = ref<Lang>("zh");
@@ -54,6 +58,7 @@ const text: Record<Lang, Record<string, string>> = {
     clear: "清空",
     loadClipboard: "读取系统剪贴板",
     exportSnapshot: "导出 HTML 快照（并复制）",
+    parseElapsed: "解析耗时(ms)",
     source: "来源",
     snapshotLength: "快照长度",
     paragraphCount: "段落",
@@ -64,6 +69,9 @@ const text: Record<Lang, Record<string, string>> = {
     imageCount: "图片",
     anchorImageCount: "浮动图",
     wrappedImageCount: "绕排图",
+    ommlCount: "OMML",
+    chartCount: "图表",
+    smartArtCount: "SmartArt",
     commentRefCount: "评论引用",
     revisionInsCount: "修订新增",
     revisionDelCount: "修订删除",
@@ -78,6 +86,7 @@ const text: Record<Lang, Record<string, string>> = {
     clear: "Clear",
     loadClipboard: "Read Clipboard",
     exportSnapshot: "Export HTML Snapshot (copy)",
+    parseElapsed: "Parse Elapsed(ms)",
     source: "Source",
     snapshotLength: "Snapshot Length",
     paragraphCount: "Paragraphs",
@@ -88,6 +97,9 @@ const text: Record<Lang, Record<string, string>> = {
     imageCount: "Images",
     anchorImageCount: "Anchored Images",
     wrappedImageCount: "Wrapped Images",
+    ommlCount: "OMML",
+    chartCount: "Charts",
+    smartArtCount: "SmartArt",
     commentRefCount: "Comment Refs",
     revisionInsCount: "Revisions +",
     revisionDelCount: "Revisions -",
@@ -111,6 +123,9 @@ const stats = ref<SemanticStats>({
   imageCount: 0,
   anchorImageCount: 0,
   wrappedImageCount: 0,
+  ommlCount: 0,
+  chartCount: 0,
+  smartArtCount: 0,
   listParagraphCount: 0,
   commentRefCount: 0,
   revisionInsCount: 0,
@@ -119,15 +134,17 @@ const stats = ref<SemanticStats>({
   pageSpacerCount: 0,
   textCharCount: 0
 });
+const report = ref<DocxParseReport | null>(null);
 
 const onReady = (payload: { version: string }) => {
   console.log("ready", payload.version);
 };
 
-const onChange = (payload: { source: string; htmlSnapshot: string }) => {
+const onChange = (payload: { source: string; htmlSnapshot: string; parseReport?: DocxParseReport }) => {
   source.value = payload.source;
   length.value = payload.htmlSnapshot.length;
   stats.value = collectSemanticStatsFromHtml(payload.htmlSnapshot);
+  report.value = payload.parseReport ?? null;
 };
 
 const onError = (payload: { message: string }) => {

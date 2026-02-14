@@ -1,6 +1,6 @@
 {
   "name": "@coding01/docsjs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Render-first Word fidelity component with Web Component core and React/Vue adapters",
   "license": "MIT",
   "type": "module",
@@ -38,6 +38,7 @@
     "visual:update": "node scripts/visual-regression.mjs --update",
     "visual:test": "node scripts/visual-regression.mjs",
     "benchmark:fidelity": "node scripts/fidelity-benchmark.mjs",
+    "docs:sync": "node scripts/sync-doc-content.mjs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run sizecheck",
     "prepublishOnly": "npm run verify"
   },

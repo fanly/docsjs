@@ -263,8 +263,50 @@
         gap: 12px;
       }
 
+      .toc {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        padding: 14px;
+      }
+
+      .toc h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      .toc-links {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .toc-links a {
+        text-decoration: none;
+        border: 1px solid #d8e3e0;
+        border-radius: 10px;
+        color: #1f4038;
+        background: #fbfefd;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
       .feature-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .section-sub {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 14px;
       }
 
       .card {
@@ -300,6 +342,31 @@
       .status.progress {
         color: #9a5d12;
         background: var(--accent-soft);
+      }
+
+      .checklist {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .checklist li {
+        margin: 0;
+        padding: 7px 0;
+        border-bottom: 1px dashed #d5e1de;
+        color: #2f4148;
+        font-size: 14px;
+      }
+
+      .checklist li:last-child {
+        border-bottom: 0;
+      }
+
+      .matrix {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 12px;
       }
 
       .panel {
@@ -454,7 +521,9 @@
         }
         .feature-grid,
         .api-grid,
-        .case-grid {
+        .matrix,
+        .case-grid,
+        .toc-links {
           grid-template-columns: 1fr;
         }
       }
@@ -495,7 +564,7 @@
           </div>
           <div class="hero-kpi">
             <div class="kpi">
-              <strong>47</strong>
+              <strong>50</strong>
               <span data-i18n="kpiTests">automated tests passing</span>
             </div>
             <div class="kpi">
@@ -528,43 +597,215 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
         </div>
       </section>
 
-      <section>
+      <section class="toc">
+        <h3 data-i18n="tocTitle">Page Directory</h3>
+        <div class="toc-links">
+          <a href="#tracks" data-i18n="tocTracks">Deep Tracks</a>
+          <a href="#features" data-i18n="tocFeatures">Feature Checklist</a>
+          <a href="#architecture" data-i18n="tocArchitecture">Architecture</a>
+          <a href="#quality" data-i18n="tocQuality">Quality Gates</a>
+          <a href="#roadmap" data-i18n="tocRoadmap">Roadmap</a>
+          <a href="#quickstart" data-i18n="tocQuickStart">Quick Start</a>
+          <a href="#api" data-i18n="tocApi">API</a>
+          <a href="#cases" data-i18n="tocCases">Cases</a>
+          <a href="#links" data-i18n="tocLinks">Project Links</a>
+        </div>
+      </section>
+
+      <section id="tracks">
         <h2 data-i18n="tracksTitle">Deep-Fidelity Tracks</h2>
         <div class="grid feature-grid" style="margin-top: 12px">
           <article class="card">
             <h3 data-i18n="f1t">Anchor Layout v1</h3>
             <p data-i18n="f1d">`wp:anchor` with relative references, overlap policy, z-layer, and wrap distance markers.</p>
-            <span class="status">✅ done</span>
+            <span class="status" data-i18n="statusDone">✅ done</span>
           </article>
           <article class="card">
             <h3 data-i18n="f2t">Table Fidelity v1</h3>
             <p data-i18n="f2d">`tblGrid/tcW`, merge spans, `tblBorders/tcBorders`, `tblCellSpacing`, and layout mode mapping.</p>
-            <span class="status">✅ done</span>
+            <span class="status" data-i18n="statusDone">✅ done</span>
           </article>
           <article class="card">
             <h3 data-i18n="f3t">OMML / Chart / SmartArt</h3>
             <p data-i18n="f3d">Semantic fallback output for formulas, charts, and diagram nodes to keep downstream processing stable.</p>
-            <span class="status">✅ done</span>
+            <span class="status" data-i18n="statusDone">✅ done</span>
           </article>
           <article class="card">
             <h3 data-i18n="f4t">Golden Benchmark</h3>
             <p data-i18n="f4d">Corpus-driven fidelity score and trend artifacts in CI for release confidence.</p>
-            <span class="status">✅ done</span>
+            <span class="status" data-i18n="statusDone">✅ done</span>
           </article>
           <article class="card">
             <h3 data-i18n="f5t">Anchor Collision Parity</h3>
             <p data-i18n="f5d">Pixel-level text wrapping collision parity with desktop Word.</p>
-            <span class="status progress">⏳ next</span>
+            <span class="status progress" data-i18n="statusNext">⏳ next</span>
           </article>
           <article class="card">
             <h3 data-i18n="f6t">Math High Fidelity</h3>
             <p data-i18n="f6d">OMML to MathML/KaTeX pipeline for production rendering quality.</p>
-            <span class="status progress">⏳ next</span>
+            <span class="status progress" data-i18n="statusNext">⏳ next</span>
           </article>
         </div>
       </section>
 
-      <section class="panel">
+      <section id="features">
+        <div class="section-head">
+          <h2 data-i18n="featureTitle">Feature Checklist</h2>
+          <p class="section-sub" data-i18n="featureSub">Delivered capabilities and currently planned gaps.</p>
+        </div>
+        <div class="grid feature-grid" style="margin-top: 12px">
+          <!-- GENERATED:FEATURE_CARDS:START -->
+<article class="card">
+            <h3 data-i18n="feat_core_title">Core</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_core_item_1">✅ Web Component core (`docs-word-editor`)</li>
+              <li data-i18n="feat_core_item_2">✅ React adapter + Vue adapter</li>
+              <li data-i18n="feat_core_item_3">✅ Events and imperative public API</li>
+              <li data-i18n="feat_core_item_4">✅ Strict-only parser strategy</li>
+            </ul>
+          </article>
+<article class="card">
+            <h3 data-i18n="feat_import_title">Import Pipeline</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_import_item_1">✅ Clipboard import (`text/html`, `text/plain`)</li>
+              <li data-i18n="feat_import_item_2">✅ `.docx` upload + relationship media mapping</li>
+              <li data-i18n="feat_import_item_3">✅ Clipboard image hydration (`file:/blob:/cid:`)</li>
+              <li data-i18n="feat_import_item_4">✅ Output as stable HTML snapshot</li>
+            </ul>
+          </article>
+<article class="card">
+            <h3 data-i18n="feat_layout_title">Layout Fidelity</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_layout_item_1">✅ List reconstruction (`numId`, `ilvl`, `lvlText`)</li>
+              <li data-i18n="feat_layout_item_2">✅ Table v1 (`tblGrid/tcW`, merge, border, spacing)</li>
+              <li data-i18n="feat_layout_item_3">✅ Floating anchors v1 (`wp:anchor` metadata)</li>
+              <li data-i18n="feat_layout_item_4">⏳ Anchor collision parity (pixel-level wrap)</li>
+            </ul>
+          </article>
+<article class="card">
+            <h3 data-i18n="feat_advanced_title">Advanced Semantics</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_advanced_item_1">✅ Footnotes / endnotes / comments</li>
+              <li data-i18n="feat_advanced_item_2">✅ Revision markers (`ins` / `del`) + metadata</li>
+              <li data-i18n="feat_advanced_item_3">✅ Page break semantic markers</li>
+              <li data-i18n="feat_advanced_item_4">✅ DOCX hyperlink relationship + anchor mapping</li>
+            </ul>
+          </article>
+<article class="card">
+            <h3 data-i18n="feat_fallback_title">Semantic Fallback</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_fallback_item_1">✅ OMML fallback output</li>
+              <li data-i18n="feat_fallback_item_2">✅ Chart semantic extraction fallback</li>
+              <li data-i18n="feat_fallback_item_3">✅ SmartArt node fallback extraction</li>
+              <li data-i18n="feat_fallback_item_4">⏳ OMML high-fidelity render pipeline (MathML/KaTeX)</li>
+            </ul>
+          </article>
+<article class="card">
+            <h3 data-i18n="feat_quality_title">Engineering Quality</h3>
+            <ul class="checklist">
+              <li data-i18n="feat_quality_item_1">✅ 50 automated tests (regression + boundary)</li>
+              <li data-i18n="feat_quality_item_2">✅ Baseline snapshot regression framework</li>
+              <li data-i18n="feat_quality_item_3">✅ `verify` quality gate (lint/typecheck/test/build/size)</li>
+              <li data-i18n="feat_quality_item_4">✅ Parse report API for performance tuning</li>
+            </ul>
+          </article>
+<!-- GENERATED:FEATURE_CARDS:END -->
+        </div>
+      </section>
+
+      <section id="architecture">
+        <div class="section-head">
+          <h2 data-i18n="archTitle">Architecture</h2>
+          <p class="section-sub" data-i18n="archSub">Directory-style view from import to rendered snapshot.</p>
+        </div>
+        <div class="matrix">
+          <article class="card">
+            <h3 data-i18n="arch1t">1) Input Layer</h3>
+            <ul class="checklist">
+              <li data-i18n="arch1i1">Clipboard reader + upload reader</li>
+              <li data-i18n="arch1i2">Source normalization and MIME routing</li>
+              <li data-i18n="arch1i3">Legacy image URI hydration</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3 data-i18n="arch2t">2) DOCX Parser Layer</h3>
+            <ul class="checklist">
+              <li data-i18n="arch2i1">ZIP relationship resolution</li>
+              <li data-i18n="arch2i2">Style/list/table/anchor semantic extraction</li>
+              <li data-i18n="arch2i3">Strict mode parse report counters</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3 data-i18n="arch3t">3) HTML Snapshot Layer</h3>
+            <ul class="checklist">
+              <li data-i18n="arch3i1">Stable semantic attributes for downstream systems</li>
+              <li data-i18n="arch3i2">Runtime render compatibility normalization</li>
+              <li data-i18n="arch3i3">Host-friendly output for storage/render</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3 data-i18n="arch4t">4) UI Adapter Layer</h3>
+            <ul class="checklist">
+              <li data-i18n="arch4i1">Web Component core (`docs-word-editor`)</li>
+              <li data-i18n="arch4i2">React/Vue wrappers with unified props/events</li>
+              <li data-i18n="arch4i3">Demo apps with bilingual controls</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="quality">
+        <div class="section-head">
+          <h2 data-i18n="qualityTitle">Quality Gates</h2>
+          <p class="section-sub" data-i18n="qualitySub">All changes must pass lint, typecheck, tests, build, and size budget.</p>
+        </div>
+        <div class="matrix">
+          <article class="card">
+            <h3 data-i18n="quality1t">CI Pipeline</h3>
+            <ul class="checklist">
+              <li><code>npm run lint</code></li>
+              <li><code>npm run typecheck</code></li>
+              <li><code>npm run test</code></li>
+              <li><code>npm run build</code> + <code>npm run sizecheck</code></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3 data-i18n="quality2t">Fidelity Tooling</h3>
+            <ul class="checklist">
+              <li data-i18n="quality2i1">Golden corpus benchmark trend artifacts in CI</li>
+              <li data-i18n="quality2i2">Baseline snapshot regression for semantic stability</li>
+              <li data-i18n="quality2i3">Parse report counters for optimization loops</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="roadmap">
+        <div class="section-head">
+          <h2 data-i18n="roadmapTitle">Roadmap (Deep Fidelity)</h2>
+          <p class="section-sub" data-i18n="roadmapSub">Next targets aligned with desktop Word parity goals.</p>
+        </div>
+        <div class="matrix">
+          <article class="card">
+            <h3 data-i18n="roadmap1t">Layout Parity</h3>
+            <ul class="checklist">
+              <li data-i18n="roadmap1i1">⏳ `wp:anchor` full floating layout restoration</li>
+              <li data-i18n="roadmap1i2">⏳ Anchor collision/wrap parity with desktop Word</li>
+              <li data-i18n="roadmap1i3">⏳ Word table auto-layout algorithm parity</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3 data-i18n="roadmap2t">Semantic Rendering</h3>
+            <ul class="checklist">
+              <li data-i18n="roadmap2i1">⏳ OMML parser and MathML/KaTeX render pipeline</li>
+              <li data-i18n="roadmap2i2">⏳ Chart semantic extraction + render strategy</li>
+              <li data-i18n="roadmap2i3">⏳ SmartArt degradation and readability strategy</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="quickstart" class="panel">
         <div class="panel-hd">
           <h2 data-i18n="quickStartTitle">Quick Start</h2>
           <div class="tabs">
@@ -579,7 +820,7 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
         </div>
       </section>
 
-      <section class="api-grid">
+      <section id="api" class="api-grid">
         <article class="card">
           <h3 data-i18n="apiEvents">Events</h3>
           <ul class="api-list">
@@ -600,7 +841,7 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
         </article>
       </section>
 
-      <section>
+      <section id="cases">
         <h2 data-i18n="casesTitle">Docs Cases Showcase</h2>
         <div class="case-grid" style="margin-top: 12px">
           <article class="case">
@@ -627,7 +868,7 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
         </div>
       </section>
 
-      <footer class="foot">
+      <footer id="links" class="foot">
         <small data-i18n="foot">
           Built for global engineers. React/Vue demos, CI quality gates, release workflows, and benchmark reports are all in repo.
         </small>
@@ -647,7 +888,7 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
         const legacyHosts = new Set(["yemeishu.com", "www.yemeishu.com"]);
         const host = window.location.hostname.toLowerCase();
         if (!legacyHosts.has(host)) return;
-        const target = new URL("https://fanly.github.io/docsjs/");
+        const target = new URL("https://docsjs.coding01.cn/");
         if (window.location.hash) target.hash = window.location.hash;
         window.location.replace(target.toString());
       })();
@@ -709,6 +950,87 @@ el.addEventListener("docsjs-change", (event) => {
           kpiTracks: "deep-fidelity tracks delivered",
           kpiQuality: "quality gates and benchmark trend",
           tracksTitle: "Deep-Fidelity Tracks",
+          featureTitle: "Feature Checklist",
+          tocTitle: "Page Directory",
+          tocTracks: "Deep Tracks",
+          tocFeatures: "Feature Checklist",
+          tocArchitecture: "Architecture",
+          tocQuality: "Quality Gates",
+          tocRoadmap: "Roadmap",
+          tocQuickStart: "Quick Start",
+          tocApi: "API",
+          tocCases: "Cases",
+          tocLinks: "Project Links",
+          statusDone: "✅ done",
+          statusNext: "⏳ next",
+          featureSub: "Delivered capabilities and currently planned gaps.",
+          /* GENERATED:FEATURE_I18N_EN:START */
+          feat_core_title: "Core",
+          feat_core_item_1: "✅ Web Component core (`docs-word-editor`)",
+          feat_core_item_2: "✅ React adapter + Vue adapter",
+          feat_core_item_3: "✅ Events and imperative public API",
+          feat_core_item_4: "✅ Strict-only parser strategy",
+          feat_import_title: "Import Pipeline",
+          feat_import_item_1: "✅ Clipboard import (`text/html`, `text/plain`)",
+          feat_import_item_2: "✅ `.docx` upload + relationship media mapping",
+          feat_import_item_3: "✅ Clipboard image hydration (`file:/blob:/cid:`)",
+          feat_import_item_4: "✅ Output as stable HTML snapshot",
+          feat_layout_title: "Layout Fidelity",
+          feat_layout_item_1: "✅ List reconstruction (`numId`, `ilvl`, `lvlText`)",
+          feat_layout_item_2: "✅ Table v1 (`tblGrid/tcW`, merge, border, spacing)",
+          feat_layout_item_3: "✅ Floating anchors v1 (`wp:anchor` metadata)",
+          feat_layout_item_4: "⏳ Anchor collision parity (pixel-level wrap)",
+          feat_advanced_title: "Advanced Semantics",
+          feat_advanced_item_1: "✅ Footnotes / endnotes / comments",
+          feat_advanced_item_2: "✅ Revision markers (`ins` / `del`) + metadata",
+          feat_advanced_item_3: "✅ Page break semantic markers",
+          feat_advanced_item_4: "✅ DOCX hyperlink relationship + anchor mapping",
+          feat_fallback_title: "Semantic Fallback",
+          feat_fallback_item_1: "✅ OMML fallback output",
+          feat_fallback_item_2: "✅ Chart semantic extraction fallback",
+          feat_fallback_item_3: "✅ SmartArt node fallback extraction",
+          feat_fallback_item_4: "⏳ OMML high-fidelity render pipeline (MathML/KaTeX)",
+          feat_quality_title: "Engineering Quality",
+          feat_quality_item_1: "✅ 50 automated tests (regression + boundary)",
+          feat_quality_item_2: "✅ Baseline snapshot regression framework",
+          feat_quality_item_3: "✅ `verify` quality gate (lint/typecheck/test/build/size)",
+          feat_quality_item_4: "✅ Parse report API for performance tuning",
+/* GENERATED:FEATURE_I18N_EN:END */
+          archTitle: "Architecture",
+          archSub: "Directory-style view from import to rendered snapshot.",
+          arch1t: "1) Input Layer",
+          arch1i1: "Clipboard reader + upload reader",
+          arch1i2: "Source normalization and MIME routing",
+          arch1i3: "Legacy image URI hydration",
+          arch2t: "2) DOCX Parser Layer",
+          arch2i1: "ZIP relationship resolution",
+          arch2i2: "Style/list/table/anchor semantic extraction",
+          arch2i3: "Strict mode parse report counters",
+          arch3t: "3) HTML Snapshot Layer",
+          arch3i1: "Stable semantic attributes for downstream systems",
+          arch3i2: "Runtime render compatibility normalization",
+          arch3i3: "Host-friendly output for storage/render",
+          arch4t: "4) UI Adapter Layer",
+          arch4i1: "Web Component core (`docs-word-editor`)",
+          arch4i2: "React/Vue wrappers with unified props/events",
+          arch4i3: "Demo apps with bilingual controls",
+          qualityTitle: "Quality Gates",
+          qualitySub: "All changes must pass lint, typecheck, tests, build, and size budget.",
+          quality1t: "CI Pipeline",
+          quality2t: "Fidelity Tooling",
+          quality2i1: "Golden corpus benchmark trend artifacts in CI",
+          quality2i2: "Baseline snapshot regression for semantic stability",
+          quality2i3: "Parse report counters for optimization loops",
+          roadmapTitle: "Roadmap (Deep Fidelity)",
+          roadmapSub: "Next targets aligned with desktop Word parity goals.",
+          roadmap1t: "Layout Parity",
+          roadmap1i1: "⏳ `wp:anchor` full floating layout restoration",
+          roadmap1i2: "⏳ Anchor collision/wrap parity with desktop Word",
+          roadmap1i3: "⏳ Word table auto-layout algorithm parity",
+          roadmap2t: "Semantic Rendering",
+          roadmap2i1: "⏳ OMML parser and MathML/KaTeX render pipeline",
+          roadmap2i2: "⏳ Chart semantic extraction + render strategy",
+          roadmap2i3: "⏳ SmartArt degradation and readability strategy",
           f1t: "Anchor Layout v1",
           f1d: "`wp:anchor` with relative references, overlap policy, z-layer, and wrap distance markers.",
           f2t: "Table Fidelity v1",
@@ -745,6 +1067,87 @@ el.addEventListener("docsjs-change", (event) => {
           kpiTracks: "深度保真能力已交付",
           kpiQuality: "质量门禁与基准趋势",
           tracksTitle: "深度能力进展",
+          featureTitle: "功能清单",
+          tocTitle: "页面目录",
+          tocTracks: "深度能力",
+          tocFeatures: "功能清单",
+          tocArchitecture: "架构目录",
+          tocQuality: "质量门禁",
+          tocRoadmap: "路线图",
+          tocQuickStart: "快速开始",
+          tocApi: "API",
+          tocCases: "案例展示",
+          tocLinks: "项目链接",
+          statusDone: "✅ 已完成",
+          statusNext: "⏳ 下一步",
+          featureSub: "已交付能力与待完成差距列表。",
+          /* GENERATED:FEATURE_I18N_ZH:START */
+          feat_core_title: "核心",
+          feat_core_item_1: "✅ Web Component 内核（`docs-word-editor`）",
+          feat_core_item_2: "✅ React + Vue 适配层",
+          feat_core_item_3: "✅ 事件体系与命令式公开 API",
+          feat_core_item_4: "✅ 严格模式唯一解析策略",
+          feat_import_title: "导入链路",
+          feat_import_item_1: "✅ 剪贴板导入（`text/html`、`text/plain`）",
+          feat_import_item_2: "✅ `.docx` 上传与关系媒体映射",
+          feat_import_item_3: "✅ 不稳定图片 URI 修复（`file:/blob:/cid:`）",
+          feat_import_item_4: "✅ 输出稳定 HTML Snapshot",
+          feat_layout_title: "版式保真",
+          feat_layout_item_1: "✅ 列表结构恢复（`numId`、`ilvl`、`lvlText`）",
+          feat_layout_item_2: "✅ 表格 v1（`tblGrid/tcW`、合并、边框、间距）",
+          feat_layout_item_3: "✅ 浮动锚点 v1（`wp:anchor` 元数据）",
+          feat_layout_item_4: "⏳ 锚点碰撞一致性（像素级绕排）",
+          feat_advanced_title: "高级语义",
+          feat_advanced_item_1: "✅ 脚注/尾注/批注",
+          feat_advanced_item_2: "✅ 修订标记（`ins`/`del`）与元数据",
+          feat_advanced_item_3: "✅ 分页语义标记",
+          feat_advanced_item_4: "✅ DOCX 超链接关系与锚点映射",
+          feat_fallback_title: "语义降级",
+          feat_fallback_item_1: "✅ OMML 语义降级输出",
+          feat_fallback_item_2: "✅ 图表语义提取降级",
+          feat_fallback_item_3: "✅ SmartArt 节点降级提取",
+          feat_fallback_item_4: "⏳ OMML 高保真渲染链（MathML/KaTeX）",
+          feat_quality_title: "工程质量",
+          feat_quality_item_1: "✅ 50 条自动化测试（回归 + 边界）",
+          feat_quality_item_2: "✅ 基准快照回归框架",
+          feat_quality_item_3: "✅ `verify` 质量门禁（lint/typecheck/test/build/size）",
+          feat_quality_item_4: "✅ 解析报告 API（性能调优）",
+/* GENERATED:FEATURE_I18N_ZH:END */
+          archTitle: "架构目录",
+          archSub: "从导入到快照输出的目录化分层视图。",
+          arch1t: "1）输入层",
+          arch1i1: "剪贴板读取 + 上传读取",
+          arch1i2: "源格式归一化与 MIME 路由",
+          arch1i3: "历史图片 URI 补全转换",
+          arch2t: "2）DOCX 解析层",
+          arch2i1: "ZIP 关系解析",
+          arch2i2: "样式/列表/表格/锚点语义抽取",
+          arch2i3: "严格模式解析报告计数",
+          arch3t: "3）HTML Snapshot 层",
+          arch3i1: "面向下游系统的稳定语义属性",
+          arch3i2: "运行时渲染兼容性修正",
+          arch3i3: "便于存储与渲染的宿主友好输出",
+          arch4t: "4）UI 适配层",
+          arch4i1: "Web Component 内核（`docs-word-editor`）",
+          arch4i2: "React/Vue 封装（统一 props/events）",
+          arch4i3: "双语 Demo 交互面板",
+          qualityTitle: "质量门禁",
+          qualitySub: "任何改动必须通过 lint、typecheck、测试、构建和体积预算。",
+          quality1t: "CI 流程",
+          quality2t: "保真工具链",
+          quality2i1: "Golden 语料保真趋势产物纳入 CI",
+          quality2i2: "基准快照回归保障语义稳定性",
+          quality2i3: "解析报告计数用于持续优化",
+          roadmapTitle: "路线图（深度保真）",
+          roadmapSub: "下一阶段目标对齐桌面 Word 的一致性标准。",
+          roadmap1t: "版式一致性",
+          roadmap1i1: "⏳ `wp:anchor` 全量浮动布局还原",
+          roadmap1i2: "⏳ 锚点碰撞与绕排一致性对齐桌面 Word",
+          roadmap1i3: "⏳ Word 表格自动布局算法一致性",
+          roadmap2t: "语义渲染",
+          roadmap2i1: "⏳ OMML 解析与 MathML/KaTeX 渲染链",
+          roadmap2i2: "⏳ 图表语义提取与渲染策略",
+          roadmap2i3: "⏳ SmartArt 降级与可读性策略",
           f1t: "锚点布局 v1",
           f1d: "`wp:anchor` 已支持定位参照、重叠策略、层级和绕排距离标记。",
           f2t: "表格保真 v1",

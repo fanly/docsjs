@@ -12,7 +12,7 @@
 
 ## GitHub Pages
 
-- 产品单页: [https://fanly.github.io/docsjs/](https://fanly.github.io/docsjs/)
+- 产品单页: [https://docsjs.coding01.cn/](https://docsjs.coding01.cn/)
 - 页面源码: `docs/index.html`
 - 自动部署: `.github/workflows/pages.yml`
 
@@ -97,34 +97,49 @@ document.body.appendChild(el);
 
 ## 功能清单
 
+<!-- GENERATED:FEATURE_CHECKLIST_ZH:START -->
+### 核心
+
 - ✅ Web Component 内核（`docs-word-editor`）
-- ✅ React 适配（`@coding01/docsjs/react`）
-- ✅ Vue 适配（`@coding01/docsjs/vue`）
-- ✅ 粘贴导入（`text/html`、`text/plain`）
-- ✅ 剪贴板不稳定图片源替换（`file:/blob:/cid:/mhtml:` -> data URL）
-- ✅ `.docx` 上传解析
-- ✅ 段落基础语义（对齐、标题映射、换行）
-- ✅ Run 基础样式（粗斜体、下划线、删除线、颜色、高亮、上下标）
-- ✅ 列表基础恢复（`numId` + `ilvl` + `lvlText`）
-- ✅ 表格基础结构（`table/tr/td`）
-- ✅ 表格合并与嵌套表格只读保真（`vMerge/gridSpan`）
-- ✅ 表格宽度映射（`tblGrid/gridCol`、`tcW`）
-- ✅ 图片关系映射（`rId -> media`）
-- ✅ 页面几何映射（页高、页边距、版心宽）
-- ✅ 运行时渲染修正（`mso-*` 兼容、分页 spacer、空段落修正）
-- ✅ 事件与公共 API
-- ✅ React/Vue 可运行示例
-- ✅ npm OIDC 自动发布流水线
-- ✅ 批注/脚注/修订只读语义支持
-- ✅ 批注区间标记（`commentRangeStart/commentRangeEnd`）
-- ✅ 修订元数据标记（`id/author/date`）
-- ✅ 浮动锚点对象 v1 保真（定位参照/层级/避让距离/重叠策略标记）
-- ✅ Word 表格 v1 保真（边框模型/单元格间距/布局类型映射）
-- ✅ OMML/图表/SmartArt 语义降级渲染（v1）
-- ✅ 自动化保真评分 v1（golden corpus + CI 趋势产物）
-- ⏳ 浮动对象文字绕排碰撞的像素级还原
-- ⏳ Word 表格自动布局与桌面 Word 深度一致
-- ⏳ OMML 高保真渲染（MathML/KaTeX 渲染链）
+- ✅ React + Vue 适配层
+- ✅ 事件体系与命令式公开 API
+- ✅ 严格模式唯一解析策略
+
+### 导入链路
+
+- ✅ 剪贴板导入（`text/html`、`text/plain`）
+- ✅ `.docx` 上传与关系媒体映射
+- ✅ 不稳定图片 URI 修复（`file:/blob:/cid:`）
+- ✅ 输出稳定 HTML Snapshot
+
+### 版式保真
+
+- ✅ 列表结构恢复（`numId`、`ilvl`、`lvlText`）
+- ✅ 表格 v1（`tblGrid/tcW`、合并、边框、间距）
+- ✅ 浮动锚点 v1（`wp:anchor` 元数据）
+- ⏳ 锚点碰撞一致性（像素级绕排）
+
+### 高级语义
+
+- ✅ 脚注/尾注/批注
+- ✅ 修订标记（`ins`/`del`）与元数据
+- ✅ 分页语义标记
+- ✅ DOCX 超链接关系与锚点映射
+
+### 语义降级
+
+- ✅ OMML 语义降级输出
+- ✅ 图表语义提取降级
+- ✅ SmartArt 节点降级提取
+- ⏳ OMML 高保真渲染链（MathML/KaTeX）
+
+### 工程质量
+
+- ✅ 50 条自动化测试（回归 + 边界）
+- ✅ 基准快照回归框架
+- ✅ `verify` 质量门禁（lint/typecheck/test/build/size）
+- ✅ 解析报告 API（性能调优）
+<!-- GENERATED:FEATURE_CHECKLIST_ZH:END -->
 
 ## v0.1.3 更新内容
 
@@ -167,6 +182,13 @@ npm run test
 npm run build
 npm run benchmark:fidelity
 ```
+
+## 工程模式
+
+- 规则说明: [ENGINEERING_MODES.md](./ENGINEERING_MODES.md)
+- 解析 API 支持:
+  - `parseDocxToHtmlSnapshot(file)`
+  - `parseDocxToHtmlSnapshotWithReport(file)`
 
 ## 演示
 

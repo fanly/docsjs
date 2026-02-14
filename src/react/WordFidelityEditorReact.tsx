@@ -18,7 +18,13 @@ export interface WordFidelityEditorReactProps {
   editorRef?: (el: DocsWordEditorElementApi | null) => void;
 }
 
-export function WordFidelityEditorReact({ lang, onChange, onError, onReady, editorRef }: WordFidelityEditorReactProps) {
+export function WordFidelityEditorReact({
+  lang,
+  onChange,
+  onError,
+  onReady,
+  editorRef
+}: WordFidelityEditorReactProps) {
   const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -50,5 +56,8 @@ export function WordFidelityEditorReact({ lang, onChange, onError, onReady, edit
     };
   }, [editorRef, onChange, onError, onReady]);
 
-  return React.createElement("docs-word-editor", { ref: ref as unknown as Ref<HTMLElement>, lang });
+  return React.createElement("docs-word-editor", {
+    ref: ref as unknown as Ref<HTMLElement>,
+    lang
+  });
 }

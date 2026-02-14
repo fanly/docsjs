@@ -1,10 +1,11 @@
 import { buildHtmlSnapshot } from "../lib/htmlSnapshot";
-import { parseDocxToHtmlSnapshot } from "../lib/docxHtml";
+import { parseDocxToHtmlSnapshotWithReport } from "../lib/docxHtml";
 import { extractFromClipboardDataTransfer, extractFromClipboardItems } from "../lib/pastePipeline";
 import { applyWordRenderModel } from "../lib/renderApply";
 import { parseDocxStyleProfile, type WordStyleProfile } from "../lib/styleProfile";
+import type { DocxParseReport } from "../lib/docxHtml";
 
-const VERSION = "0.1.2";
+const VERSION = "0.1.5";
 
 type Locale = "zh" | "en";
 type ChangeSource = "paste" | "upload" | "api" | "clear";
@@ -190,15 +191,15 @@ export class DocsWordElement extends HTMLElement {
 
   private async applyDocx(file: File): Promise<void> {
     try {
-      const [snapshot, profile] = await Promise.all([
-        parseDocxToHtmlSnapshot(file),
+      const [parseResult, profile] = await Promise.all([
+        parseDocxToHtmlSnapshotWithReport(file),
         parseDocxStyleProfile(file)
       ]);
       this.styleProfile = profile;
-      this.htmlSnapshot = snapshot;
+      this.htmlSnapshot = parseResult.htmlSnapshot;
       this.renderSnapshot();
       this.setHint(MESSAGES[this.locale].loadedWord(profile.sourceFileName));
-      this.emitChange("upload", profile.sourceFileName);
+      this.emitChange("upload", profile.sourceFileName, parseResult.report);
     } catch (error) {
       this.emitError(error instanceof Error ? error.message : MESSAGES[this.locale].parseFailed);
     }
@@ -267,8 +268,10 @@ export class DocsWordElement extends HTMLElement {
     this.frame.srcdoc = this.htmlSnapshot;
   }
 
-  private emitChange(source: ChangeSource, fileName?: string): void {
-    this.dispatchEvent(new CustomEvent("docsjs-change", { detail: { htmlSnapshot: this.htmlSnapshot, source, fileName } }));
+  private emitChange(source: ChangeSource, fileName?: string, parseReport?: DocxParseReport): void {
+    this.dispatchEvent(
+      new CustomEvent("docsjs-change", { detail: { htmlSnapshot: this.htmlSnapshot, source, fileName, parseReport } })
+    );
   }
 
   private emitError(message: string): void {

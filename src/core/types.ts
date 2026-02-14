@@ -1,7 +1,10 @@
+import type { DocxParseReport } from "../lib/docxHtml";
+
 export interface DocsWordEditorChangeDetail {
   htmlSnapshot: string;
   source: "paste" | "upload" | "api" | "clear";
   fileName?: string;
+  parseReport?: DocxParseReport;
 }
 
 export interface DocsWordEditorErrorDetail {

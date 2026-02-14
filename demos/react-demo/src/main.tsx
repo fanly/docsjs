@@ -4,6 +4,7 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 import type { DocsWordEditorElementApi } from "@coding01/docsjs/types";
 import { collectSemanticStatsFromHtml } from "@coding01/docsjs";
 import type { SemanticStats } from "@coding01/docsjs";
+import type { DocxParseReport } from "@coding01/docsjs";
 
 type Lang = "zh" | "en";
 
@@ -15,6 +16,9 @@ const EMPTY_STATS: SemanticStats = {
   imageCount: 0,
   anchorImageCount: 0,
   wrappedImageCount: 0,
+  ommlCount: 0,
+  chartCount: 0,
+  smartArtCount: 0,
   listParagraphCount: 0,
   commentRefCount: 0,
   revisionInsCount: 0,
@@ -30,6 +34,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     clear: "清空",
     loadClipboard: "读取系统剪贴板",
     exportSnapshot: "导出 HTML 快照（并复制）",
+    parseElapsed: "解析耗时(ms)",
     source: "来源",
     snapshotLength: "快照长度",
     paragraphCount: "段落",
@@ -40,6 +45,9 @@ const TEXT: Record<Lang, Record<string, string>> = {
     imageCount: "图片",
     anchorImageCount: "浮动图",
     wrappedImageCount: "绕排图",
+    ommlCount: "OMML",
+    chartCount: "图表",
+    smartArtCount: "SmartArt",
     commentRefCount: "评论引用",
     revisionInsCount: "修订新增",
     revisionDelCount: "修订删除",
@@ -54,6 +62,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     clear: "Clear",
     loadClipboard: "Read Clipboard",
     exportSnapshot: "Export HTML Snapshot (copy)",
+    parseElapsed: "Parse Elapsed(ms)",
     source: "Source",
     snapshotLength: "Snapshot Length",
     paragraphCount: "Paragraphs",
@@ -64,6 +73,9 @@ const TEXT: Record<Lang, Record<string, string>> = {
     imageCount: "Images",
     anchorImageCount: "Anchored Images",
     wrappedImageCount: "Wrapped Images",
+    ommlCount: "OMML",
+    chartCount: "Charts",
+    smartArtCount: "SmartArt",
     commentRefCount: "Comment Refs",
     revisionInsCount: "Revisions +",
     revisionDelCount: "Revisions -",
@@ -80,6 +92,7 @@ function App() {
   const [source, setSource] = React.useState<string>("-");
   const [length, setLength] = React.useState<number>(0);
   const [stats, setStats] = React.useState<SemanticStats>(EMPTY_STATS);
+  const [report, setReport] = React.useState<DocxParseReport | null>(null);
   const editorRef = React.useRef<DocsWordEditorElementApi | null>(null);
   const t = TEXT[lang];
 
@@ -122,6 +135,7 @@ function App() {
           setSource(payload.source);
           setLength(payload.htmlSnapshot.length);
           setStats(collectSemanticStatsFromHtml(payload.htmlSnapshot));
+          setReport(payload.parseReport ?? null);
         }}
         onError={(payload) => {
           alert(payload.message);
@@ -129,7 +143,7 @@ function App() {
       />
 
       <div style={{ marginTop: 10, color: "#5b6788", fontSize: 13 }}>
-        {t.source}: {source} | {t.snapshotLength}: {length}
+        {t.source}: {source} | {t.snapshotLength}: {length} | strict | {t.parseElapsed}: {report?.elapsedMs ?? "-"}
       </div>
       <div style={{ marginTop: 10, color: "#263356", fontSize: 13, display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 6 }}>
         <div>{t.paragraphCount}: {stats.paragraphCount}</div>
@@ -140,6 +154,9 @@ function App() {
         <div>{t.imageCount}: {stats.imageCount}</div>
         <div>{t.anchorImageCount}: {stats.anchorImageCount}</div>
         <div>{t.wrappedImageCount}: {stats.wrappedImageCount}</div>
+        <div>{t.ommlCount}: {stats.ommlCount}</div>
+        <div>{t.chartCount}: {stats.chartCount}</div>
+        <div>{t.smartArtCount}: {stats.smartArtCount}</div>
         <div>{t.commentRefCount}: {stats.commentRefCount}</div>
         <div>{t.revisionInsCount}: {stats.revisionInsCount}</div>
         <div>{t.revisionDelCount}: {stats.revisionDelCount}</div>

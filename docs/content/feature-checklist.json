@@ -1,0 +1,178 @@
+{
+  "groups": [
+    {
+      "id": "core",
+      "title": {
+        "en": "Core",
+        "zh": "核心"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Web Component core (`docs-word-editor`)",
+          "zh": "Web Component 内核（`docs-word-editor`）"
+        },
+        {
+          "status": "done",
+          "en": "React adapter + Vue adapter",
+          "zh": "React + Vue 适配层"
+        },
+        {
+          "status": "done",
+          "en": "Events and imperative public API",
+          "zh": "事件体系与命令式公开 API"
+        },
+        {
+          "status": "done",
+          "en": "Strict-only parser strategy",
+          "zh": "严格模式唯一解析策略"
+        }
+      ]
+    },
+    {
+      "id": "import",
+      "title": {
+        "en": "Import Pipeline",
+        "zh": "导入链路"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Clipboard import (`text/html`, `text/plain`)",
+          "zh": "剪贴板导入（`text/html`、`text/plain`）"
+        },
+        {
+          "status": "done",
+          "en": "`.docx` upload + relationship media mapping",
+          "zh": "`.docx` 上传与关系媒体映射"
+        },
+        {
+          "status": "done",
+          "en": "Clipboard image hydration (`file:/blob:/cid:`)",
+          "zh": "不稳定图片 URI 修复（`file:/blob:/cid:`）"
+        },
+        {
+          "status": "done",
+          "en": "Output as stable HTML snapshot",
+          "zh": "输出稳定 HTML Snapshot"
+        }
+      ]
+    },
+    {
+      "id": "layout",
+      "title": {
+        "en": "Layout Fidelity",
+        "zh": "版式保真"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "List reconstruction (`numId`, `ilvl`, `lvlText`)",
+          "zh": "列表结构恢复（`numId`、`ilvl`、`lvlText`）"
+        },
+        {
+          "status": "done",
+          "en": "Table v1 (`tblGrid/tcW`, merge, border, spacing)",
+          "zh": "表格 v1（`tblGrid/tcW`、合并、边框、间距）"
+        },
+        {
+          "status": "done",
+          "en": "Floating anchors v1 (`wp:anchor` metadata)",
+          "zh": "浮动锚点 v1（`wp:anchor` 元数据）"
+        },
+        {
+          "status": "next",
+          "en": "Anchor collision parity (pixel-level wrap)",
+          "zh": "锚点碰撞一致性（像素级绕排）"
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": {
+        "en": "Advanced Semantics",
+        "zh": "高级语义"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Footnotes / endnotes / comments",
+          "zh": "脚注/尾注/批注"
+        },
+        {
+          "status": "done",
+          "en": "Revision markers (`ins` / `del`) + metadata",
+          "zh": "修订标记（`ins`/`del`）与元数据"
+        },
+        {
+          "status": "done",
+          "en": "Page break semantic markers",
+          "zh": "分页语义标记"
+        },
+        {
+          "status": "done",
+          "en": "DOCX hyperlink relationship + anchor mapping",
+          "zh": "DOCX 超链接关系与锚点映射"
+        }
+      ]
+    },
+    {
+      "id": "fallback",
+      "title": {
+        "en": "Semantic Fallback",
+        "zh": "语义降级"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "OMML fallback output",
+          "zh": "OMML 语义降级输出"
+        },
+        {
+          "status": "done",
+          "en": "Chart semantic extraction fallback",
+          "zh": "图表语义提取降级"
+        },
+        {
+          "status": "done",
+          "en": "SmartArt node fallback extraction",
+          "zh": "SmartArt 节点降级提取"
+        },
+        {
+          "status": "next",
+          "en": "OMML high-fidelity render pipeline (MathML/KaTeX)",
+          "zh": "OMML 高保真渲染链（MathML/KaTeX）"
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "title": {
+        "en": "Engineering Quality",
+        "zh": "工程质量"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "50 automated tests (regression + boundary)",
+          "zh": "50 条自动化测试（回归 + 边界）"
+        },
+        {
+          "status": "done",
+          "en": "Baseline snapshot regression framework",
+          "zh": "基准快照回归框架"
+        },
+        {
+          "status": "done",
+          "en": "`verify` quality gate (lint/typecheck/test/build/size)",
+          "zh": "`verify` 质量门禁（lint/typecheck/test/build/size）"
+        },
+        {
+          "status": "done",
+          "en": "Parse report API for performance tuning",
+          "zh": "解析报告 API（性能调优）"
+        }
+      ]
+    }
+  ]
+}

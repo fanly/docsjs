@@ -12,7 +12,7 @@ Import Word/WPS/Google Docs content from paste or `.docx` while preserving struc
 
 ## GitHub Pages
 
-- Product page: [https://fanly.github.io/docsjs/](https://fanly.github.io/docsjs/)
+- Product page: [https://docsjs.coding01.cn/](https://docsjs.coding01.cn/)
 - Source: `docs/index.html`
 - Deploy workflow: `.github/workflows/pages.yml`
 
@@ -81,7 +81,7 @@ el.addEventListener("docsjs-change", (e) => {
 ### Events
 
 - `docsjs-change`
-  - payload: `{ htmlSnapshot: string; source: "paste" | "upload" | "api" | "clear"; fileName?: string }`
+  - payload: `{ htmlSnapshot: string; source: "paste" | "upload" | "api" | "clear"; fileName?: string; parseReport?: DocxParseReport }`
 - `docsjs-error`
   - payload: `{ message: string }`
 - `docsjs-ready`
@@ -102,34 +102,49 @@ el.addEventListener("docsjs-change", (e) => {
 
 ## Feature Checklist
 
+<!-- GENERATED:FEATURE_CHECKLIST_EN:START -->
+### Core
+
 - ✅ Web Component core (`docs-word-editor`)
-- ✅ React adapter (`@coding01/docsjs/react`)
-- ✅ Vue adapter (`@coding01/docsjs/vue`)
-- ✅ Paste import (`text/html`, `text/plain`)
-- ✅ Clipboard image hydration (`file:/blob:/cid:/mhtml:` to data URL)
-- ✅ `.docx` upload and parse
-- ✅ Basic paragraph semantics (alignment, headings, line break)
-- ✅ Basic run styles (bold/italic/underline/strike/color/highlight/super/sub)
-- ✅ List reconstruction (`numId` + `ilvl` + `lvlText`)
-- ✅ Basic table structure (`table/tr/td`)
-- ✅ Table merge + nested table read-only fidelity (`vMerge/gridSpan`)
-- ✅ Table width mapping (`tblGrid/gridCol`, `tcW`)
-- ✅ Embedded image relationship mapping (`rId -> media`)
-- ✅ Page geometry mapping (page height, margins, content width)
-- ✅ Runtime render fixes (`mso-*` compatibility, pagination spacer, empty paragraph normalization)
-- ✅ Events and public methods
-- ✅ React and Vue runnable demos
-- ✅ npm publish workflow with OIDC trusted publishing
-- ✅ Footnotes / endnotes / comments / track changes read-only semantics
-- ✅ Comment range markers (`commentRangeStart/commentRangeEnd`)
-- ✅ Revision metadata markers (`id/author/date`)
-- ✅ Floating anchors (`wp:anchor`) v1 fidelity (position ref / overlap / layer / wrap distance markers)
-- ✅ Word table v1 fidelity (border model / cell spacing / table-layout mapping)
-- ✅ OMML / charts / SmartArt semantic fallback rendering (v1)
-- ✅ Automated fidelity benchmark v1 (golden corpus + CI trend artifacts)
-- ⏳ Floating anchor text-wrap collision fidelity (pixel-level)
-- ⏳ Word table auto layout parity with desktop Word
-- ⏳ OMML high-fidelity renderer (MathML/KaTeX pipeline)
+- ✅ React adapter + Vue adapter
+- ✅ Events and imperative public API
+- ✅ Strict-only parser strategy
+
+### Import Pipeline
+
+- ✅ Clipboard import (`text/html`, `text/plain`)
+- ✅ `.docx` upload + relationship media mapping
+- ✅ Clipboard image hydration (`file:/blob:/cid:`)
+- ✅ Output as stable HTML snapshot
+
+### Layout Fidelity
+
+- ✅ List reconstruction (`numId`, `ilvl`, `lvlText`)
+- ✅ Table v1 (`tblGrid/tcW`, merge, border, spacing)
+- ✅ Floating anchors v1 (`wp:anchor` metadata)
+- ⏳ Anchor collision parity (pixel-level wrap)
+
+### Advanced Semantics
+
+- ✅ Footnotes / endnotes / comments
+- ✅ Revision markers (`ins` / `del`) + metadata
+- ✅ Page break semantic markers
+- ✅ DOCX hyperlink relationship + anchor mapping
+
+### Semantic Fallback
+
+- ✅ OMML fallback output
+- ✅ Chart semantic extraction fallback
+- ✅ SmartArt node fallback extraction
+- ⏳ OMML high-fidelity render pipeline (MathML/KaTeX)
+
+### Engineering Quality
+
+- ✅ 50 automated tests (regression + boundary)
+- ✅ Baseline snapshot regression framework
+- ✅ `verify` quality gate (lint/typecheck/test/build/size)
+- ✅ Parse report API for performance tuning
+<!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
 
 ## What's New in v0.1.3
 
@@ -172,6 +187,13 @@ npm run test
 npm run build
 npm run benchmark:fidelity
 ```
+
+## Engineering Modes
+
+- Spec and conventions: [ENGINEERING_MODES.md](./ENGINEERING_MODES.md)
+- Parse API now supports:
+  - `parseDocxToHtmlSnapshot(file)`
+  - `parseDocxToHtmlSnapshotWithReport(file)`
 
 ## Demos
 
