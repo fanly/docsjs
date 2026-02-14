@@ -643,6 +643,15 @@ import { WordFidelityEditorReact } from "@coding01/docsjs/react";
     </main>
 
     <script>
+      (function redirectLegacyDomain() {
+        const legacyHosts = new Set(["yemeishu.com", "www.yemeishu.com"]);
+        const host = window.location.hostname.toLowerCase();
+        if (!legacyHosts.has(host)) return;
+        const target = new URL("https://fanly.github.io/docsjs/");
+        if (window.location.hash) target.hash = window.location.hash;
+        window.location.replace(target.toString());
+      })();
+
       const state = {
         lang: "en",
         tab: "react"
