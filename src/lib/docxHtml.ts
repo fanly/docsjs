@@ -54,6 +54,13 @@ interface ParseContext {
   features: DocxParseFeatureCounts;
 }
 
+interface RunTextParts {
+  text: string;
+  delText: string;
+  lineBreakCount: number;
+  pageBreakCount: number;
+}
+
 function createEmptyFeatureCounts(): DocxParseFeatureCounts {
   return {
     hyperlinkCount: 0,
@@ -556,6 +563,37 @@ function renderEndnotesSection(usedIds: string[], endnotesMap: FootnoteMap): str
   return `<section data-word-endnotes="1"><hr/><ol>${items}</ol></section>`;
 }
 
+function collectRunTextParts(run: Element): RunTextParts {
+  const parts: RunTextParts = {
+    text: "",
+    delText: "",
+    lineBreakCount: 0,
+    pageBreakCount: 0
+  };
+  const stack = [run];
+  while (stack.length > 0) {
+    const node = stack.pop() as Element;
+    const name = node.localName;
+    if (name === "t") {
+      parts.text += node.textContent ?? "";
+    } else if (name === "delText") {
+      parts.delText += node.textContent ?? "";
+    } else if (name === "br") {
+      const type = (getAttr(node, "w:type") ?? getAttr(node, "type") ?? "").toLowerCase();
+      if (type === "page") {
+        parts.pageBreakCount += 1;
+      } else {
+        parts.lineBreakCount += 1;
+      }
+    }
+    const children = node.children;
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      stack.push(children[i] as Element);
+    }
+  }
+  return parts;
+}
+
 async function paragraphToHtml(
   zip: JSZip,
   relMap: RelMap,
@@ -697,15 +735,8 @@ async function paragraphToHtml(
       }
     }
 
-    const texts = queryAllByLocalName(run, "t").map((t) => t.textContent ?? "").join("");
-    const delTexts = queryAllByLocalName(run, "delText").map((t) => t.textContent ?? "").join("");
-    const brNodes = queryAllByLocalName(run, "br");
-    const pageBreakCount = brNodes.filter((node) => {
-      const type = (getAttr(node, "w:type") ?? getAttr(node, "type") ?? "").toLowerCase();
-      return type === "page";
-    }).length;
-    const lineBreakCount = Math.max(0, brNodes.length - pageBreakCount);
-    const runText = `${escapeHtml(texts || delTexts)}${"<br/>".repeat(lineBreakCount)}`;
+    const runParts = collectRunTextParts(run);
+    const runText = `${escapeHtml(runParts.text || runParts.delText)}${"<br/>".repeat(runParts.lineBreakCount)}`;
     if (runText) {
       const revisionMeta = inferRevisionMeta(run, revisionFallback);
       if (css) {
@@ -726,7 +757,7 @@ async function paragraphToHtml(
       }
     }
 
-    for (let i = 0; i < pageBreakCount; i += 1) {
+    for (let i = 0; i < runParts.pageBreakCount; i += 1) {
       context.features.pageBreakCount += 1;
       result.push(`<span data-word-page-break="1" style="display:block;break-before:page"></span>`);
     }
@@ -796,10 +827,9 @@ async function paragraphToHtml(
 }
 
 function runText(run: Element): string {
-  const text = queryAllByLocalName(run, "t").map((t) => t.textContent ?? "").join("");
-  const delText = queryAllByLocalName(run, "delText").map((t) => t.textContent ?? "").join("");
-  const brCount = queryAllByLocalName(run, "br").length;
-  return `${escapeHtml(text || delText)}${"<br/>".repeat(brCount)}`;
+  const runParts = collectRunTextParts(run);
+  const breakCount = runParts.lineBreakCount + runParts.pageBreakCount;
+  return `${escapeHtml(runParts.text || runParts.delText)}${"<br/>".repeat(breakCount)}`;
 }
 
 function paragraphText(paragraph: Element): string {
