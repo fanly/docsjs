@@ -3,3 +3,6 @@ dist
 artifacts
 .DS_Store
 npm-debug.log*
+.npm-cache
+.tmp-pack
+*.tgz
