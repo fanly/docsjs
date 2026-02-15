@@ -475,22 +475,36 @@ function paragraphDataAttr(paragraphIndex: number | null): string {
   return paragraphIndex === null ? "" : ` data-word-p-index="${paragraphIndex}"`;
 }
 
-function parseFootnotesMap(footnotesXmlText: string | null): FootnoteMap {
-  if (!footnotesXmlText) return {};
-  const footnotesDoc = parseXml(footnotesXmlText);
-  const map: FootnoteMap = {};
-  const footnotes = queryAllByLocalName(footnotesDoc, "footnote");
-  for (const footnote of footnotes) {
-    const idRaw = getAttr(footnote, "w:id") ?? getAttr(footnote, "id");
-    const idNum = idRaw ? Number.parseInt(idRaw, 10) : Number.NaN;
-    if (!Number.isFinite(idNum) || idNum <= 0) continue;
+function extractNodeParagraphText(node: Element): string {
+  const paragraphs = queryAllByLocalName(node, "p");
+  return paragraphs.map((p) => paragraphText(p)).join("<br/>").trim();
+}
 
-    const paragraphs = queryAllByLocalName(footnote, "p");
-    const text = paragraphs.map((p) => paragraphText(p)).join("<br/>").trim();
+function parseIndexedParagraphMap(
+  xmlText: string | null,
+  itemTagName: string,
+  options: { requirePositiveNumericId: boolean }
+): FootnoteMap {
+  if (!xmlText) return {};
+  const doc = parseXml(xmlText);
+  const map: FootnoteMap = {};
+  const items = queryAllByLocalName(doc, itemTagName);
+  for (const item of items) {
+    const idRaw = getAttr(item, "w:id") ?? getAttr(item, "id");
+    if (!idRaw) continue;
+    if (options.requirePositiveNumericId) {
+      const idNum = Number.parseInt(idRaw, 10);
+      if (!Number.isFinite(idNum) || idNum <= 0) continue;
+    }
+    const text = extractNodeParagraphText(item);
     if (!text) continue;
-    map[String(idNum)] = text;
+    map[idRaw] = text;
   }
   return map;
+}
+
+function parseFootnotesMap(footnotesXmlText: string | null): FootnoteMap {
+  return parseIndexedParagraphMap(footnotesXmlText, "footnote", { requirePositiveNumericId: true });
 }
 
 function parseCommentsMap(commentsXmlText: string | null): CommentMap {
@@ -501,8 +515,7 @@ function parseCommentsMap(commentsXmlText: string | null): CommentMap {
   for (const comment of comments) {
     const idRaw = getAttr(comment, "w:id") ?? getAttr(comment, "id");
     if (!idRaw) continue;
-    const paragraphs = queryAllByLocalName(comment, "p");
-    const text = paragraphs.map((p) => paragraphText(p)).join("<br/>").trim();
+    const text = extractNodeParagraphText(comment);
     if (!text) continue;
     map[idRaw] = {
       author: getAttr(comment, "w:author") ?? getAttr(comment, "author"),
@@ -514,21 +527,7 @@ function parseCommentsMap(commentsXmlText: string | null): CommentMap {
 }
 
 function parseEndnotesMap(endnotesXmlText: string | null): FootnoteMap {
-  if (!endnotesXmlText) return {};
-  const endnotesDoc = parseXml(endnotesXmlText);
-  const map: FootnoteMap = {};
-  const endnotes = queryAllByLocalName(endnotesDoc, "endnote");
-  for (const endnote of endnotes) {
-    const idRaw = getAttr(endnote, "w:id") ?? getAttr(endnote, "id");
-    const idNum = idRaw ? Number.parseInt(idRaw, 10) : Number.NaN;
-    if (!Number.isFinite(idNum) || idNum <= 0) continue;
-
-    const paragraphs = queryAllByLocalName(endnote, "p");
-    const text = paragraphs.map((p) => paragraphText(p)).join("<br/>").trim();
-    if (!text) continue;
-    map[String(idNum)] = text;
-  }
-  return map;
+  return parseIndexedParagraphMap(endnotesXmlText, "endnote", { requirePositiveNumericId: true });
 }
 
 function renderFootnotesSection(usedIds: string[], footnotesMap: FootnoteMap): string {
