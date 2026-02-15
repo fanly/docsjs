@@ -24,6 +24,68 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
     expect(snapshot).toContain("x^(2)");
   });
 
+  it("renders OMML fraction to linear fallback", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:f>
+                <m:num><m:r><m:t>a</m:t></m:r></m:num>
+                <m:den><m:r><m:t>b</m:t></m:r></m:den>
+              </m:f>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-omml="1"`);
+    expect(snapshot).toContain("(a)/(b)");
+  });
+
+  it("renders OMML subscript to linear fallback", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:sSub>
+                <m:e><m:r><m:t>x</m:t></m:r></m:e>
+                <m:sub><m:r><m:t>i</m:t></m:r></m:sub>
+              </m:sSub>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-omml="1"`);
+    expect(snapshot).toContain("x_(i)");
+  });
+
+  it("renders OMML sqrt to linear fallback", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:rad>
+                <m:e><m:r><m:t>x</m:t></m:r></m:e>
+              </m:rad>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-omml="1"`);
+    expect(snapshot).toContain("sqrt(x)");
+  });
+
   it("extracts chart semantic summary from chart relationship", async () => {
     const file = await makeDocxFile({
       documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

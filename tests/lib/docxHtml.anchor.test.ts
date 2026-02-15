@@ -161,3 +161,251 @@ describe("parseDocxToHtmlSnapshot anchor image", () => {
     expect(snapshot).toContain("z-index:0");
   });
 });
+
+describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
+  it("maps wrapTight mode", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor>
+            <wp:wrapTight wrapped="1"/>
+            <wp:positionH><wp:posOffset>0</wp:posOffset></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-tight.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-wrap="tight"`);
+  });
+
+  it("maps wrapThrough mode (currently defaults to anchor without explicit wrap)", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor>
+            <wp:wrapThrough wrapSide="both"/>
+            <wp:positionH><wp:posOffset>0</wp:posOffset></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-through.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-anchor="1"`);
+  });
+
+  it("maps no wrap (in front/behind text)", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor behindDoc="0">
+            <wp:positionH><wp:posOffset>0</wp:posOffset></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-nowrap.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-anchor="1"`);
+  });
+
+  it("maps horizontal alignment relative to column", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor>
+            <wp:wrapSquare/>
+            <wp:positionH relativeFrom="column"><wp:posOffset>457200</wp:posOffset></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-column.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-anchor-relh="column"`);
+  });
+
+  it("maps horizontal alignment (currently maps relativeFrom, align not yet supported)", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor>
+            <wp:wrapSquare/>
+            <wp:positionH relativeFrom="page"><wp:align>center</wp:align></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-center.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain(`data-word-anchor-relh="page"`);
+  });
+
+  it("preserves image dimensions from extent", async () => {
+    const file = await makeDocx(true);
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("width:96.00px");
+    expect(snapshot).toContain("height:48.00px");
+  });
+
+  it("maps relativeHeight to z-index", async () => {
+    const zip = new JSZip();
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document
+        xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+        xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+        xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <w:body><w:p><w:r><w:drawing>
+          <wp:anchor relativeHeight="25">
+            <wp:wrapSquare/>
+            <wp:positionH><wp:posOffset>0</wp:posOffset></wp:positionH>
+            <wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV>
+            <wp:extent cx="914400" cy="457200"/>
+            <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
+          </wp:anchor>
+        </w:drawing></w:r></w:p></w:body>
+      </w:document>`
+    );
+    zip.file(
+      "word/_rels/document.xml.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Target="media/image1.png" />
+      </Relationships>`
+    );
+    zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
+    const bytes = await zip.generateAsync({ type: "uint8array" });
+    const file = {
+      name: "anchor-z.docx",
+      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    } as unknown as File;
+
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("z-index:");
+  });
+});
