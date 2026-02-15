@@ -83,12 +83,35 @@ function parseXml(xmlText: string): Document {
   return parser.parseFromString(xmlText, "application/xml");
 }
 
+function rootChildrenAsElements(root: ParentNode): Element[] {
+  return Array.from((root as ParentNode & { children?: HTMLCollection }).children ?? []) as Element[];
+}
+
 function queryAllByLocalName(root: ParentNode, localName: string): Element[] {
-  return Array.from(root.querySelectorAll("*")).filter((el) => el.localName === localName);
+  const result: Element[] = [];
+  const stack = rootChildrenAsElements(root).reverse();
+  while (stack.length > 0) {
+    const node = stack.pop() as Element;
+    if (node.localName === localName) result.push(node);
+    const children = node.children;
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      stack.push(children[i] as Element);
+    }
+  }
+  return result;
 }
 
 function queryByLocalName(root: ParentNode, localName: string): Element | null {
-  return queryAllByLocalName(root, localName)[0] ?? null;
+  const stack = rootChildrenAsElements(root).reverse();
+  while (stack.length > 0) {
+    const node = stack.pop() as Element;
+    if (node.localName === localName) return node;
+    const children = node.children;
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      stack.push(children[i] as Element);
+    }
+  }
+  return null;
 }
 
 function directChildrenByLocalName(node: Element, localName: string): Element[] {
@@ -550,9 +573,9 @@ async function paragraphToHtml(
   const alignStyle = paragraphAlignStyle(paragraph);
   const dataAttr = paragraphDataAttr(paragraphIndex);
   const hasRenderableNode =
-    queryAllByLocalName(paragraph, "r").length > 0 ||
-    queryAllByLocalName(paragraph, "oMath").length > 0 ||
-    queryAllByLocalName(paragraph, "oMathPara").length > 0;
+    queryByLocalName(paragraph, "r") !== null ||
+    queryByLocalName(paragraph, "oMath") !== null ||
+    queryByLocalName(paragraph, "oMathPara") !== null;
   if (!hasRenderableNode) {
     return `<${tag}${dataAttr}${alignStyle ? ` style="${alignStyle}"` : ""}><br/></${tag}>`;
   }
@@ -588,10 +611,10 @@ async function paragraphToHtml(
 
   async function runToHtml(run: Element, revisionFallback: RevisionMeta | null): Promise<string[]> {
     const result: string[] = [];
-    const rPr = queryByLocalName(run, "rPr");
+    const rPr = directChildrenByLocalName(run, "rPr")[0] ?? null;
     const css = runStyleToCss(rPr);
 
-    const footnoteRef = queryByLocalName(run, "footnoteReference");
+    const footnoteRef = directChildrenByLocalName(run, "footnoteReference")[0] ?? null;
     const footnoteId = getAttr(footnoteRef, "w:id") ?? getAttr(footnoteRef, "id");
     if (footnoteId && footnotesMap[footnoteId]) {
       context.features.footnoteRefCount += 1;
@@ -602,7 +625,7 @@ async function paragraphToHtml(
       return result;
     }
 
-    const endnoteRef = queryByLocalName(run, "endnoteReference");
+    const endnoteRef = directChildrenByLocalName(run, "endnoteReference")[0] ?? null;
     const endnoteId = getAttr(endnoteRef, "w:id") ?? getAttr(endnoteRef, "id");
     if (endnoteId && endnotesMap[endnoteId]) {
       context.features.endnoteRefCount += 1;
@@ -613,7 +636,7 @@ async function paragraphToHtml(
       return result;
     }
 
-    const commentRef = queryByLocalName(run, "commentReference");
+    const commentRef = directChildrenByLocalName(run, "commentReference")[0] ?? null;
     const commentId = getAttr(commentRef, "w:id") ?? getAttr(commentRef, "id");
     if (commentId && commentsMap[commentId]) {
       context.features.commentRefCount += 1;
@@ -624,7 +647,7 @@ async function paragraphToHtml(
       return result;
     }
 
-    const drawing = queryByLocalName(run, "drawing");
+    const drawing = directChildrenByLocalName(run, "drawing")[0] ?? null;
     if (drawing) {
       const blip = queryByLocalName(drawing, "blip");
       const rid = getAttr(blip, "r:embed") ?? getAttr(blip, "embed");
