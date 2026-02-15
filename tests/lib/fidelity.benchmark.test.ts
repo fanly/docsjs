@@ -2,17 +2,12 @@ import { describe, expect, it } from "vitest";
 import { parseDocxToHtmlSnapshotWithReport } from "../../src/lib/docxHtml";
 import { collectSemanticStatsFromHtml } from "../../src/lib/semanticStats";
 import { calculateFidelityScore } from "../../src/lib/fidelityScore";
-import {
-  getAllFixtureNames,
-  getFixture,
-  FIXTURE_REGISTRY,
-  type FixtureConfig
-} from "../fixtures";
+import { getAllFixtureNames, getFixture } from "../fixtures";
 
 describe("Fidelity Benchmark Suite", () => {
   describe("Basic Documents", () => {
     it("parses empty document without error", async () => {
-      const { file, config } = await getFixture("empty");
+      const { file } = await getFixture("empty");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toBeDefined();
@@ -59,7 +54,7 @@ describe("Fidelity Benchmark Suite", () => {
     });
 
     it("parses formatted text with style preservation", async () => {
-      const { file, config } = await getFixture("formatted-text");
+      const { file } = await getFixture("formatted-text");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain("font-weight:700");
@@ -115,7 +110,7 @@ describe("Fidelity Benchmark Suite", () => {
 
   describe("List Fidelity", () => {
     it("parses simple numbered list preserving content", async () => {
-      const { file, config } = await getFixture("simple-numbered-list");
+      const { file } = await getFixture("simple-numbered-list");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain("First item");
@@ -125,7 +120,7 @@ describe("Fidelity Benchmark Suite", () => {
     });
 
     it("parses multi-level list preserving nested content", async () => {
-      const { file, config } = await getFixture("multi-level-list");
+      const { file } = await getFixture("multi-level-list");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain("Level 1 - Item 1");
@@ -138,7 +133,7 @@ describe("Fidelity Benchmark Suite", () => {
 
   describe("Annotation Fidelity", () => {
     it("parses document with comments preserving references", async () => {
-      const { file, config } = await getFixture("with-comments");
+      const { file } = await getFixture("with-comments");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain('data-word-comment-ref="0"');
@@ -150,21 +145,20 @@ describe("Fidelity Benchmark Suite", () => {
     });
 
     it("parses document with footnotes preserving structure", async () => {
-      const { file, config } = await getFixture("with-footnotes");
+      const { file } = await getFixture("with-footnotes");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain('data-word-footnote-ref="1"');
       expect(result.htmlSnapshot).toContain('data-word-footnotes="1"');
       expect(result.htmlSnapshot).toContain("Footnote content here");
 
-      const stats = collectSemanticStatsFromHtml(result.htmlSnapshot);
       expect(result.htmlSnapshot).toContain('data-word-footnotes="1"');
     });
   });
 
   describe("Revision Fidelity", () => {
     it("parses document with insertions and deletions", async () => {
-      const { file, config } = await getFixture("with-revisions");
+      const { file } = await getFixture("with-revisions");
       const result = await parseDocxToHtmlSnapshotWithReport(file);
 
       expect(result.htmlSnapshot).toContain('data-word-revision="ins"');
