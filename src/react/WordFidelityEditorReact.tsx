@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import type { Ref } from "react";
-import { defineDocsWordElement } from "../core/DocsWordElement";
+import { defineDocsWordElement } from "../index";
 import type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
   DocsWordEditorReadyDetail
-} from "../core/types";
+} from "../index";
 
 defineDocsWordElement();
 

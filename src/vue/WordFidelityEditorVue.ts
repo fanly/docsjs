@@ -1,11 +1,11 @@
 import { defineComponent, h, onBeforeUnmount, onMounted, ref } from "vue";
-import { defineDocsWordElement } from "../core/DocsWordElement";
+import { defineDocsWordElement } from "../index";
 import type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
   DocsWordEditorReadyDetail
-} from "../core/types";
+} from "../index";
 
 defineDocsWordElement();
 
