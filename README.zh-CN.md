@@ -104,6 +104,7 @@ document.body.appendChild(el);
 - ✅ React + Vue 适配层
 - ✅ 事件体系与命令式公开 API
 - ✅ 严格模式唯一解析策略
+- ✅ 插件架构框架
 
 ### 导入链路
 
@@ -111,6 +112,36 @@ document.body.appendChild(el);
 - ✅ `.docx` 上传与关系媒体映射
 - ✅ 不稳定图片 URI 修复（`file:/blob:/cid:`）
 - ✅ 输出稳定 HTML Snapshot
+
+### 清理插件（粘贴管道）
+
+- ✅ Google Docs 产物清理（`docs-internal-guid`、`google-sheets-html-origin`、`data-sheets-*`）
+- ✅ WPS Office 产物清理（`wps-*`、`kingsoft-*`）
+- ✅ Word 产物清理（`mso-*`、`class="Mso*"`、Office XML 命名空间）
+
+### 内容插件（DOCX 解析器）
+
+- ✅ 书签解析
+- ✅ 页眉/页脚引用解析
+- ✅ 章节属性解析（页面大小、页边距，分栏）
+- ✅ 首字下沉格式
+- ✅ 域解析（PAGE、NUMPAGES、DATE、TOC）
+- ✅ 交叉引用解析
+- ✅ 题注解析
+
+### 渲染插件
+
+- ✅ VML/DrawingML 形状渲染
+- ✅ 艺术字渲染
+- ✅ OLE 对象占位符
+- ✅ 内容控件（SDT）解析
+- ✅ 水印渲染
+- ✅ 页面背景颜色
+
+### 样式插件
+
+- ✅ 从 styles.xml 继承样式
+- ✅ 列表样式解析
 
 ### 版式保真
 
@@ -135,11 +166,35 @@ document.body.appendChild(el);
 
 ### 工程质量
 
-- ✅ 125 条自动化测试（回归 + 边界）
+- ✅ 157 条自动化测试（回归 + 边界 + 插件）
 - ✅ 基准快照回归框架
 - ✅ `verify` 质量门禁（lint/typecheck/test/build/size）
 - ✅ 解析报告 API（性能调优）
+- ✅ 插件管道 API（可扩展性）
 <!-- GENERATED:FEATURE_CHECKLIST_ZH:END -->
+- ✅ `verify` 质量门禁（lint/typecheck/test/build/size）
+- ✅ 解析报告 API（性能调优）
+<!-- GENERATED:FEATURE_CHECKLIST_ZH:END -->
+
+## v0.1.8 更新内容
+
+- 新增**插件架构框架**，支持可扩展性：
+  - 插件注册表与优先级执行
+  - 支持 Cleanup、Transform、Parse 阶段
+  - 23 个内置插件，增强 DOCX/Word/WPS/Google Docs 支持
+- 新增**清理插件**用于粘贴管道：
+  - Google Docs 产物清理（`docs-internal-guid`、`google-sheets-html-origin`、`data-sheets-*`）
+  - WPS Office 产物清理（`wps-*`、`kingsoft-*`）
+  - Word 产物清理（`mso-*`、`class="Mso*"`、Office XML 命名空间）
+- 新增**内容插件**用于 DOCX 解析：
+  - 书签、页眉/页脚、章节属性、首字下沉、域、交叉引用、题注
+- 新增**渲染插件**用于高级元素：
+  - VML/DrawingML 形状、艺术字、OLE 对象、内容控件（SDT）、水印、页面背景
+- 新增**样式插件**用于增强样式：
+  - 样式继承、列表样式解析
+- 新增**数学插件**用于 MathML 转换
+- 测试套件扩展至 **157 个测试**
+- 新增 `DocxPluginPipeline` API 用于自定义插件配置
 
 ## v0.1.7 更新内容
 

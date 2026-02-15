@@ -26,6 +26,11 @@
           "status": "done",
           "en": "Strict-only parser strategy",
           "zh": "严格模式唯一解析策略"
+        },
+        {
+          "status": "done",
+          "en": "Plugin architecture framework",
+          "zh": "插件架构框架"
         }
       ]
     },
@@ -55,6 +60,132 @@
           "status": "done",
           "en": "Output as stable HTML snapshot",
           "zh": "输出稳定 HTML Snapshot"
+        }
+      ]
+    },
+    {
+      "id": "cleanup",
+      "title": {
+        "en": "Cleanup Plugins (Paste Pipeline)",
+        "zh": "清理插件（粘贴管道）"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Google Docs artifacts removal (`docs-internal-guid`, `google-sheets-html-origin`, `data-sheets-*`)",
+          "zh": "Google Docs 产物清理（`docs-internal-guid`、`google-sheets-html-origin`、`data-sheets-*`）"
+        },
+        {
+          "status": "done",
+          "en": "WPS Office artifacts removal (`wps-*`, `kingsoft-*`)",
+          "zh": "WPS Office 产物清理（`wps-*`、`kingsoft-*`）"
+        },
+        {
+          "status": "done",
+          "en": "Word artifacts removal (`mso-*`, `class=\"Mso*\"`, Office XML namespaces)",
+          "zh": "Word 产物清理（`mso-*`、`class=\"Mso*\"`、Office XML 命名空间）"
+        }
+      ]
+    },
+    {
+      "id": "content",
+      "title": {
+        "en": "Content Plugins (DOCX Parser)",
+        "zh": "内容插件（DOCX 解析器）"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Bookmark parsing",
+          "zh": "书签解析"
+        },
+        {
+          "status": "done",
+          "en": "Header/Footer reference parsing",
+          "zh": "页眉/页脚引用解析"
+        },
+        {
+          "status": "done",
+          "en": "Section properties parsing (page size, margins, columns)",
+          "zh": "章节属性解析（页面大小、页边距、分栏）"
+        },
+        {
+          "status": "done",
+          "en": "Drop cap formatting",
+          "zh": "首字下沉格式"
+        },
+        {
+          "status": "done",
+          "en": "Field parsing (PAGE, NUMPAGES, DATE, TOC)",
+          "zh": "域解析（PAGE、NUMPAGES、DATE、TOC）"
+        },
+        {
+          "status": "done",
+          "en": "Cross-reference parsing",
+          "zh": "交叉引用解析"
+        },
+        {
+          "status": "done",
+          "en": "Caption parsing",
+          "zh": "题注解析"
+        }
+      ]
+    },
+    {
+      "id": "render",
+      "title": {
+        "en": "Render Plugins",
+        "zh": "渲染插件"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "VML/DrawingML shape rendering",
+          "zh": "VML/DrawingML 形状渲染"
+        },
+        {
+          "status": "done",
+          "en": "WordArt rendering",
+          "zh": "艺术字渲染"
+        },
+        {
+          "status": "done",
+          "en": "OLE object placeholders",
+          "zh": "OLE 对象占位符"
+        },
+        {
+          "status": "done",
+          "en": "Content control (SDT) parsing",
+          "zh": "内容控件（SDT）解析"
+        },
+        {
+          "status": "done",
+          "en": "Watermark rendering",
+          "zh": "水印渲染"
+        },
+        {
+          "status": "done",
+          "en": "Page background color",
+          "zh": "页面背景颜色"
+        }
+      ]
+    },
+    {
+      "id": "style",
+      "title": {
+        "en": "Style Plugins",
+        "zh": "样式插件"
+      },
+      "items": [
+        {
+          "status": "done",
+          "en": "Style inheritance from styles.xml",
+          "zh": "从 styles.xml 继承样式"
+        },
+        {
+          "status": "done",
+          "en": "List style parsing",
+          "zh": "列表样式解析"
         }
       ]
     },
@@ -154,8 +285,8 @@
       "items": [
         {
           "status": "done",
-          "en": "50 automated tests (regression + boundary)",
-          "zh": "50 条自动化测试（回归 + 边界）"
+          "en": "157 automated tests (regression + boundary + plugins)",
+          "zh": "157 条自动化测试（回归 + 边界 + 插件）"
         },
         {
           "status": "done",
@@ -171,6 +302,11 @@
           "status": "done",
           "en": "Parse report API for performance tuning",
           "zh": "解析报告 API（性能调优）"
+        },
+        {
+          "status": "done",
+          "en": "Plugin pipeline API for extensibility",
+          "zh": "插件管道 API（可扩展性）"
         }
       ]
     }

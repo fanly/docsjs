@@ -109,6 +109,7 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ React adapter + Vue adapter
 - ✅ Events and imperative public API
 - ✅ Strict-only parser strategy
+- ✅ Plugin architecture framework
 
 ### Import Pipeline
 
@@ -116,6 +117,36 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ `.docx` upload + relationship media mapping
 - ✅ Clipboard image hydration (`file:/blob:/cid:`)
 - ✅ Output as stable HTML snapshot
+
+### Cleanup Plugins (Paste Pipeline)
+
+- ✅ Google Docs artifacts removal (`docs-internal-guid`, `google-sheets-html-origin`, `data-sheets-*`)
+- ✅ WPS Office artifacts removal (`wps-*`, `kingsoft-*`)
+- ✅ Word artifacts removal (`mso-*`, `class="Mso*"`, `o:/w:` namespaces)
+
+### Content Plugins (DOCX Parser)
+
+- ✅ Bookmark parsing
+- ✅ Header/Footer reference parsing
+- ✅ Section properties parsing (page size, margins, columns)
+- ✅ Drop cap formatting
+- ✅ Field parsing (PAGE, NUMPAGES, DATE, TOC)
+- ✅ Cross-reference parsing
+- ✅ Caption parsing
+
+### Render Plugins
+
+- ✅ VML/DrawingML shape rendering
+- ✅ WordArt rendering
+- ✅ OLE object placeholders
+- ✅ Content control (SDT) parsing
+- ✅ Watermark rendering
+- ✅ Page background color
+
+### Style Plugins
+
+- ✅ Style inheritance from styles.xml
+- ✅ List style parsing
 
 ### Layout Fidelity
 
@@ -140,11 +171,32 @@ el.addEventListener("docsjs-change", (e) => {
 
 ### Engineering Quality
 
-- ✅ 125 automated tests (regression + boundary)
+- ✅ 157 automated tests (regression + boundary + plugins)
 - ✅ Baseline snapshot regression framework
 - ✅ `verify` quality gate (lint/typecheck/test/build/size)
 - ✅ Parse report API for performance tuning
+- ✅ Plugin pipeline API for extensibility
 <!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
+
+## What's New in v0.1.8
+
+- Added **plugin architecture framework** for extensibility:
+  - Plugin registry with priority-based execution
+  - Support for Cleanup, Transform, Parse phases
+  - 23 built-in plugins for enhanced DOCX/Word/WPS/Google Docs support
+- Added **cleanup plugins** for paste pipeline:
+  - Google Docs artifacts removal (`docs-internal-guid`, `google-sheets-html-origin`, `data-sheets-*`)
+  - WPS Office artifacts removal (`wps-*`, `kingsoft-*`)
+  - Word artifacts removal (`mso-*`, `class="Mso*"`, Office XML namespaces)
+- Added **content plugins** for DOCX parsing:
+  - Bookmark, Header/Footer, Section, DropCap, Field, CrossRef, Caption
+- Added **render plugins** for advanced elements:
+  - VML/DrawingML shapes, WordArt, OLE objects, Content controls (SDT), Watermarks, Page backgrounds
+- Added **style plugins** for enhanced styling:
+  - Style inheritance, List style parsing
+- Added **math plugin** for MathML conversion
+- Test suite expanded to **157 tests**
+- New `DocxPluginPipeline` API for custom plugin configurations
 
 ## What's New in v0.1.7
 
