@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { buildHtmlSnapshot } from "./htmlSnapshot";
+import { createPipeline, type DocxPluginPipeline } from "./pluginPipeline";
 
 interface RelMap {
   [rid: string]: string;
@@ -43,6 +44,15 @@ export interface DocxParseFeatureCounts {
   commentRefCount: number;
   revisionCount: number;
   pageBreakCount: number;
+  bookmarkCount: number;
+  fieldCount: number;
+  crossRefCount: number;
+  sdtCount: number;
+  shapeCount: number;
+  oleCount: number;
+  watermarkCount: number;
+  headerCount: number;
+  footerCount: number;
 }
 
 export interface DocxParseReport {
@@ -52,6 +62,7 @@ export interface DocxParseReport {
 
 interface ParseContext {
   features: DocxParseFeatureCounts;
+  pluginPipeline?: DocxPluginPipeline;
 }
 
 interface RunTextParts {
@@ -73,7 +84,16 @@ function createEmptyFeatureCounts(): DocxParseFeatureCounts {
     endnoteRefCount: 0,
     commentRefCount: 0,
     revisionCount: 0,
-    pageBreakCount: 0
+    pageBreakCount: 0,
+    bookmarkCount: 0,
+    fieldCount: 0,
+    crossRefCount: 0,
+    sdtCount: 0,
+    shapeCount: 0,
+    oleCount: 0,
+    watermarkCount: 0,
+    headerCount: 0,
+    footerCount: 0
   };
 }
 
@@ -1089,10 +1109,15 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
 }
 
 export async function parseDocxToHtmlSnapshotWithReport(
-  file: File
+  file: File,
+  options?: { enablePlugins?: boolean }
 ): Promise<{ htmlSnapshot: string; report: DocxParseReport }> {
   const startedAt = Date.now();
-  const context: ParseContext = { features: createEmptyFeatureCounts() };
+  const enablePlugins = options?.enablePlugins ?? true;
+  
+  const pluginPipeline = enablePlugins ? createPipeline() : null;
+  const context: ParseContext = { features: createEmptyFeatureCounts(), pluginPipeline: pluginPipeline ?? undefined };
+  
   const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
   const buffer = maybeArrayBuffer ? await maybeArrayBuffer.call(file) : await new Response(file).arrayBuffer();
   const zip = await JSZip.loadAsync(buffer);
@@ -1105,10 +1130,16 @@ export async function parseDocxToHtmlSnapshotWithReport(
   const footnotesText = await zip.file("word/footnotes.xml")?.async("string");
   const endnotesText = await zip.file("word/endnotes.xml")?.async("string");
   const commentsText = await zip.file("word/comments.xml")?.async("string");
+  const stylesText = await zip.file("word/styles.xml")?.async("string");
+  const numberingText = await zip.file("word/numbering.xml")?.async("string");
+  
   const relMap = parseDocRelsMap(relsText ?? null);
   const footnotesMap = parseFootnotesMap(footnotesText ?? null);
   const endnotesMap = parseEndnotesMap(endnotesText ?? null);
   const commentsMap = parseCommentsMap(commentsText ?? null);
+  const stylesXml = stylesText ? parseXml(stylesText) : null;
+  const numberingXml = numberingText ? parseXml(numberingText) : null;
+  
   const usedFootnoteIds: string[] = [];
   const usedEndnoteIds: string[] = [];
   const usedCommentIds: string[] = [];
@@ -1116,6 +1147,10 @@ export async function parseDocxToHtmlSnapshotWithReport(
   const body = queryByLocalName(documentXml, "body");
   if (!body) {
     throw new Error("DOCX missing body");
+  }
+
+  if (pluginPipeline) {
+    await pluginPipeline.initialize(zip, documentXml, stylesXml, numberingXml, relMap);
   }
 
   const paragraphIndexMap = new Map<Element, number>();
@@ -1154,8 +1189,15 @@ export async function parseDocxToHtmlSnapshotWithReport(
   blockHtml.push(renderFootnotesSection(usedFootnoteIds, footnotesMap));
   blockHtml.push(renderEndnotesSection(usedEndnoteIds, endnotesMap));
   blockHtml.push(renderCommentsSection(usedCommentIds, commentsMap));
+  
+  let htmlResult = buildHtmlSnapshot(blockHtml.join("\n"));
+  
+  if (pluginPipeline) {
+    htmlResult = await pluginPipeline.executeTransformPhase(htmlResult);
+  }
+  
   return {
-    htmlSnapshot: buildHtmlSnapshot(blockHtml.join("\n")),
+    htmlSnapshot: htmlResult,
     report: {
       elapsedMs: Date.now() - startedAt,
       features: context.features
