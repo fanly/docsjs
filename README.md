@@ -140,11 +140,26 @@ el.addEventListener("docsjs-change", (e) => {
 
 ### Engineering Quality
 
-- ✅ 50 automated tests (regression + boundary)
+- ✅ 125 automated tests (regression + boundary)
 - ✅ Baseline snapshot regression framework
 - ✅ `verify` quality gate (lint/typecheck/test/build/size)
 - ✅ Parse report API for performance tuning
 <!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
+
+## What's New in v0.1.7
+
+- Added comprehensive fidelity test suites:
+  - Fidelity benchmark suite with 26 baseline tests
+  - Deep list fidelity tests (7 tests)
+  - Deep table fidelity tests (12 tests)
+  - Anchor image layout tests (7 tests)
+  - Footnote/endnote rendering tests (8 tests)
+  - Revision tracking visualization tests (10 tests)
+  - Pagination precision tests (widow/orphan, keep-with-next)
+  - OMML formula rendering tests (fraction, subscript, sqrt)
+- Test suite grew from 50+ to **125 tests**
+- All tests follow TDD and lossless paste verification principles
+- Added semantic statistics for pagination (spacer markers, widow/orphan)
 
 ## What's New in v0.1.3
 
