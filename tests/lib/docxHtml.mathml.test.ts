@@ -230,4 +230,107 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
     expect(snapshot).toContain("data-word-omml=\"1\"");
     expect(snapshot).toContain("123");
   });
+
+  it("handles nested fraction in superscript", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:sSup><m:e><m:f><m:num><m:r><m:t>1</m:t></m:r></m:num><m:den><m:r><m:t>2</m:t></m:r></m:den></m:f></m:e><m:sup><m:r><m:t>3</m:t></m:r></m:sup></m:sSup>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain("^(3)");
+  });
+
+  it("handles multiple operators in sequence", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:r><m:t>a</m:t></m:r><m:o><m:t>+</m:t></m:o><m:r><m:t>b</m:t></m:r><m:o><m:t>*</m:t></m:o><m:r><m:t>c</m:t></m:r>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain("a");
+    expect(snapshot).toContain("+");
+    expect(snapshot).toContain("*");
+    expect(snapshot).toContain("c");
+  });
+
+  it("handles empty math element gracefully", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath></m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).not.toContain("data-word-omml=\"1\"");
+  });
+
+  it("handles math with only whitespace gracefully", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>   </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).not.toContain("data-word-omml=\"1\"");
+  });
+
+  it("handles group character with custom character", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:groupChr chr="["><m:e><m:r><m:t>x</m:t></m:r></m:e></m:groupChr>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("data-word-omml=\"1\"");
+  });
+
+  it("handles lim element with base and limit", async () => {
+    const file = await makeDocxFile({
+      documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math">
+        <w:body>
+          <w:p>
+            <m:oMath>
+              <m:lim><m:e><m:r><m:t>x</m:t></m:r></m:e><m:lim><m:r><m:t>y</m:t></m:r></m:lim></m:lim>
+            </m:oMath>
+          </w:p>
+        </w:body>
+      </w:document>`
+    });
+    const snapshot = await parseDocxToHtmlSnapshot(file);
+    expect(snapshot).toContain("data-word-omml=\"1\"");
+  });
 });

@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 import { PluginPhase, PluginPriority, type TransformPlugin, type PluginContext } from "../base";
 
 export interface MathMlConfig {
@@ -43,304 +42,348 @@ export function createMathMlPlugin(config?: MathMlConfig): TransformPlugin {
 
 function ommlToMathml(omml: Element): string {
   const math = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
-
-  function convert(node: Element | null): Element | null {
-    if (!node) return null;
-
-    const localName = node.localName || "";
-    let result: Element;
-
-    switch (localName) {
-      case "oMath":
-      case "m":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
-        for (const child of Array.from(node.childNodes)) {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            const converted = convert(child as Element);
-            if (converted) result.appendChild(converted);
-          } else if (child.nodeType === Node.TEXT_NODE) {
-            const text = child.textContent?.trim();
-            if (text) {
-              const mtext = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mtext");
-              mtext.textContent = text;
-              result.appendChild(mtext);
-            }
-          }
-        }
-        break;
-
-      case "f":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mfrac");
-        const num = node.querySelector("m\\:num, num");
-        const den = node.querySelector("m\\:den, den");
-        if (num) {
-          const converted = convert(num);
-          if (converted) result.appendChild(converted);
-        }
-        if (den) {
-          const convertedDen = convert(den);
-          if (convertedDen) result.appendChild(convertedDen);
-        }
-        break;
-
-      case "sup":
-      case "sSup":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msup");
-        const supBase = node.querySelector("m\\:e, e");
-        const supSup = node.querySelector("m\\:sup, sup");
-        if (supBase) {
-          const converted = convert(supBase);
-          if (converted) result.appendChild(converted);
-        }
-        if (supSup) {
-          const convertedSup = convert(supSup);
-          if (convertedSup) result.appendChild(convertedSup);
-        }
-        break;
-
-      case "sub":
-      case "sSub":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msub");
-        const subBase = node.querySelector("m\\:e, e");
-        const subSub = node.querySelector("m\\:sub, sub");
-        if (subBase) {
-          const converted = convert(subBase);
-          if (converted) result.appendChild(converted);
-        }
-        if (subSub) {
-          const convertedSub = convert(subSub);
-          if (convertedSub) result.appendChild(convertedSub);
-        }
-        break;
-
-      case "sSubSup":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msubsup");
-        const subSupBase = node.querySelector("m\\:e, e");
-        const subSupSub = node.querySelector("m\\:sub, sub");
-        const subSupSup = node.querySelector("m\\:sup, sup");
-        if (subSupBase) {
-          const converted = convert(subSupBase);
-          if (converted) result.appendChild(converted);
-        }
-        if (subSupSub) {
-          const convertedSub = convert(subSupSub);
-          if (convertedSub) result.appendChild(convertedSub);
-        }
-        if (subSupSup) {
-          const convertedSup = convert(subSupSup);
-          if (convertedSup) result.appendChild(convertedSup);
-        }
-        break;
-
-      case "rad":
-      case "root":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mroot");
-        const rootBase = node.querySelector("m\\:e, e");
-        const rootDeg = node.querySelector("m\\:deg, deg, m\\:degree, degree");
-        if (rootBase) {
-          const converted = convert(rootBase);
-          if (converted) result.appendChild(converted);
-        }
-        if (rootDeg) {
-          const convertedDeg = convert(rootDeg);
-          if (convertedDeg) result.appendChild(convertedDeg);
-        } else {
-          const deg = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
-          deg.textContent = "2";
-          result.appendChild(deg);
-        }
-        break;
-
-      case "bar":
-      case "barOver":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mover");
-        const barBase = node.querySelector("m\\:e, e");
-        if (barBase) {
-          const converted = convert(barBase);
-          if (converted) result.appendChild(converted);
-        }
-        const overBar = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-        overBar.textContent = "̄";
-        result.appendChild(overBar);
-        break;
-
-      case "barUnder":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "munder");
-        const underBase = node.querySelector("m\\:e, e");
-        if (underBase) {
-          const converted = convert(underBase);
-          if (converted) result.appendChild(converted);
-        }
-        const underLine = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-        underLine.textContent = "̱";
-        result.appendChild(underLine);
-        break;
-
-      case "acc":
-      case "accent":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mover");
-        const accBase = node.querySelector("m\\:e, e");
-        const accChar = node.getAttribute("chr") || "^";
-        if (accBase) {
-          const converted = convert(accBase);
-          if (converted) result.appendChild(converted);
-        }
-        const accent = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-        accent.textContent = accChar;
-        result.appendChild(accent);
-        break;
-
-      case "lim":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "munderover");
-        const limBase = node.querySelector("m\\:e, e");
-        const limLow = node.querySelector("m\\:lim, lim, m\\:bottom, bottom");
-        if (limBase) {
-          const converted = convert(limBase);
-          if (converted) result.appendChild(converted);
-        }
-        if (limLow) {
-          const convertedLow = convert(limLow);
-          if (convertedLow) result.appendChild(convertedLow);
-        }
-        const limSym = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
-        limSym.textContent = "lim";
-        result.appendChild(limSym);
-        break;
-
-      case "func":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
-        const funcName = node.querySelector("m\\:func, func, m\\:fName, fName");
-        const funcArg = node.querySelector("m\\:arg, arg, m\\:e, e");
-        if (funcName) {
-          const convertedName = convert(funcName);
-          if (convertedName) result.appendChild(convertedName);
-        }
-        if (funcArg) {
-          const convertedArg = convert(funcArg);
-          if (convertedArg) result.appendChild(convertedArg);
-        }
-        break;
-
-      case "r":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "t":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mtext");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "n":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "o":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "s":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "ms");
-        result.setAttribute("stretchy", "false");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "b":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
-        result.setAttribute("font-weight", "bold");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "i":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mi");
-        result.setAttribute("font-style", "italic");
-        result.textContent = node.textContent || "";
-        break;
-
-      case "span":
-      case "sp":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
-        for (const child of Array.from(node.childNodes)) {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            const converted = convert(child as Element);
-            if (converted) result.appendChild(converted);
-          }
-        }
-        break;
-
-      case "box":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mpadded");
-        for (const child of Array.from(node.childNodes)) {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            const converted = convert(child as Element);
-            if (converted) result.appendChild(converted);
-          }
-        }
-        break;
-
-      case "groupChr":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mover");
-        const groupChrBase = node.querySelector("m\\:e, e");
-        const groupChrChr = node.getAttribute("chr") || "{";
-        if (groupChrBase) {
-          const converted = convert(groupChrBase);
-          if (converted) result.appendChild(converted);
-        }
-        const groupChr = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mo");
-        groupChr.textContent = groupChrChr;
-        result.appendChild(groupChr);
-        break;
-
-      case "borderBox":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "menclose");
-        result.setAttribute("notation", "top bottom left right");
-        for (const child of Array.from(node.childNodes)) {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            const converted = convert(child as Element);
-            if (converted) result.appendChild(converted);
-          }
-        }
-        break;
-
-      case "d":
-      case "deg":
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "msup");
-        const degBase = node.previousElementSibling;
-        if (degBase) {
-          const converted = convert(degBase);
-          if (converted) result.appendChild(converted);
-        }
-        const degNum = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mn");
-        degNum.textContent = node.textContent || "0";
-        result.appendChild(degNum);
-        break;
-
-      default:
-        result = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mrow");
-        for (const child of Array.from(node.childNodes)) {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            const converted = convert(child as Element);
-            if (converted) result.appendChild(converted);
-          } else if (child.nodeType === Node.TEXT_NODE) {
-            const text = child.textContent?.trim();
-            if (text) {
-              const mtext = document.createElementNS("http://www.w3.org/1998/Math/MathML", "mtext");
-              mtext.textContent = text;
-              result.appendChild(mtext);
-            }
-          }
-        }
-    }
-
-    return result;
-  }
-
-  const converted = convert(omml);
+  const converted = convertOmml(omml);
   if (converted) math.appendChild(converted);
-
   return `<math xmlns="http://www.w3.org/1998/Math/MathML">${math.innerHTML}</math>`;
+}
+
+function convertOmml(node: Element | null): Element | null {
+  if (!node) return null;
+
+  const localName = node.localName || "";
+
+  switch (localName) {
+    case "oMath":
+    case "m":
+      return convertRow(node);
+    case "f":
+      return convertFraction(node);
+    case "sup":
+    case "sSup":
+      return convertSuperscript(node);
+    case "sub":
+    case "sSub":
+      return convertSubscript(node);
+    case "sSubSup":
+      return convertSubSup(node);
+    case "rad":
+    case "root":
+      return convertRoot(node);
+    case "bar":
+    case "barOver":
+      return convertBarOver(node);
+    case "barUnder":
+      return convertBarUnder(node);
+    case "acc":
+    case "accent":
+      return convertAccent(node);
+    case "lim":
+      return convertLim(node);
+    case "func":
+      return convertFunc(node);
+    case "r":
+      return convertText(node, "mi");
+    case "t":
+      return convertText(node, "mtext");
+    case "n":
+      return convertText(node, "mn");
+    case "o":
+      return convertText(node, "mo");
+    case "s":
+      return convertTextStretchy(node);
+    case "b":
+      return convertBold(node);
+    case "i":
+      return convertItalic(node);
+    case "span":
+    case "sp":
+      return convertRow(node);
+    case "box":
+      return convertBox(node);
+    case "groupChr":
+      return convertGroupChr(node);
+    case "borderBox":
+      return convertBorderBox(node);
+    case "d":
+    case "deg":
+      return convertDegree(node);
+    default:
+      return convertDefault(node);
+  }
+}
+
+function createMathElement(tag: string): Element {
+  return document.createElementNS("http://www.w3.org/1998/Math/MathML", tag);
+}
+
+function convertText(node: Element, tag: string): Element {
+  const el = createMathElement(tag);
+  el.textContent = node.textContent || "";
+  return el;
+}
+
+function convertTextStretchy(node: Element): Element {
+  const el = createMathElement("ms");
+  el.setAttribute("stretchy", "false");
+  el.textContent = node.textContent || "";
+  return el;
+}
+
+function convertBold(node: Element): Element {
+  const el = createMathElement("mi");
+  el.setAttribute("font-weight", "bold");
+  el.textContent = node.textContent || "";
+  return el;
+}
+
+function convertItalic(node: Element): Element {
+  const el = createMathElement("mi");
+  el.setAttribute("font-style", "italic");
+  el.textContent = node.textContent || "";
+  return el;
+}
+
+function convertRow(node: Element): Element {
+  const result = createMathElement("mrow");
+  for (const child of Array.from(node.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const converted = convertOmml(child as Element);
+      if (converted) result.appendChild(converted);
+    } else if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent?.trim();
+      if (text) {
+        const mtext = createMathElement("mtext");
+        mtext.textContent = text;
+        result.appendChild(mtext);
+      }
+    }
+  }
+  return result;
+}
+
+function convertFraction(node: Element): Element {
+  const result = createMathElement("mfrac");
+  const num = node.querySelector("m\\:num, num");
+  const den = node.querySelector("m\\:den, den");
+  if (num) {
+    const converted = convertOmml(num);
+    if (converted) result.appendChild(converted);
+  }
+  if (den) {
+    const convertedDen = convertOmml(den);
+    if (convertedDen) result.appendChild(convertedDen);
+  }
+  return result;
+}
+
+function convertSuperscript(node: Element): Element {
+  const result = createMathElement("msup");
+  const base = node.querySelector("m\\:e, e");
+  const sup = node.querySelector("m\\:sup, sup");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  if (sup) {
+    const convertedSup = convertOmml(sup);
+    if (convertedSup) result.appendChild(convertedSup);
+  }
+  return result;
+}
+
+function convertSubscript(node: Element): Element {
+  const result = createMathElement("msub");
+  const base = node.querySelector("m\\:e, e");
+  const sub = node.querySelector("m\\:sub, sub");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  if (sub) {
+    const convertedSub = convertOmml(sub);
+    if (convertedSub) result.appendChild(convertedSub);
+  }
+  return result;
+}
+
+function convertSubSup(node: Element): Element {
+  const result = createMathElement("msubsup");
+  const base = node.querySelector("m\\:e, e");
+  const sub = node.querySelector("m\\:sub, sub");
+  const sup = node.querySelector("m\\:sup, sup");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  if (sub) {
+    const convertedSub = convertOmml(sub);
+    if (convertedSub) result.appendChild(convertedSub);
+  }
+  if (sup) {
+    const convertedSup = convertOmml(sup);
+    if (convertedSup) result.appendChild(convertedSup);
+  }
+  return result;
+}
+
+function convertRoot(node: Element): Element {
+  const result = createMathElement("mroot");
+  const base = node.querySelector("m\\:e, e");
+  const deg = node.querySelector("m\\:deg, deg, m\\:degree, degree");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  if (deg) {
+    const convertedDeg = convertOmml(deg);
+    if (convertedDeg) result.appendChild(convertedDeg);
+  } else {
+    const degEl = createMathElement("mn");
+    degEl.textContent = "2";
+    result.appendChild(degEl);
+  }
+  return result;
+}
+
+function convertBarOver(node: Element): Element {
+  const result = createMathElement("mover");
+  const base = node.querySelector("m\\:e, e");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  const overBar = createMathElement("mo");
+  overBar.textContent = "̄";
+  result.appendChild(overBar);
+  return result;
+}
+
+function convertBarUnder(node: Element): Element {
+  const result = createMathElement("munder");
+  const base = node.querySelector("m\\:e, e");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  const underLine = createMathElement("mo");
+  underLine.textContent = "̱";
+  result.appendChild(underLine);
+  return result;
+}
+
+function convertAccent(node: Element): Element {
+  const result = createMathElement("mover");
+  const base = node.querySelector("m\\:e, e");
+  const char = node.getAttribute("chr") || "^";
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  const accent = createMathElement("mo");
+  accent.textContent = char;
+  result.appendChild(accent);
+  return result;
+}
+
+function convertLim(node: Element): Element {
+  const result = createMathElement("munderover");
+  const base = node.querySelector("m\\:e, e");
+  const low = node.querySelector("m\\:lim, lim, m\\:bottom, bottom");
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  if (low) {
+    const convertedLow = convertOmml(low);
+    if (convertedLow) result.appendChild(convertedLow);
+  }
+  const limSym = createMathElement("mi");
+  limSym.textContent = "lim";
+  result.appendChild(limSym);
+  return result;
+}
+
+function convertFunc(node: Element): Element {
+  const result = createMathElement("mrow");
+  const name = node.querySelector("m\\:func, func, m\\:fName, fName");
+  const arg = node.querySelector("m\\:arg, arg, m\\:e, e");
+  if (name) {
+    const converted = convertOmml(name);
+    if (converted) result.appendChild(converted);
+  }
+  if (arg) {
+    const converted = convertOmml(arg);
+    if (converted) result.appendChild(converted);
+  }
+  return result;
+}
+
+function convertBox(node: Element): Element {
+  const result = createMathElement("mpadded");
+  for (const child of Array.from(node.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const converted = convertOmml(child as Element);
+      if (converted) result.appendChild(converted);
+    }
+  }
+  return result;
+}
+
+function convertGroupChr(node: Element): Element {
+  const result = createMathElement("mover");
+  const base = node.querySelector("m\\:e, e");
+  const char = node.getAttribute("chr") || "{";
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  const groupChr = createMathElement("mo");
+  groupChr.textContent = char;
+  result.appendChild(groupChr);
+  return result;
+}
+
+function convertBorderBox(node: Element): Element {
+  const result = createMathElement("menclose");
+  result.setAttribute("notation", "top bottom left right");
+  for (const child of Array.from(node.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const converted = convertOmml(child as Element);
+      if (converted) result.appendChild(converted);
+    }
+  }
+  return result;
+}
+
+function convertDegree(node: Element): Element {
+  const result = createMathElement("msup");
+  const base = node.previousElementSibling;
+  if (base) {
+    const converted = convertOmml(base);
+    if (converted) result.appendChild(converted);
+  }
+  const deg = createMathElement("mn");
+  deg.textContent = node.textContent || "0";
+  result.appendChild(deg);
+  return result;
+}
+
+function convertDefault(node: Element): Element {
+  const result = createMathElement("mrow");
+  for (const child of Array.from(node.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const converted = convertOmml(child as Element);
+      if (converted) result.appendChild(converted);
+    } else if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent?.trim();
+      if (text) {
+        const mtext = createMathElement("mtext");
+        mtext.textContent = text;
+        result.appendChild(mtext);
+      }
+    }
+  }
+  return result;
 }
 
 function ommlToKaTeX(omml: Element): string {
@@ -352,98 +395,70 @@ function ommlToKaTeX(omml: Element): string {
     switch (localName) {
       case "oMath":
       case "m":
-        return Array.from(node.childNodes)
-          .map(child => child.nodeType === Node.ELEMENT_NODE ? convert(child as Element) : "")
-          .join(" ");
-
+      case "span":
+      case "sp":
+        return convertChildren(node);
       case "f":
-        const num = node.querySelector("m\\:num, num");
-        const den = node.querySelector("m\\:den, den");
-        return `\\frac{${convert(num)}}{${convert(den)}}`;
-
+        return `\\frac{${convert(node.querySelector("m\\:num, num"))}}{${convert(node.querySelector("m\\:den, den"))}}`;
       case "sup":
       case "sSup":
-        const supBase = node.querySelector("m\\:e, e");
-        const supSup = node.querySelector("m\\:sup, sup");
-        return `{${convert(supBase)}}^{${convert(supSup)}}`;
-
+        return `^{${convert(node.querySelector("m\\:sup, sup"))}}`;
       case "sub":
       case "sSub":
-        const subBase = node.querySelector("m\\:e, e");
-        const subSub = node.querySelector("m\\:sub, sub");
-        return `{${convert(subBase)}}_{${convert(subSub)}}`;
-
-      case "sSubSup":
-        const subSupBase = node.querySelector("m\\:e, e");
-        const subSupSub = node.querySelector("m\\:sub, sub");
-        const subSupSup = node.querySelector("m\\:sup, sup");
-        return `{${convert(subSupBase)}}_{${convert(subSupSub)}}^{${convert(subSupSup)}}`;
-
+        return `_{${convert(node.querySelector("m\\:sub, sub"))}}`;
+      case "sSubSup": {
+        const base = convert(node.querySelector("m\\:e, e"));
+        const sub = convert(node.querySelector("m\\:sub, sub"));
+        const sup = convert(node.querySelector("m\\:sup, sup"));
+        return `${base}_{${sub}}^{${sup}}`;
+      }
       case "rad":
       case "root":
-        const rootBase = node.querySelector("m\\:e, e");
-        const rootDeg = node.querySelector("m\\:deg, deg, m\\:degree, degree");
-        if (rootDeg) {
-          return `\\sqrt[${convert(rootDeg)}]{${convert(rootBase)}}`;
-        }
-        return `\\sqrt{${convert(rootBase)}}`;
-
+        return `\\sqrt${convert(node.querySelector("m\\:e, e"))}`;
       case "bar":
       case "barOver":
-        const barBase = node.querySelector("m\\:e, e");
-        return `\\overline{${convert(barBase)}}`;
-
+        return `\\overline{${convert(node.querySelector("m\\:e, e"))}}`;
       case "barUnder":
-        const underBase = node.querySelector("m\\:e, e");
-        return `\\underline{${convert(underBase)}}`;
-
+        return `\\underline{${convert(node.querySelector("m\\:e, e"))}}`;
+      case "acc":
+      case "accent":
+        return `\\hat{${convert(node.querySelector("m\\:e, e"))}}`;
       case "lim":
-        const limBase = node.querySelector("m\\:e, e");
-        const limLow = node.querySelector("m\\:lim, lim, m\\:bottom, bottom");
-        return `\\lim_{${convert(limLow)}} ${convert(limBase)}`;
-
-      case "func":
-        const funcName = node.querySelector("m\\:func, func, m\\:fName, fName");
-        const funcArg = node.querySelector("m\\:arg, arg, m\\:e, e");
-        return `${convert(funcName)}${convert(funcArg)}`;
-
+        return `\\lim_{${convert(node.querySelector("m\\:lim, lim"))}}`;
+      case "func": {
+        const name = convert(node.querySelector("m\\:func, func, m\\:fName, fName"));
+        const arg = convert(node.querySelector("m\\:arg, arg, m\\:e, e"));
+        return `${name}${arg}`;
+      }
       case "r":
       case "t":
-        return node.textContent || "";
-
       case "n":
-        return node.textContent || "";
-
       case "o":
         return node.textContent || "";
-
+      case "s":
+        return `\\space${node.textContent || ""}`;
       case "b":
         return `\\mathbf{${node.textContent || ""}}`;
-
       case "i":
-        return `\\textit{${node.textContent || ""}}`;
-
-      case "box":
-        return `\\boxed{${Array.from(node.childNodes)
-          .map(child => child.nodeType === Node.ELEMENT_NODE ? convert(child as Element) : "")
-          .join(" ")}}`;
-
-      case "groupChr":
-        const groupBase = node.querySelector("m\\:e, e");
-        return `\\underbrace{${convert(groupBase)}}`;
-
-      case "borderBox":
-        return `\\fbox{${Array.from(node.childNodes)
-          .map(child => child.nodeType === Node.ELEMENT_NODE ? convert(child as Element) : "")
-          .join(" ")}}`;
-
+        return `\\mathit{${node.textContent || ""}}`;
       default:
-        return Array.from(node.childNodes)
-          .map(child => child.nodeType === Node.ELEMENT_NODE ? convert(child as Element) : "")
-          .join(" ");
+        return convertChildren(node);
     }
   }
 
-  const katexContent = convert(omml);
-  return `<span class="katex" data-katex="${encodeURIComponent(katexContent)}">${katexContent}</span>`;
+  function convertChildren(node: Element): string {
+    const parts: string[] = [];
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        parts.push(convert(child as Element));
+      } else if (child.nodeType === Node.TEXT_NODE) {
+        const text = child.textContent?.trim();
+        if (text) parts.push(text);
+      }
+    }
+    return parts.join("");
+  }
+
+  const converted = convert(omml);
+  return `<span class="katex">${converted}</span>`;
 }
