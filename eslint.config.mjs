@@ -34,7 +34,8 @@ export default tseslint.config(
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports", fixStyle: "separate-type-imports" }
-      ]
+      ],
+      "no-case-declarations": "off"
     }
   }
 );
