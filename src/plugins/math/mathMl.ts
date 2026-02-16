@@ -1,3 +1,10 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* The switch-case pattern below uses const declarations in each case block.
+ * This is a common pattern for recursive AST transformations.
+ * Wrapping each case in braces is error-prone for maintenance.
+ * The alternative (moving all const declarations to function scope) would hurt readability.
+ */
 import { PluginPhase, PluginPriority, type TransformPlugin, type PluginContext } from "../base";
 
 export interface MathMlConfig {
