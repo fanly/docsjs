@@ -172,7 +172,7 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ OMML fallback output
 - ✅ Chart semantic extraction fallback
 - ✅ SmartArt node fallback extraction
-- ⏳ OMML high-fidelity render pipeline (MathML/KaTeX)
+- ✅ OMML high-fidelity render pipeline (MathML/KaTeX)
 
 ### Engineering Quality
 
@@ -182,6 +182,18 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ Parse report API for performance tuning
 - ✅ Plugin pipeline API for extensibility
 <!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
+
+## What's New in v0.2.0
+
+- Added **MathML high-fidelity rendering** with support for:
+  - Fractions, superscripts, subscripts, superscript-subscript combinations
+  - Square roots and nth roots
+  - Overlines, underlines, accents
+  - Limits, functions, operators
+  - Bold and italic math text
+  - Boxed and framed expressions
+- Added **KaTeX output format** option for better rendering
+- Added config option `outputFormat: "mathml" | "katex"`
 
 ## What's New in v0.1.9
 
