@@ -187,6 +187,11 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ Plugin pipeline API for extensibility
 <!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
 
+## What's New in v0.1.9
+
+- Added **GitHub stats cards** to README for enhanced project presentation
+- Used transparent theme with brand color (#0e8b78) to match docsjs design
+
 ## What's New in v0.1.8
 
 - Added **plugin architecture framework** for extensibility:
