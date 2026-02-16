@@ -8,6 +8,15 @@ Import Word/WPS/Google Docs content from paste or `.docx` while preserving struc
 [![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
 [![Pages](https://github.com/fanly/docsjs/actions/workflows/pages.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/pages.yml)
 
+---
+
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=fanly&show_icons=true&theme=transparent&hide_border=true&title_color=0e8b78&text_color=53626e&icon_color=0e8b78" height="180" alt="stats" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=fanly&layout=compact&theme=transparent&hide_border=true&title_color=0e8b78&text_color=53626e" height="180" alt="languages" />
+</p>
+
+---
+
 [中文文档](./README.zh-CN.md)
 
 ## GitHub Pages
