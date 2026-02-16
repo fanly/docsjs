@@ -2,7 +2,7 @@
 
 Goal: build a practical, benchmarked Word fidelity pipeline for global developers.
 
-## Current Status
+## Current Status (v0.2.0)
 
 - [x] Web Component core (`docs-word-editor`)
 - [x] React/Vue adapters
@@ -11,15 +11,13 @@ Goal: build a practical, benchmarked Word fidelity pipeline for global developer
 - [x] Runnable React demo
 - [x] Runnable Vue demo
 - [x] Baseline tests (`pastePipeline`, `renderApply`)
-- [ ] Fidelity benchmark corpus and scorecard
+- [x] Plugin architecture framework (23 built-in plugins)
+- [x] OMML/MathML support with KaTeX output option
+- [x] Fidelity benchmark suite (26 baseline tests)
+- [x] 170 automated tests
 
 ## P0 (Next 2-4 weeks)
 
-- [ ] Build a fidelity benchmark suite
-  - [ ] Add `fixtures/` corpus: contract, resume, report, mixed-language document
-  - [ ] Add semantic diff tests: list/tree/table/image stats
-  - [ ] Add visual regression tests (Playwright screenshot compare)
-  - [ ] Output Fidelity Score: structure/style/pagination
 - [ ] Deep list fidelity
   - [ ] `lvlOverride/startOverride` support
   - [ ] Cross-section numbering continuity mode
@@ -31,13 +29,12 @@ Goal: build a practical, benchmarked Word fidelity pipeline for global developer
 
 ## P1 (4-8 weeks)
 
+- [ ] Anchor collision parity
+  - [ ] Pixel-level text wrapping collision detection
+  - [ ] Overlap handling policy
 - [ ] Image and floating object fidelity
-  - [ ] `wp:anchor` absolute/relative positioning
-  - [ ] Text wrap modes (`square`, `tight`, `topAndBottom`)
   - [ ] Crop/rotation/flip mapping
-- [ ] Advanced semantics (read-only first)
-  - [ ] footnotes/endnotes
-  - [ ] comments
+- [ ] Advanced semantics
   - [ ] track changes overlays
 - [ ] Pagination precision
   - [ ] widow/orphan
@@ -45,7 +42,6 @@ Goal: build a practical, benchmarked Word fidelity pipeline for global developer
 
 ## P2 (Advanced)
 
-- [ ] OMML equation fallback and plugin extension point
 - [ ] chart/SmartArt fallback rendering
 - [ ] collaboration adapter hooks (CRDT-friendly event model)
 - [ ] optional host-side sanitization profile (`fidelity-first` vs `strict`)
