@@ -5,15 +5,11 @@ Import Word/WPS/Google Docs content from paste or `.docx` while preserving struc
 
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![npm downloads](https://img.shields.io/npm/dm/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
+[![GitHub stars](https://img.shields.io/github/stars/fanly/docsjs)](https://github.com/fanly/docsjs/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fanly/docsjs)](https://github.com/fanly/docsjs/network)
+[![GitHub issues](https://img.shields.io/github/issues/fanly/docsjs)](https://github.com/fanly/docsjs/issues)
 [![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
 [![Pages](https://github.com/fanly/docsjs/actions/workflows/pages.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/pages.yml)
-
----
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=fanly&show_icons=true&theme=transparent&hide_border=true&title_color=0e8b78&text_color=53626e&icon_color=0e8b78" height="180" alt="stats" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=fanly&layout=compact&theme=transparent&hide_border=true&title_color=0e8b78&text_color=53626e" height="180" alt="languages" />
-</p>
 
 ---
 
