@@ -11,5 +11,6 @@ export type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
-  DocsWordEditorReadyDetail
+  DocsWordEditorReadyDetail,
+  CollaborationAdapter
 } from "./core/types";

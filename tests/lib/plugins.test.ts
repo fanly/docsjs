@@ -13,6 +13,7 @@ import { createWatermarkPlugin } from "../../src/plugins/render/watermark";
 import { createPageBackgroundPlugin } from "../../src/plugins/render/pageBackground";
 import { createListStylePlugin } from "../../src/plugins/style/listStyle";
 import { createMathMlPlugin } from "../../src/plugins/math/mathMl";
+import { createAnchorCollisionPlugin } from "../../src/plugins/render/anchorCollision";
 import { createPipeline } from "../../src/lib/pluginPipeline";
 import type JSZip from "jszip";
 
@@ -272,6 +273,61 @@ describe("Plugin System", () => {
         expect(result).toBe(html);
       });
     });
+
+    describe("AnchorCollision Plugin", () => {
+      it("skips transformation when anchors feature disabled", () => {
+        const plugin = createAnchorCollisionPlugin();
+        const config = { ...defaultPluginConfig, features: { ...defaultPluginConfig.features, anchors: false } };
+        const context = { ...mockContext, config };
+        const html = '<p>Content</p>';
+        
+        const result = plugin.transform(html, context);
+        
+        expect(result).toBe(html);
+      });
+
+      it("returns unchanged HTML when no anchors present", () => {
+        const plugin = createAnchorCollisionPlugin();
+        const html = '<p>Content</p>';
+        
+        const result = plugin.transform(html, mockContext);
+        
+        expect(result).toBe(html);
+      });
+
+      it("returns unchanged HTML when single anchor present", () => {
+        const plugin = createAnchorCollisionPlugin();
+        const html = '<img src="test.png" data-word-anchor="1" style="left:100px;top:100px;width:50px;height:50px;">';
+        
+        const result = plugin.transform(html, mockContext);
+        
+        expect(result).toBe(html);
+      });
+
+      it("detects collision between overlapping anchors", () => {
+        const plugin = createAnchorCollisionPlugin();
+        const html = `
+          <img src="test1.png" data-word-anchor="1" style="left:100px;top:100px;width:100px;height:100px;">
+          <img src="test2.png" data-word-anchor="1" style="left:150px;top:150px;width:100px;height:100px;">
+        `;
+        
+        const result = plugin.transform(html, mockContext);
+        
+        expect(result).toContain('data-word-anchor-collision');
+      });
+
+      it("does not flag non-overlapping anchors", () => {
+        const plugin = createAnchorCollisionPlugin();
+        const html = `
+          <img src="test1.png" data-word-anchor="1" style="left:100px;top:100px;width:50px;height:50px;">
+          <img src="test2.png" data-word-anchor="1" style="left:200px;top:200px;width:50px;height:50px;">
+        `;
+        
+        const result = plugin.transform(html, mockContext);
+        
+        expect(result).not.toContain('data-word-anchor-collision');
+      });
+    });
   });
 
   describe("PluginPipeline Integration", () => {
@@ -285,7 +341,7 @@ describe("Plugin System", () => {
     it("can disable plugins via config", () => {
       const pipeline = createPipeline({ 
         cleanup: { googleDocs: false, wps: false, word: false },
-        features: { mathML: false, shapes: false, oleObjects: false }
+        features: { mathML: false, shapes: false, oleObjects: false, anchors: false }
       });
       
       const config = pipeline.getConfig();
@@ -325,7 +381,7 @@ describe("Plugin System", () => {
     it("allows custom configuration", () => {
       const registry = new PluginRegistry({
         cleanup: { googleDocs: false, wps: false, word: false },
-        features: { mathML: false, shapes: false, oleObjects: true }
+        features: { mathML: false, shapes: false, oleObjects: true, anchors: false }
       });
       
       const config = registry.getConfig();

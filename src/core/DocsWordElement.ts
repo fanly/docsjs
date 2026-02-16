@@ -5,7 +5,8 @@ import { applyWordRenderModel } from "../lib/renderApply";
 import { parseDocxStyleProfile, type WordStyleProfile } from "../lib/styleProfile";
 import type { DocxParseReport } from "../lib/docxHtml";
 
-const VERSION = "0.1.5";
+const VERSION = "0.2.0";
+let sequenceCounter = 0;
 
 type Locale = "zh" | "en";
 type ChangeSource = "paste" | "upload" | "api" | "clear";
@@ -269,8 +270,18 @@ export class DocsWordElement extends HTMLElement {
   }
 
   private emitChange(source: ChangeSource, fileName?: string, parseReport?: DocxParseReport): void {
+    sequenceCounter += 1;
     this.dispatchEvent(
-      new CustomEvent("docsjs-change", { detail: { htmlSnapshot: this.htmlSnapshot, source, fileName, parseReport } })
+      new CustomEvent("docsjs-change", { 
+        detail: { 
+          htmlSnapshot: this.htmlSnapshot, 
+          source, 
+          fileName, 
+          parseReport,
+          timestamp: Date.now(),
+          sequenceId: `seq-${sequenceCounter}`
+        } 
+      })
     );
   }
 

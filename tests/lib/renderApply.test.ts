@@ -157,6 +157,28 @@ describe("applyWordRenderModel - list markers", () => {
     expect(document.querySelector("#p3 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
   });
 
+  it("continues numbering across section breaks when continuous option is true", () => {
+    document.body.innerHTML = `<p id="p1">S1-1</p><p id="p2">S1-2</p><p id="p3">S2-1</p>`;
+    const profile = makeProfile([
+      makeParagraphProfile(0, "S1-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
+      makeParagraphProfile(1, "S1-2", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
+      makeParagraphProfile(2, "S2-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.", sectionBreakBefore: true })
+    ]);
+    applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false, listNumbering: { continuous: true } });
+    expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
+    expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe("2.");
+    expect(document.querySelector("#p3 > span.__word-list-marker")?.textContent?.trim()).toBe("3.");
+  });
+
+  it("handles multi-level pattern (%1.%2.%3) with missing higher levels", () => {
+    document.body.innerHTML = `<p id="p1">L1</p>`;
+    const profile = makeProfile([
+      makeParagraphProfile(0, "L1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.%2.%3." })
+    ]);
+    applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
+    expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
+  });
+
   it("indents nested levels appropriately", () => {
     document.body.innerHTML = `<p id="p1">L0</p><p id="p2">L1</p>`;
     const profile = makeProfile([

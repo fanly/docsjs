@@ -5,6 +5,8 @@ export interface DocsWordEditorChangeDetail {
   source: "paste" | "upload" | "api" | "clear";
   fileName?: string;
   parseReport?: DocxParseReport;
+  timestamp: number;
+  sequenceId: string;
 }
 
 export interface DocsWordEditorErrorDetail {
@@ -21,4 +23,9 @@ export interface DocsWordEditorElementApi extends HTMLElement {
   loadClipboard(): Promise<void>;
   clear(): void;
   getSnapshot(): string;
+}
+
+export interface CollaborationAdapter {
+  onChange(detail: DocsWordEditorChangeDetail): void;
+  getState(): DocsWordEditorChangeDetail | null;
 }

@@ -38,3 +38,4 @@ export { createMathMlPlugin } from "./math/mathMl";
 export { createCaptionPlugin } from "./content/caption";
 export { createWatermarkPlugin } from "./render/watermark";
 export { createPageBackgroundPlugin } from "./render/pageBackground";
+export { createAnchorCollisionPlugin } from "./render/anchorCollision";

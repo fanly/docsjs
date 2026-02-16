@@ -21,7 +21,8 @@ import {
   createPageBackgroundPlugin,
   createStyleInheritancePlugin,
   createListStylePlugin,
-  createMathMlPlugin
+  createMathMlPlugin,
+  createAnchorCollisionPlugin
 } from "../plugins";
 
 export interface DocxPluginPipelineConfig extends PluginConfig {
@@ -39,7 +40,8 @@ const defaultPipelineConfig: DocxPluginPipelineConfig = {
   features: {
     mathML: true,
     shapes: true,
-    oleObjects: true
+    oleObjects: true,
+    anchors: true
   }
 };
 
@@ -83,6 +85,7 @@ export class DocxPluginPipeline {
     this.registry.register(createListStylePlugin());
 
     this.registry.register(createMathMlPlugin());
+    this.registry.register(createAnchorCollisionPlugin());
   }
 
   async initialize(

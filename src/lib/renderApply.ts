@@ -5,6 +5,9 @@ interface ApplyWordRenderOptions {
   doc: Document;
   styleProfile: WordStyleProfile | null;
   showFormattingMarks: boolean;
+  listNumbering?: {
+    continuous?: boolean;
+  };
 }
 
 function setImportantStyle(el: HTMLElement, prop: string, value: string): void {
@@ -123,7 +126,7 @@ function formatListMarkerByPattern(
     return String(n);
   });
 
-  const normalized = replaced.trim();
+  const normalized = replaced.replace(/\.{2,}/g, ".").trim();
   if (!normalized) {
     return formatListMarker(currentFormat, countersByLevel[currentLevel] ?? 1);
   }
@@ -247,7 +250,7 @@ function hasMeaningfulParagraphAfter(paragraphs: HTMLElement[], index: number): 
   return false;
 }
 
-function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile): HTMLElement[] {
+function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, listNumbering?: ApplyWordRenderOptions["listNumbering"]): HTMLElement[] {
   const fallbackParagraphs = Array.from(doc.body.querySelectorAll("p")) as HTMLElement[];
   fallbackParagraphs.forEach((p) => {
     p.classList.remove("__word-date-anchor");
@@ -342,7 +345,7 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile): 
 
     if (profile.listNumId !== null && profile.listLevel !== null) {
       para.setAttribute("data-word-list", "1");
-      if (profile.sectionBreakBefore) {
+      if (profile.sectionBreakBefore && !listNumbering?.continuous) {
         listCounters.set(profile.listNumId, []);
       }
       const currentLevel = Math.max(0, profile.listLevel);
@@ -469,7 +472,7 @@ function applyFormattingMarks(doc: Document, showFormattingMarks: boolean): void
   `;
 }
 
-export function applyWordRenderModel({ doc, styleProfile, showFormattingMarks }: ApplyWordRenderOptions): void {
+export function applyWordRenderModel({ doc, styleProfile, showFormattingMarks, listNumbering }: ApplyWordRenderOptions): void {
   const effectiveProfile = styleProfile ?? createFallbackWordStyleProfile("__default_a4__");
 
   applyWordHtmlCompatibility(doc, {
@@ -484,7 +487,7 @@ export function applyWordRenderModel({ doc, styleProfile, showFormattingMarks }:
   applyInlineLayoutGuards(doc, effectiveProfile);
 
   if (styleProfile) {
-    paragraphs = applyParagraphProfiles(doc, styleProfile);
+    paragraphs = applyParagraphProfiles(doc, styleProfile, listNumbering);
     applyKeepPagination(doc, styleProfile, paragraphs);
   }
 

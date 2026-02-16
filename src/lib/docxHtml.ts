@@ -60,9 +60,12 @@ export interface DocxParseReport {
   features: DocxParseFeatureCounts;
 }
 
+export type SanitizationProfile = "fidelity-first" | "strict";
+
 interface ParseContext {
   features: DocxParseFeatureCounts;
   pluginPipeline?: DocxPluginPipeline;
+  sanitizationProfile?: SanitizationProfile;
 }
 
 interface RunTextParts {
@@ -1108,15 +1111,46 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
   return `<table style="border-collapse:${tableStyle.borderCollapse};${spacing}table-layout:${tableStyle.tableLayout};${tableWidthStyle};border:${tableStyle.borderCss};">${merged}</table>`;
 }
 
+function applySanitization(html: string, profile: SanitizationProfile): string {
+  if (profile === "fidelity-first") return html;
+  
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  
+  doc.querySelectorAll("[style]").forEach((el) => {
+    const style = el.getAttribute("style") || "";
+    const cleaned: string[] = [];
+    const parts = style.split(";").filter((s) => s.trim());
+    for (const part of parts) {
+      const [prop, value] = part.split(":").map((s) => s.trim());
+      if (!prop || !value) continue;
+      if (prop === "position" && value === "absolute") continue;
+      if (prop.startsWith("margin") || prop.startsWith("padding")) {
+        const num = parseFloat(value);
+        if (num > 100) continue;
+      }
+      cleaned.push(`${prop}:${value}`);
+    }
+    if (cleaned.length > 0) {
+      el.setAttribute("style", cleaned.join(";"));
+    } else {
+      el.removeAttribute("style");
+    }
+  });
+  
+  return doc.documentElement.outerHTML;
+}
+
 export async function parseDocxToHtmlSnapshotWithReport(
   file: File,
-  options?: { enablePlugins?: boolean }
+  options?: { enablePlugins?: boolean; sanitizationProfile?: SanitizationProfile }
 ): Promise<{ htmlSnapshot: string; report: DocxParseReport }> {
   const startedAt = Date.now();
   const enablePlugins = options?.enablePlugins ?? true;
+  const sanitizationProfile = options?.sanitizationProfile ?? "fidelity-first";
   
   const pluginPipeline = enablePlugins ? createPipeline() : null;
-  const context: ParseContext = { features: createEmptyFeatureCounts(), pluginPipeline: pluginPipeline ?? undefined };
+  const context: ParseContext = { features: createEmptyFeatureCounts(), pluginPipeline: pluginPipeline ?? undefined, sanitizationProfile };
   
   const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
   const buffer = maybeArrayBuffer ? await maybeArrayBuffer.call(file) : await new Response(file).arrayBuffer();
@@ -1195,6 +1229,8 @@ export async function parseDocxToHtmlSnapshotWithReport(
   if (pluginPipeline) {
     htmlResult = await pluginPipeline.executeTransformPhase(htmlResult);
   }
+  
+  htmlResult = applySanitization(htmlResult, sanitizationProfile);
   
   return {
     htmlSnapshot: htmlResult,

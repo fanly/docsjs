@@ -158,7 +158,7 @@ el.addEventListener("docsjs-change", (e) => {
 - ✅ List reconstruction (`numId`, `ilvl`, `lvlText`)
 - ✅ Table v1 (`tblGrid/tcW`, merge, border, spacing)
 - ✅ Floating anchors v1 (`wp:anchor` metadata)
-- ⏳ Anchor collision parity (pixel-level wrap)
+- ✅ Anchor collision parity (pixel-level wrap)
 
 ### Advanced Semantics
 
@@ -176,7 +176,7 @@ el.addEventListener("docsjs-change", (e) => {
 
 ### Engineering Quality
 
-- ✅ 157 automated tests (regression + boundary + plugins)
+- ✅ 177 automated tests (regression + boundary + plugins)
 - ✅ Baseline snapshot regression framework
 - ✅ `verify` quality gate (lint/typecheck/test/build/size)
 - ✅ Parse report API for performance tuning
@@ -194,6 +194,18 @@ el.addEventListener("docsjs-change", (e) => {
   - Boxed and framed expressions
 - Added **KaTeX output format** option for better rendering
 - Added config option `outputFormat: "mathml" | "katex"`
+- Added **anchor collision detection** for pixel-level wrap fidelity
+- Added config option `features.anchors: boolean` to enable/disable anchor collision detection
+- Added **deep list fidelity** with `lvlOverride/startOverride` support
+- Added **deep table fidelity** with `vMerge/gridSpan` merged cell mapping and nested table rendering
+- Added **cross-section numbering continuity** option (`listNumbering.continuous`)
+- Added **multi-level marker template** support (`%1.%2.%3` patterns)
+- Added **image transform support** (rotation, flip horizontal/vertical)
+- Added **track changes** visualization (`data-word-revision="ins/del"`)
+- Added **pagination precision** (widow/orphan control, keep-with-next)
+- Added **sanitization profile** option (`sanitizationProfile: "fidelity-first" | "strict"`)
+- Added **CRDT-friendly collaboration** events with timestamp and sequenceId
+- Added **chart/SmartArt fallback** rendering
 
 ## What's New in v0.1.9
 

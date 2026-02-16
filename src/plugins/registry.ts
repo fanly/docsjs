@@ -9,7 +9,7 @@ export class PluginRegistry {
     this.config = {
       experimental: config.experimental ?? false,
       cleanup: config.cleanup ?? { googleDocs: true, wps: true, word: true },
-      features: config.features ?? { mathML: true, shapes: true, oleObjects: false }
+      features: config.features ?? { mathML: true, shapes: true, oleObjects: false, anchors: true }
     };
   }
 

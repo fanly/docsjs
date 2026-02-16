@@ -14,37 +14,38 @@ Goal: build a practical, benchmarked Word fidelity pipeline for global developer
 - [x] Plugin architecture framework (23 built-in plugins)
 - [x] OMML/MathML support with KaTeX output option
 - [x] Fidelity benchmark suite (26 baseline tests)
-- [x] 170 automated tests
+- [x] Anchor collision detection (pixel-level wrap)
+- [x] 177 automated tests
 
 ## P0 (Next 2-4 weeks)
 
-- [ ] Deep list fidelity
-  - [ ] `lvlOverride/startOverride` support
-  - [ ] Cross-section numbering continuity mode
-  - [ ] Multi-level marker template edge cases (`%1.%2.%3`, legal/roman/letter)
-- [ ] Deep table fidelity
-  - [ ] `vMerge/gridSpan` merged cell mapping
-  - [ ] Nested table rendering
-  - [ ] `tblGrid/tcW` width and fixed layout restoration
+- [x] Deep list fidelity
+  - [x] `lvlOverride/startOverride` support
+  - [x] Cross-section numbering continuity mode
+  - [x] Multi-level marker template edge cases (`%1.%2.%3`, legal/roman/letter)
+- [x] Deep table fidelity
+  - [x] `vMerge/gridSpan` merged cell mapping
+  - [x] Nested table rendering
+  - [x] `tblGrid/tcW` width and fixed layout restoration
 
 ## P1 (4-8 weeks)
 
-- [ ] Anchor collision parity
-  - [ ] Pixel-level text wrapping collision detection
-  - [ ] Overlap handling policy
-- [ ] Image and floating object fidelity
-  - [ ] Crop/rotation/flip mapping
-- [ ] Advanced semantics
-  - [ ] track changes overlays
-- [ ] Pagination precision
-  - [ ] widow/orphan
-  - [ ] keep-with-next + table split interaction
+- [x] Anchor collision parity
+  - [x] Pixel-level text wrapping collision detection
+  - [x] Overlap handling policy
+- [x] Image and floating object fidelity
+  - [x] Crop/rotation/flip mapping
+- [x] Advanced semantics
+  - [x] track changes overlays
+- [x] Pagination precision
+  - [x] widow/orphan
+  - [x] keep-with-next + table split interaction
 
 ## P2 (Advanced)
 
-- [ ] chart/SmartArt fallback rendering
-- [ ] collaboration adapter hooks (CRDT-friendly event model)
-- [ ] optional host-side sanitization profile (`fidelity-first` vs `strict`)
+- [x] chart/SmartArt fallback rendering
+- [x] collaboration adapter hooks (CRDT-friendly event model)
+- [x] optional host-side sanitization profile (`fidelity-first` vs `strict`)
 
 ## Definition of Done
 

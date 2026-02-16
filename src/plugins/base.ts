@@ -38,6 +38,7 @@ export interface PluginConfig {
     mathML: boolean;
     shapes: boolean;
     oleObjects: boolean;
+    anchors: boolean;
   };
 }
 
@@ -51,7 +52,8 @@ export const defaultPluginConfig: PluginConfig = {
   features: {
     mathML: true,
     shapes: true,
-    oleObjects: false
+    oleObjects: false,
+    anchors: true
   }
 };
 
