@@ -373,6 +373,26 @@
         background: var(--bg-alt);
       }
 
+      .api-section {
+        padding: 60px 0;
+      }
+
+      .api-section h2 {
+        text-align: center;
+        font-size: 32px;
+        margin: 0 0 48px;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .api-section code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "SF Mono", Monaco, Consolas, monospace;
+        font-size: 13px;
+        color: #e83e8c;
+      }
+
       .features-list h2 {
         text-align: center;
         font-size: 32px;
@@ -651,6 +671,40 @@
       </div>
     </section>
 
+    <!-- API Section -->
+    <section class="api-section" id="api">
+      <div class="container">
+        <h2>API Reference</h2>
+        <div class="feature-columns">
+          <div class="feature-column">
+            <h3>Events</h3>
+            <ul class="feature-list">
+              <li><code>docsjs-change</code> - Content changed</li>
+              <li><code>docsjs-error</code> - Error occurred</li>
+              <li><code>docsjs-ready</code> - Component ready</li>
+            </ul>
+          </div>
+          <div class="feature-column">
+            <h3>Methods</h3>
+            <ul class="feature-list">
+              <li><code>loadHtml(html)</code> - Load HTML</li>
+              <li><code>loadDocx(file)</code> - Load DOCX</li>
+              <li><code>loadClipboard()</code> - Load from clipboard</li>
+              <li><code>getSnapshot()</code> - Get HTML output</li>
+              <li><code>clear()</code> - Clear content</li>
+            </ul>
+          </div>
+          <div class="feature-column">
+            <h3>Attributes</h3>
+            <ul class="feature-list">
+              <li><code>lang</code> - Language (zh/en)</li>
+              <li><code>show-toolbar</code> - Show toolbar</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Sponsors -->
     <section class="sponsors">
       <div class="container">
@@ -815,12 +869,14 @@ document.body.<span class="function">appendChild</span>(el);`
         btn.addEventListener("click", () => switchLang(btn.dataset.lang));
       });
 
-      // Smooth scroll
+      // Smooth scroll - update URL hash
       navLinks.forEach(link => {
         link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const target = document.querySelector(link.getAttribute("href"));
+          const href = link.getAttribute("href");
+          const target = document.querySelector(href);
           if (target) {
+            // Update URL hash for browser history
+            history.pushState(null, "", href);
             target.scrollIntoView({ behavior: "smooth" });
           }
         });
