@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 0.2.0)'
+        required: false
 
 jobs:
   publish:
@@ -15,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -41,6 +47,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Debug version
+        run: echo "Publishing version ${{ steps.version.outputs.VERSION }}"
 
       - name: Publish
         run: npm publish --provenance --access public
