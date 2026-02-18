@@ -25,3 +25,13 @@ jobs:
 
       - name: Verify
         run: npm run verify
+
+      - name: Install demo dependencies
+        run: |
+          npm --prefix demos/react-demo ci
+          npm --prefix demos/vue-demo ci
+
+      - name: Build demos
+        run: |
+          npm --prefix demos/react-demo run build
+          npm --prefix demos/vue-demo run build

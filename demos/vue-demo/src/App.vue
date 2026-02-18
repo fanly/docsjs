@@ -46,9 +46,7 @@ import {
   WordFidelityEditorVue
 } from "@coding01/docsjs/vue";
 import { collectSemanticStatsFromHtml } from "@coding01/docsjs";
-import type { DocsWordEditorElementApi } from "@coding01/docsjs/types";
-import type { SemanticStats } from "@coding01/docsjs";
-import type { DocxParseReport } from "@coding01/docsjs";
+import type { DocsWordEditorElementApi, SemanticStats, DocxParseReport } from "@coding01/docsjs";
 
 type Lang = "zh" | "en";
 const lang = ref<Lang>("zh");

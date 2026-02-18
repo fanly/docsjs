@@ -1,10 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { WordFidelityEditorReact } from "@coding01/docsjs/react";
-import type { DocsWordEditorElementApi } from "@coding01/docsjs/types";
 import { collectSemanticStatsFromHtml } from "@coding01/docsjs";
-import type { SemanticStats } from "@coding01/docsjs";
-import type { DocxParseReport } from "@coding01/docsjs";
+import type { SemanticStats, DocxParseReport, DocsWordEditorElementApi } from "@coding01/docsjs";
 
 type Lang = "zh" | "en";
 
