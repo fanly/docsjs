@@ -5,7 +5,9 @@ import { applyWordRenderModel } from "../lib/renderApply";
 import { parseDocxStyleProfile, type WordStyleProfile } from "../lib/styleProfile";
 import type { DocxParseReport } from "../lib/docxHtml";
 
-const VERSION = "0.2.0";
+declare const __DOCSJS_VERSION__: string | undefined;
+
+const VERSION = typeof __DOCSJS_VERSION__ === "string" ? __DOCSJS_VERSION__ : "0.0.0";
 let sequenceCounter = 0;
 
 type Locale = "zh" | "en";

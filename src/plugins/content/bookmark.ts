@@ -1,7 +1,8 @@
 import { PluginPhase, PluginPriority, type ParagraphPlugin, type PluginContext, type ParagraphParseResult } from "../base";
 
-function queryAllByLocalName(root: ParentNode, localName: string): Element[] {
-  return Array.from(root.querySelectorAll(`:scope > ${localName}`));
+function directChildrenByLocalName(root: ParentNode, localName: string): Element[] {
+  const children = Array.from((root as Element).children ?? []);
+  return children.filter((child) => child.localName === localName);
 }
 
 export function createBookmarkPlugin(): ParagraphPlugin {
@@ -17,7 +18,7 @@ export function createBookmarkPlugin(): ParagraphPlugin {
     execute() {},
     
     parseParagraph(element: Element, _context: PluginContext): ParagraphParseResult {
-      const bookmarkStarts = queryAllByLocalName(element, "bookmarkStart");
+      const bookmarkStarts = directChildrenByLocalName(element, "bookmarkStart");
       
       if (bookmarkStarts.length === 0) {
         return { html: "", handled: false };

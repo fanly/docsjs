@@ -1,6 +1,7 @@
 import type JSZip from "jszip";
 import type { PluginContext, PluginConfig } from "../plugins";
 import { PluginRegistry } from "../plugins";
+import { PluginPhase, type ParagraphPlugin, type RunPlugin, type TablePlugin } from "../plugins";
 
 import {
   createGoogleDocsCleanupPlugin,
@@ -74,9 +75,13 @@ export class DocxPluginPipeline {
     this.registry.register(createCrossRefPlugin());
     this.registry.register(createCaptionPlugin());
 
-    this.registry.register(createShapePlugin());
-    this.registry.register(createWordArtPlugin());
-    this.registry.register(createOlePlugin());
+    if (this.config.features.shapes) {
+      this.registry.register(createShapePlugin());
+      this.registry.register(createWordArtPlugin());
+    }
+    if (this.config.features.oleObjects) {
+      this.registry.register(createOlePlugin());
+    }
     this.registry.register(createSdtPlugin());
     this.registry.register(createWatermarkPlugin());
     this.registry.register(createPageBackgroundPlugin());
@@ -148,6 +153,36 @@ export class DocxPluginPipeline {
     };
 
     return this.registry.cleanup(html, context);
+  }
+
+  getParagraphPlugins(): ParagraphPlugin[] {
+    return this.registry
+      .list()
+      .filter(
+        (plugin): plugin is ParagraphPlugin =>
+          "parseParagraph" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+      )
+      .sort((a, b) => b.priority - a.priority);
+  }
+
+  getRunPlugins(): RunPlugin[] {
+    return this.registry
+      .list()
+      .filter(
+        (plugin): plugin is RunPlugin =>
+          "parseRun" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+      )
+      .sort((a, b) => b.priority - a.priority);
+  }
+
+  getTablePlugins(): TablePlugin[] {
+    return this.registry
+      .list()
+      .filter(
+        (plugin): plugin is TablePlugin =>
+          "parseTable" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+      )
+      .sort((a, b) => b.priority - a.priority);
   }
 
   getRegistry(): PluginRegistry {

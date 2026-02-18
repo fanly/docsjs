@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import { buildHtmlSnapshot } from "./htmlSnapshot";
 import { createPipeline, type DocxPluginPipeline } from "./pluginPipeline";
+import type { PluginContext } from "../plugins";
 
 interface RelMap {
   [rid: string]: string;
@@ -65,6 +66,7 @@ export type SanitizationProfile = "fidelity-first" | "strict";
 interface ParseContext {
   features: DocxParseFeatureCounts;
   pluginPipeline?: DocxPluginPipeline;
+  pluginContext?: PluginContext;
   sanitizationProfile?: SanitizationProfile;
 }
 
@@ -640,6 +642,21 @@ async function paragraphToHtml(
     return `<${tag}${dataAttr}${alignStyle ? ` style="${alignStyle}"` : ""}><br/></${tag}>`;
   }
 
+  const pluginParagraphFragments: string[] = [];
+
+  if (context.pluginPipeline && context.pluginContext) {
+    for (const plugin of context.pluginPipeline.getParagraphPlugins()) {
+      const parsed = plugin.parseParagraph(paragraph, context.pluginContext);
+      if (!parsed.handled) continue;
+      if (parsed.metadata) {
+        Object.assign(context.pluginContext.metadata, parsed.metadata);
+      }
+      if (parsed.html) {
+        pluginParagraphFragments.push(parsed.html);
+      }
+    }
+  }
+
   function parseRevisionMeta(node: Element, type: "ins" | "del"): RevisionMeta {
     return {
       type,
@@ -671,6 +688,14 @@ async function paragraphToHtml(
 
   async function runToHtml(run: Element, revisionFallback: RevisionMeta | null): Promise<string[]> {
     const result: string[] = [];
+    if (context.pluginPipeline && context.pluginContext) {
+      for (const plugin of context.pluginPipeline.getRunPlugins()) {
+        const parsed = plugin.parseRun(run, context.pluginContext);
+        if (!parsed.handled) continue;
+        if (parsed.html) result.push(parsed.html);
+        return result;
+      }
+    }
     const rPr = directChildrenByLocalName(run, "rPr")[0] ?? null;
     const css = runStyleToCss(rPr);
 
@@ -834,7 +859,7 @@ async function paragraphToHtml(
     return nested;
   }
 
-  const parts: string[] = [];
+  const parts: string[] = [...pluginParagraphFragments];
   const renderedPageBreakCount = queryAllByLocalName(paragraph, "lastRenderedPageBreak").length;
   for (let i = 0; i < renderedPageBreakCount; i += 1) {
     context.features.pageBreakCount += 1;
@@ -1014,6 +1039,15 @@ function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>, c
 }
 
 function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, context: ParseContext): string {
+  if (context.pluginPipeline && context.pluginContext) {
+    for (const plugin of context.pluginPipeline.getTablePlugins()) {
+      const parsed = plugin.parseTable(table, context.pluginContext);
+      if (parsed.handled) {
+        return parsed.html;
+      }
+    }
+  }
+
   context.features.tableCount += 1;
   const rows = directChildrenByLocalName(table, "tr");
   const gridWidthsPx = parseTblGridWidthsPx(table);
@@ -1185,6 +1219,15 @@ export async function parseDocxToHtmlSnapshotWithReport(
 
   if (pluginPipeline) {
     await pluginPipeline.initialize(zip, documentXml, stylesXml, numberingXml, relMap);
+    context.pluginContext = {
+      zip,
+      documentXml,
+      stylesXml,
+      numberingXml,
+      relsMap: relMap,
+      metadata: {},
+      config: pluginPipeline.getConfig()
+    };
   }
 
   const paragraphIndexMap = new Map<Element, number>();
@@ -1228,6 +1271,7 @@ export async function parseDocxToHtmlSnapshotWithReport(
   
   if (pluginPipeline) {
     htmlResult = await pluginPipeline.executeTransformPhase(htmlResult);
+    htmlResult = await pluginPipeline.executeCleanupPhase(htmlResult);
   }
   
   htmlResult = applySanitization(htmlResult, sanitizationProfile);
