@@ -16,6 +16,14 @@
 - 页面源码: `docs/index.html`
 - 自动部署: `.github/workflows/pages.yml`
 
+## 重点推荐：@coding01/docsjs-markdown
+
+建议配套 `@coding01/docsjs-markdown` 使用：将 docsjs 的 HTML 快照（或 DOCX）转换为 Markdown，方便知识库、文档站和静态发布链路。
+
+- npm: https://www.npmjs.com/package/@coding01/docsjs-markdown
+- GitHub: https://github.com/fanly/docsjs-markdown
+- 产品页: https://fanly.github.io/docsjs-markdown/
+
 ## 核心能力
 
 - Web Component 内核：`docs-word-editor`

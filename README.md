@@ -21,6 +21,14 @@ Import Word/WPS/Google Docs content from paste or `.docx` while preserving struc
 - Source: `docs/index.html`
 - Deploy workflow: `.github/workflows/pages.yml`
 
+## Recommended Pair: @coding01/docsjs-markdown
+
+Use `@coding01/docsjs-markdown` to convert docsjs HTML snapshots (or DOCX) into Markdown for docs portals, knowledge bases, and static publishing workflows.
+
+- npm: https://www.npmjs.com/package/@coding01/docsjs-markdown
+- GitHub: https://github.com/fanly/docsjs-markdown
+- Product page: https://fanly.github.io/docsjs-markdown/
+
 ## What You Get
 
 - Web Component core: `docs-word-editor`
