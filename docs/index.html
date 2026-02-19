@@ -14,6 +14,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css"
+    />
     <style>
       :root {
         --bg: #ffffff;
@@ -352,20 +356,13 @@
         overflow-x: auto;
       }
 
-      .code-content pre {
+      .code-content pre,
+      .code-content code {
         margin: 0;
-        color: #e0e0e0;
         font-family: "SF Mono", Monaco, Consolas, monospace;
         font-size: 14px;
         line-height: 1.7;
       }
-
-      .code-content .keyword { color: #c792ea; }
-      .code-content .string { color: #c3e88d; }
-      .code-content .function { color: #82aaff; }
-      .code-content .comment { color: #676e95; }
-      .code-content .tag { color: #f07178; }
-      .code-content .attr { color: #ffcb6b; }
 
       /* Features List */
       .features-list {
@@ -620,7 +617,7 @@
             <span class="code-dot"></span>
           </div>
           <div class="code-content">
-            <pre id="code-block"></pre>
+            <pre><code id="code-block" class="language-js"></code></pre>
           </div>
         </div>
       </div>
@@ -753,56 +750,70 @@
       </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-jsx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
     <script>
       // Code snippets
       const snippets = {
-        react: `<span class="keyword">npm</span> i @coding01/docsjs
+        react: {
+          language: "language-jsx",
+          code: `npm i @coding01/docsjs
 
-<span class="comment">// App.jsx</span>
-<span class="keyword">import</span> { WordFidelityEditorReact } <span class="keyword">from</span> <span class="string">"@coding01/docsjs/react"</span>;
+// App.jsx
+import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 
-<span class="keyword">export default</span> <span class="keyword">function</span> <span class="function">Page</span>() {
-  <span class="keyword">return</span> (
-    <span class="tag">&lt;WordFidelityEditorReact</span>
-      <span class="attr">lang</span>=<span class="string">"en"</span>
-      <span class="attr">onChange</span>={<span class="function">({ htmlSnapshot })</span> => {
-        console.<span class="function">log</span>(htmlSnapshot);
+export default function Page() {
+  return (
+    <WordFidelityEditorReact
+      lang="en"
+      onChange={({ htmlSnapshot }) => {
+        console.log(htmlSnapshot);
       }}
-    <span class="tag">/&gt;</span>
+    />
   );
-}`,
-        vue: `<span class="keyword">npm</span> i @coding01/docsjs
+}`
+        },
+        vue: {
+          language: "language-markup",
+          code: `npm i @coding01/docsjs
 
-<span class="comment">&lt;!-- App.vue --&gt;</span>
-<span class="tag">&lt;template&gt;</span>
-  <span class="tag">&lt;WordFidelityEditorVue</span>
-    <span class="attr">lang</span>=<span class="string">"en"</span>
-    <span class="attr">@change</span>=<span class="string">"onChange"</span>
-  <span class="tag">/&gt;</span>
-<span class="tag">&lt;/template&gt;</span>
+<!-- App.vue -->
+<template>
+  <WordFidelityEditorVue
+    lang="en"
+    @change="onChange"
+  />
+</template>
 
-<span class="tag">&lt;script setup&gt;</span>
-<span class="keyword">import</span> { WordFidelityEditorVue } <span class="keyword">from</span> <span class="string">"@coding01/docsjs/vue"</span>;
+<script setup>
+import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
 
-<span class="keyword">const</span> <span class="function">onChange</span> = ({ htmlSnapshot }) => {
-  console.<span class="function">log</span>(htmlSnapshot);
+const onChange = ({ htmlSnapshot }) => {
+  console.log(htmlSnapshot);
 };
-<span class="tag">&lt;/script&gt;</span>`,
-        wc: `<span class="keyword">npm</span> i @coding01/docsjs
+</script>`
+        },
+        wc: {
+          language: "language-js",
+          code: `npm i @coding01/docsjs
 
-<span class="comment">// main.js</span>
-<span class="keyword">import</span> { defineDocsWordElement } <span class="keyword">from</span> <span class="string">"@coding01/docsjs"</span>;
+// main.js
+import { defineDocsWordElement } from "@coding01/docsjs";
 
-<span class="function">defineDocsWordElement</span>();
+defineDocsWordElement();
 
-<span class="keyword">const</span> el = document.<span class="function">createElement</span>(<span class="string">"docs-word-editor"</span>);
-el.<span class="function">setAttribute</span>(<span class="string">"lang"</span>, <span class="string">"en"</span>);
+const el = document.createElement("docs-word-editor");
+el.setAttribute("lang", "en");
 
-el.<span class="function">addEventListener</span>(<span class="string">"docsjs-change"</span>, (e) => {
-  console.<span class="function">log</span>(e.detail.htmlSnapshot);
+el.addEventListener("docsjs-change", (e) => {
+  console.log(e.detail.htmlSnapshot);
 });
 
-document.body.<span class="function">appendChild</span>(el);`
+document.body.appendChild(el);`
+        }
       };
 
       // i18n translations
@@ -867,7 +878,12 @@ document.body.<span class="function">appendChild</span>(el);`
 
       // Render code
       function renderCode(tab) {
-        codeBlock.innerHTML = snippets[tab];
+        const snippet = snippets[tab];
+        codeBlock.className = snippet.language;
+        codeBlock.textContent = snippet.code;
+        if (window.Prism) {
+          window.Prism.highlightElement(codeBlock);
+        }
       }
 
       // Switch tab
