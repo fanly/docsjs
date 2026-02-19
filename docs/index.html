@@ -531,7 +531,7 @@
       <div class="container">
         <h1>The <span>Lossless</span> Word Pipeline for Web</h1>
         <p data-i18n="heroLead">
-          Paste or upload Word/WPS/Google Docs content while preserving structure, styles, and layout. The first truly lossless solution for the web.
+          Bring Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep structure, styles, and semantics in one import flow.
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="https://www.npmjs.com/package/@coding01/docsjs" target="_blank">
@@ -544,19 +544,19 @@
         <div class="stats-bar">
           <div class="stat-item">
             <div class="stat-value">157</div>
-            <div class="stat-label" data-i18n="statTests">Tests</div>
+            <div class="stat-label" data-i18n="statTests">Quality Gate</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">v0.2.0</div>
-            <div class="stat-label" data-i18n="statVersion">Version</div>
+            <div class="stat-label" data-i18n="statVersion">Latest</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">3</div>
-            <div class="stat-label" data-i18n="statAdapters">Adapters</div>
+            <div class="stat-label" data-i18n="statAdapters">Frameworks</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">23+</div>
-            <div class="stat-label" data-i18n="statPlugins">Plugins</div>
+            <div class="stat-label" data-i18n="statPlugins">Built-in Plugins</div>
           </div>
         </div>
       </div>
@@ -604,7 +604,7 @@
     <!-- Code Demo -->
     <section class="code-section" id="showcase">
       <div class="container">
-        <h2>Quick Start</h2>
+        <h2>Start In 3 Steps</h2>
         <div class="code-tabs">
           <button class="code-tab active" data-tab="react">React</button>
           <button class="code-tab" data-tab="vue">Vue</button>
@@ -626,7 +626,7 @@
     <!-- Features List -->
     <section class="features-list">
       <div class="container">
-        <h2>What's Included</h2>
+        <h2>Developer Impact</h2>
         <div class="feature-columns">
           <div class="feature-column">
             <h3>Core</h3>
@@ -708,9 +708,9 @@
         <div class="feature-grid">
           <div class="feature-card">
             <div class="feature-icon">📝</div>
-            <h3 data-i18n="ecoCardTitle">Bridge docsjs to Markdown delivery</h3>
+            <h3 data-i18n="ecoCardTitle">Continue to delivery: Markdown and editor bridge</h3>
             <p data-i18n="ecoCardDesc">
-              Convert docsjs HTML snapshots into clean Markdown for docs sites, knowledge bases, and static publishing flows.
+              Use docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime switching while keeping one canonical content source.
             </p>
             <p style="margin-top:16px;">
               <a
@@ -719,6 +719,12 @@
                 target="_blank"
                 data-i18n="ecoBtn"
               >Open @coding01/docsjs-markdown</a>
+              <a
+                class="btn btn-secondary"
+                href="https://www.npmjs.com/package/@coding01/docsjs-editor"
+                target="_blank"
+                style="margin-left:8px;"
+              >Open @coding01/docsjs-editor</a>
             </p>
           </div>
         </div>
@@ -819,49 +825,49 @@ document.body.appendChild(el);`
       // i18n translations
       const i18n = {
         en: {
-          heroLead: "Paste or upload Word/WPS/Google Docs content while preserving structure, styles, and layout. The first truly lossless solution for the web.",
-          statTests: "Tests",
-          statVersion: "Version",
-          statAdapters: "Adapters",
-          statPlugins: "Plugins",
+          heroLead: "Bring Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep structure, styles, and semantics in one import flow.",
+          statTests: "Quality Gate",
+          statVersion: "Latest",
+          statAdapters: "Frameworks",
+          statPlugins: "Built-in Plugins",
           feat1Title: "Lossless Paste",
-          feat1Desc: "Paste from Word/WPS/Google Docs and preserve every element: lists, tables, images, formulas, and more.",
+          feat1Desc: "Keep lists, tables, images, and formatting when importing from Word/WPS/Google Docs.",
           feat2Title: "Multi-Framework",
-          feat2Desc: "First-class support for React, Vue, and vanilla Web Components. Drop in and start using immediately.",
+          feat2Desc: "Start with React, Vue, or Web Components without rewriting your current editor shell.",
           feat3Title: "Plugin Architecture",
-          feat3Desc: "Extensible pipeline with 23+ built-in plugins for cleanup, parsing, and rendering. Customize as needed.",
+          feat3Desc: "Use built-in cleanup/parser plugins first, then extend only where your business rules differ.",
           feat4Title: "Quality Assured",
-          feat4Desc: "157 tests, baseline regression, and fidelity benchmarks. Every release passes strict quality gates.",
+          feat4Desc: "Regression baseline + fidelity checks keep import behavior stable as your docs evolve.",
           feat5Title: "Deep Semantics",
-          feat5Desc: "Footnotes, revisions, bookmarks, cross-references, and more. Desktop Word features in HTML output.",
+          feat5Desc: "Preserve advanced semantics such as notes, revisions, bookmarks, and cross references.",
           feat6Title: "Production Ready",
-          feat6Desc: "TypeScript, tree-shakeable, CSP-friendly. Built for real-world enterprise applications.",
+          feat6Desc: "TypeScript-first, tree-shakeable, CSP-friendly package for production web products.",
           ecoTitle: "Recommended Pair: @coding01/docsjs-markdown",
-          ecoCardTitle: "Bridge docsjs to Markdown delivery",
-          ecoCardDesc: "Convert docsjs HTML snapshots into clean Markdown for docs sites, knowledge bases, and static publishing flows.",
+          ecoCardTitle: "Continue to delivery: Markdown and editor bridge",
+          ecoCardDesc: "Use docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime switching while keeping one canonical content source.",
           ecoBtn: "Open @coding01/docsjs-markdown"
         },
         zh: {
-          heroLead: "粘贴或上传 Word/WPS/Google Docs 内容，同时保留结构、样式和布局。全球首个真正的无损解决方案。",
-          statTests: "测试",
-          statVersion: "版本",
-          statAdapters: "适配器",
-          statPlugins: "插件",
+          heroLead: "把 Word/WPS/Google Docs 内容接入 Web 应用，不再手工重构版式；在一次导入中保留结构、样式与语义。",
+          statTests: "质量门",
+          statVersion: "当前版本",
+          statAdapters: "框架支持",
+          statPlugins: "内置插件",
           feat1Title: "无损粘贴",
-          feat1Desc: "从 Word/WPS/Google Docs 粘贴，保留所有元素：列表、表格、图片、公式等。",
+          feat1Desc: "从 Word/WPS/Google Docs 导入时保留列表、表格、图片与格式细节。",
           feat2Title: "多框架支持",
-          feat2Desc: "原生支持 React、Vue 和原生 Web Components。直接引入即可使用。",
+          feat2Desc: "支持 React、Vue 与 Web Components，不用重写现有编辑器外壳。",
           feat3Title: "插件架构",
-          feat3Desc: "可扩展管道，内置 23+ 个清理、解析和渲染插件。按需定制。",
+          feat3Desc: "先用内置清洗/解析插件快速上线，再按业务规则做最小扩展。",
           feat4Title: "质量保证",
-          feat4Desc: "157 个测试、基线回归和保真度基准。每次发布都通过严格的质量检查。",
+          feat4Desc: "通过回归基线与保真检查，持续保证导入行为稳定可预期。",
           feat5Title: "深度语义",
-          feat5Desc: "脚注、修订、书签、交叉引用等。桌面 Word 功能输出为 HTML。",
+          feat5Desc: "保留脚注、修订、书签、交叉引用等高级语义能力。",
           feat6Title: "生产就绪",
-          feat6Desc: "TypeScript 支持、Tree-shakeable、CSP 友好。为实际企业应用构建。",
+          feat6Desc: "TypeScript 优先、Tree-shakeable、CSP 友好，可直接用于生产环境。",
           ecoTitle: "重点推荐：@coding01/docsjs-markdown",
-          ecoCardTitle: "把 docsjs 接到 Markdown 交付链路",
-          ecoCardDesc: "将 docsjs 的 HTML 快照转换为高质量 Markdown，适用于文档站、知识库和静态发布流程。",
+          ecoCardTitle: "下一步交付：Markdown 与编辑器桥接",
+          ecoCardDesc: "用 docsjs-markdown 输出发布级 Markdown；用 docsjs-editor 在多编辑器间切换且保持同一内容源。",
           ecoBtn: "打开 @coding01/docsjs-markdown"
         }
       };
