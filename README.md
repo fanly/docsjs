@@ -1,367 +1,217 @@
-# @coding01/docsjs
+# 📄 DocsJS v2 - Document Transformation Platform
 
-Render-first Word fidelity component for the web.  
-Import Word/WPS/Google Docs content from paste or `.docx` while preserving structure and layout as much as possible.
+> A PicGo-inspired document processing platform with plugin ecosystem and configurable profiles. Transform documents with security, fidelity, and extensibility.
 
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
-[![npm downloads](https://img.shields.io/npm/dm/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
-[![GitHub stars](https://img.shields.io/github/stars/fanly/docsjs)](https://github.com/fanly/docsjs/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fanly/docsjs)](https://github.com/fanly/docsjs/network)
-[![GitHub issues](https://img.shields.io/github/issues/fanly/docsjs)](https://github.com/fanly/docsjs/issues)
-[![CI](https://github.com/fanly/docsjs/actions/workflows/ci.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/ci.yml)
-[![Pages](https://github.com/fanly/docsjs/actions/workflows/pages.yml/badge.svg)](https://github.com/fanly/docsjs/actions/workflows/pages.yml)
+[![License](https://img.shields.io/npm/l/@coding01/docsjs)](LICENSE)
 
----
+## 🚀 Key Features
 
-[中文文档](./README.zh-CN.md)
+- 🔌 **Plugin Ecosystem** - 8 lifecycle hooks with security sandboxing ([Learn more](./PLUGINS.md))
+- 📋 **Configurable Profiles** - Knowledge Base, Exam Paper, Enterprise defaults ([Learn more](./PROFILES.md))
+- 🛡️ **Security-First** - Granular permissions and execution sandboxing  
+- ⚡ **High Fidelity** - Preserve Word document semantics and layout
+- 🌐 **Multi-Format** - DOCX / HTML / Markdown / JSON with AST core
+- 🏗️ **Platform-Grade** - Designed for extensibility and integrations
 
-## GitHub Pages
+## 🏗️ Core Architecture
 
-- Product page: [https://docsjs.coding01.cn/](https://docsjs.coding01.cn/)
-- Source: `docs/index.html`
-- Deploy workflow: `.github/workflows/pages.yml`
+The new 3-tier PicGo-inspired architecture:
 
-## Recommended Pair: @coding01/docsjs-markdown
-
-Use `@coding01/docsjs-markdown` to convert docsjs HTML snapshots (or DOCX) into Markdown for docs portals, knowledge bases, and static publishing workflows.
-
-- npm: https://www.npmjs.com/package/@coding01/docsjs-markdown
-- GitHub: https://github.com/fanly/docsjs-markdown
-- Product page: https://fanly.github.io/docsjs-markdown/
-
-## What You Get
-
-- Web Component core: `docs-word-editor`
-- React adapter: `WordFidelityEditorReact`
-- Vue adapter: `WordFidelityEditorVue`
-- Import pipeline: clipboard paste + `.docx` upload
-- HTML snapshot output for downstream rendering/storage
-
-## Installation
-
-```bash
-npm i @coding01/docsjs
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        PLATFORM LAYER                              │
+│  CLI + API + GUI + Profile Management + Plugin Registry           │
+├─────────────────────────────────────────────────────────────────────┤
+│                      ADAPTER LAYER                                 │  
+│  DOCX Parser ←→ DocumentAST ←→ HTML/MD/JSON Renderers             │
+├─────────────────────────────────────────────────────────────────────┤
+│                        CORE ENGINE                                 │
+│  AST v2 + Pipeline + Plugin Orchestrator + Security              │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### React
+### Installation
+```bash
+npm install @coding01/docsjs
+```
 
+### Web Component
+```html
+<script type="module">
+  import { defineDocsWordElement } from "@coding01/docsjs";
+  defineDocsWordElement();
+</script>
+
+<docs-word-editor></docs-word-editor>
+```
+
+### React Integration
 ```tsx
 import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 
-export default function Page() {
+function App() {
   return (
-    <WordFidelityEditorReact
-      onChange={(payload) => console.log(payload.htmlSnapshot)}
-      onError={(payload) => console.error(payload.message)}
+    <WordFidelityEditorReact 
+      config={{ profile: 'knowledge-base' }}
+      onReady={() => console.log('Ready!')}
+      onChange={console.log}
     />
   );
 }
 ```
 
-### Vue
+### Advanced Usage - Plugin System
+```ts
+import { CoreEngine } from "@coding01/docsjs";
 
-```vue
-<template>
-  <WordFidelityEditorVue @change="onChange" @error="onError" />
-</template>
+const engine = new CoreEngine();
 
-<script setup lang="ts">
-import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
-const onChange = (payload: { htmlSnapshot: string }) => console.log(payload.htmlSnapshot);
-const onError = (payload: { message: string }) => console.error(payload.message);
-</script>
+// Apply processing profile
+engine.applyProfile('knowledge-base'); 
+
+// Register plugins with 8 lifecycle hooks
+const contentEnhancer = {
+  name: 'math-enhancer',
+  availableHooks: ['beforeRender'] as const,
+  permissions: {
+    compute: { maxMemoryMB: 20 },
+    ast: { canModifySemantics: true, canAccessOriginal: true, canExportRawAst: false }
+  },
+  beforeRender: (context) => {
+    // Enhance content before final rendering
+    context.pipeline.state.intermediate.mathEnchanced = true;
+    return context;
+  }
+};
+
+engine.registerPlugin(contentEnhancer);
+
+// Transform with full functionality
+const result = await engine.transformDocument(file);
+console.log(result.output);      // Converted content
+console.log(result.diagnostics); // Errors and warnings  
+console.log(result.metrics);     // Performance data
 ```
 
-### Web Component
+### Profile System
+Switch processing behavior based on use-case:
 
 ```ts
-import { defineDocsWordElement } from "@coding01/docsjs";
+// For documentation with high fidelity
+engine.applyProfile('knowledge-base');
 
-defineDocsWordElement();
-const el = document.createElement("docs-word-editor");
-document.body.appendChild(el);
+// For exam papers with question extraction  
+engine.applyProfile('exam-paper');
 
-el.addEventListener("docsjs-change", (e) => {
-  const detail = (e as CustomEvent<{ htmlSnapshot: string }>).detail;
-  console.log(detail.htmlSnapshot);
-});
+// For enterprise docs with security focus
+engine.applyProfile('enterprise-document');
+
+// Custom profiles
+const custom = {
+  id: 'scientific-paper',
+  name: 'Scientific Paper Processor',
+  parse: { features: { mathML: true, tables: true, images: false } },
+  security: { allowedDomains: ['arxiv.org'], sanitizerProfile: 'fidelity-first' }
+};
+engine.registerProfile(custom);
 ```
 
-## API
+## 🔌 Plugin Development
 
-### Events
+Build extendable functionality with security controls:
 
-- `docsjs-change`
-  - payload: `{ htmlSnapshot: string; source: "paste" | "upload" | "api" | "clear"; fileName?: string; parseReport?: DocxParseReport }`
-- `docsjs-error`
-  - payload: `{ message: string }`
-- `docsjs-ready`
-  - payload: `{ version: string }`
-
-### Methods
-
-- `loadHtml(rawHtml: string): void`
-- `loadDocx(file: File): Promise<void>`
-- `loadClipboard(): Promise<void>`
-- `getSnapshot(): string`
-- `clear(): void`
-
-### Attributes
-
-- `lang="zh|en"`
-- `show-toolbar="true|false|1|0"`
-
-## Feature Checklist
-
-<!-- GENERATED:FEATURE_CHECKLIST_EN:START -->
-### Core
-
-- ✅ Web Component core (`docs-word-editor`)
-- ✅ React adapter + Vue adapter
-- ✅ Events and imperative public API
-- ✅ Strict-only parser strategy
-- ✅ Plugin architecture framework
-
-### Import Pipeline
-
-- ✅ Clipboard import (`text/html`, `text/plain`)
-- ✅ `.docx` upload + relationship media mapping
-- ✅ Clipboard image hydration (`file:/blob:/cid:`)
-- ✅ Output as stable HTML snapshot
-
-### Cleanup Plugins (Paste Pipeline)
-
-- ✅ Google Docs artifacts removal (`docs-internal-guid`, `google-sheets-html-origin`, `data-sheets-*`)
-- ✅ WPS Office artifacts removal (`wps-*`, `kingsoft-*`)
-- ✅ Word artifacts removal (`mso-*`, `class="Mso*"`, `o:/w:` namespaces)
-
-### Content Plugins (DOCX Parser)
-
-- ✅ Bookmark parsing
-- ✅ Header/Footer reference parsing
-- ✅ Section properties parsing (page size, margins, columns)
-- ✅ Drop cap formatting
-- ✅ Field parsing (PAGE, NUMPAGES, DATE, TOC)
-- ✅ Cross-reference parsing
-- ✅ Caption parsing
-
-### Render Plugins
-
-- ✅ VML/DrawingML shape rendering
-- ✅ WordArt rendering
-- ✅ OLE object placeholders
-- ✅ Content control (SDT) parsing
-- ✅ Watermark rendering
-- ✅ Page background color
-
-### Style Plugins
-
-- ✅ Style inheritance from styles.xml
-- ✅ List style parsing
-
-### Layout Fidelity
-
-- ✅ List reconstruction (`numId`, `ilvl`, `lvlText`)
-- ✅ Table v1 (`tblGrid/tcW`, merge, border, spacing)
-- ✅ Floating anchors v1 (`wp:anchor` metadata)
-- ✅ Anchor collision parity (pixel-level wrap)
-
-### Advanced Semantics
-
-- ✅ Footnotes / endnotes / comments
-- ✅ Revision markers (`ins` / `del`) + metadata
-- ✅ Page break semantic markers
-- ✅ DOCX hyperlink relationship + anchor mapping
-
-### Semantic Fallback
-
-- ✅ OMML fallback output
-- ✅ Chart semantic extraction fallback
-- ✅ SmartArt node fallback extraction
-- ✅ OMML high-fidelity render pipeline (MathML/KaTeX)
-
-### Engineering Quality
-
-- ✅ 177 automated tests (regression + boundary + plugins)
-- ✅ Baseline snapshot regression framework
-- ✅ `verify` quality gate (lint/typecheck/test/build/size)
-- ✅ Parse report API for performance tuning
-- ✅ Plugin pipeline API for extensibility
-<!-- GENERATED:FEATURE_CHECKLIST_EN:END -->
-
-## What's New in v0.2.0
-
-- Added **MathML high-fidelity rendering** with support for:
-  - Fractions, superscripts, subscripts, superscript-subscript combinations
-  - Square roots and nth roots
-  - Overlines, underlines, accents
-  - Limits, functions, operators
-  - Bold and italic math text
-  - Boxed and framed expressions
-- Added **KaTeX output format** option for better rendering
-- Added config option `outputFormat: "mathml" | "katex"`
-- Added **anchor collision detection** for pixel-level wrap fidelity
-- Added config option `features.anchors: boolean` to enable/disable anchor collision detection
-- Added **deep list fidelity** with `lvlOverride/startOverride` support
-- Added **deep table fidelity** with `vMerge/gridSpan` merged cell mapping and nested table rendering
-- Added **cross-section numbering continuity** option (`listNumbering.continuous`)
-- Added **multi-level marker template** support (`%1.%2.%3` patterns)
-- Added **image transform support** (rotation, flip horizontal/vertical)
-- Added **track changes** visualization (`data-word-revision="ins/del"`)
-- Added **pagination precision** (widow/orphan control, keep-with-next)
-- Added **sanitization profile** option (`sanitizationProfile: "fidelity-first" | "strict"`)
-- Added **CRDT-friendly collaboration** events with timestamp and sequenceId
-- Added **chart/SmartArt fallback** rendering
-
-## What's New in v0.1.9
-
-- Added **GitHub stats cards** to README for enhanced project presentation
-- Used transparent theme with brand color (#0e8b78) to match docsjs design
-
-## What's New in v0.1.8
-
-- Added **plugin architecture framework** for extensibility:
-  - Plugin registry with priority-based execution
-  - Support for Cleanup, Transform, Parse phases
-  - 23 built-in plugins for enhanced DOCX/Word/WPS/Google Docs support
-- Added **cleanup plugins** for paste pipeline:
-  - Google Docs artifacts removal (`docs-internal-guid`, `google-sheets-html-origin`, `data-sheets-*`)
-  - WPS Office artifacts removal (`wps-*`, `kingsoft-*`)
-  - Word artifacts removal (`mso-*`, `class="Mso*"`, Office XML namespaces)
-- Added **content plugins** for DOCX parsing:
-  - Bookmark, Header/Footer, Section, DropCap, Field, CrossRef, Caption
-- Added **render plugins** for advanced elements:
-  - VML/DrawingML shapes, WordArt, OLE objects, Content controls (SDT), Watermarks, Page backgrounds
-- Added **style plugins** for enhanced styling:
-  - Style inheritance, List style parsing
-- Added **math plugin** for MathML conversion
-- Test suite expanded to **157 tests**
-- New `DocxPluginPipeline` API for custom plugin configurations
-
-## What's New in v0.1.7
-
-- Added comprehensive fidelity test suites:
-  - Fidelity benchmark suite with 26 baseline tests
-  - Deep list fidelity tests (7 tests)
-  - Deep table fidelity tests (12 tests)
-  - Anchor image layout tests (7 tests)
-  - Footnote/endnote rendering tests (8 tests)
-  - Revision tracking visualization tests (10 tests)
-  - Pagination precision tests (widow/orphan, keep-with-next)
-  - OMML formula rendering tests (fraction, subscript, sqrt)
-- Test suite grew from 50+ to **125 tests**
-- All tests follow TDD and lossless paste verification principles
-- Added semantic statistics for pagination (spacer markers, widow/orphan)
-
-## What's New in v0.1.3
-
-- Added deep DOCX semantics:
-  - numbering overrides (`lvlOverride/startOverride`)
-  - merged cells (`vMerge/gridSpan`) and nested tables
-  - footnotes and endnotes (read-only rendering)
-  - comments (read-only rendering)
-  - revisions insert/delete markers (read-only rendering)
-  - comment range markers and revision metadata attributes
-  - page break semantic markers (`w:br type=page`, `lastRenderedPageBreak`)
-  - table width mapping (`tblGrid/gridCol`, `tcW`)
-  - table border model / cell spacing / table-layout mapping
-  - OMML formula fallback rendering and chart/SmartArt semantic fallback
-- Added floating image MVP:
-  - anchor position mapping (`wp:anchor`)
-  - wrap mode markers (`square`, `tight`, `topAndBottom`, `none`)
-  - anchor layout metadata (`relativeFrom`, `behindDoc`, `allowOverlap`, `layoutInCell`, `relativeHeight`, `dist*`)
-- Added fidelity tooling:
-  - semantic stats collector
-  - fidelity score calculator
-  - baseline regression framework (config-driven)
-  - visual regression workflow scaffold (Playwright + diff artifacts)
-  - golden corpus benchmark + trend report workflow (`fidelity-benchmark.yml`)
-- Added engineering quality gates:
-  - ESLint + strict verify pipeline (`lint`, `typecheck`, `test`, `build`, `sizecheck`)
-  - CI workflow for mandatory quality checks
-  - contribution/rules/deep-plan docs
-- Demo upgrades:
-  - React and Vue demos now include bilingual toggle (`zh` / `en`)
-  - component inner toolbar language follows selected locale
-  - semantic dashboard expanded with new indicators (anchor/wrap/comments/revisions/page-break)
-
-## Development
-
-```bash
-npm install
-npm run typecheck
-npm run test
-npm run build
-npm run benchmark:fidelity
+```ts
+const myPlugin = {
+  name: 'table-of-contents-generator',
+  version: '1.0.0',
+  supportedHooks: ['afterParse', 'beforeRender'] as const,
+  permissions: {
+    // Security enforcement
+    read: ['.'], 
+    write: ['.'],
+    network: false,
+    compute: { maxMemoryMB: 15, maxCpuSecs: 5 },
+    ast: { canModifySemantics: true, canAccessOriginal: true, canExportRawAst: false },
+    export: { canGenerateFiles: false, canUpload: false },
+    misc: { allowUnsafeCode: false }
+  },
+  afterParse: (context) => {
+    // Extract heading structure from AST
+    context.pipeline.state.intermediate.tocDetected = true;
+    return context;
+  },
+  beforeRender: (context) => {
+    // Insert ToC before final rendering
+    if (context.pipeline.state.intermediate.tocDetected) {
+      context.pipeline.state.intermediate.insertTocAtStart = true;
+    }
+    return context;
+  }
+};
 ```
 
-## Engineering Modes
+**8 Available Lifecycle Hooks:**
+- `beforeParse, afterParse` → Document parsing
+- `beforeTransform, afterTransform` → AST processing  
+- `beforeRender, afterRender` → Content rendering
+- `beforeExport, afterExport` → Output preparation
 
-- Spec and conventions: [ENGINEERING_MODES.md](./ENGINEERING_MODES.md)
-- Parse API now supports:
-  - `parseDocxToHtmlSnapshot(file)`
-  - `parseDocxToHtmlSnapshotWithReport(file)`
+## 💼 Use Cases
 
-## Demos
+| **Scenario** | **Best Profile** | **Key Features** |
+|--------------|------------------|------------------|
+| **Technical Documentation** | `knowledge-base` | High-fidelity, MathML support, tables |
+| **Academic Papers** | `exam-paper` | Question extraction, strict semantic parsing |
+| **Corporate Documents** | `enterprise` | Security, compliance, sanitization |
+| **General Use** | `default` | Balanced performance vs fidelity |
 
-### React demo
+## 🌟 Platform Benefits
 
-```bash
-cd demos/react-demo
-npm install
-npm run dev
-```
+### For End Users
+- **Rich Semantic Fidelity**: Word → HTML with layout, math, tables preserved
+- **Configurable Workflows**: Switch processing based on document type/use case 
+- **Security Focused**: Sandboxed execution of plugins, granular controls
+- **Performance Optimized**: Streaming processing for large documents
 
-### Vue demo
+### For Developers  
+- **Extensible Architecture**: 8 hook points for custom functionality injection
+- **Security Model**: Fine-grained permissions for safe plugin ecosystem
+- **Profile System**: Configure processing behavior for domain-specific needs
+- **Integration Friendly**: API and component interfaces
 
-```bash
-cd demos/vue-demo
-npm install
-npm run dev
-```
+### For Organizations  
+- **Enterprise-Grade**: Audit trails, compliance-ready profiles
+- **Scalable**: Worker management and resource controls
+- **Platform Capable**: Ready for CMS/blog editor integrations
+- **Extensible**: Internal plugin development enabled
 
-## Publishing
+## 🛡️ Security Model
 
-### Manual
+Security is built into the core:
 
-```bash
-npm login
-npm version patch
-git push origin main --follow-tags
-npm publish --access public
-```
+- **Plugin Sandboxing**: Execution isolation
+- **Permission System**: Granular file, network, compute access controls  
+- **AST Protection**: Prevent unintended semantic changes
+- **Content Sanitization**: Profile-dependent sanitization (fidelity-first to strict)
 
-### GitHub Actions
+## 📚 Documentation
 
-Workflow: `.github/workflows/publish.yml`
+- [Plugin Development](./PLUGINS.md) - Build your own plugins
+- [Profile Configuration](./PROFILES.md) - Customize processing behavior
+- [API Reference](./API.md) - Full API documentation  
+- [Security Model](./SECURITY.md) - Permissions and sandboxing details
 
-- Trigger: push tag `v*.*.*`
-- Steps: `npm ci` -> `npm run typecheck` -> `npm run build` -> `npm publish --provenance`
+## 🤝 Contributing
 
-### GitHub Packages (repo sidebar "Packages")
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-Workflow: `.github/workflows/publish-github-packages.yml`
+## 📜 License
 
-- Trigger: push tag `v*.*.*` or manual run
-- Target registry: `https://npm.pkg.github.com`
-- Package name in GitHub Packages: `@fanly/docsjs`
-- Note: GitHub sidebar "Packages" only shows packages published to GitHub Packages, not npmjs
+MIT License - Free for commercial and personal use.
 
-## Roadmap
+---
 
-See [ROADMAP.md](./ROADMAP.md) for prioritized execution plan (P0/P1/P2) and acceptance criteria.
-
-## Security Notes
-
-- Default mode is fidelity-first and keeps Word inline styles.
-- In production, configure CSP, iframe sandbox, file upload allowlist, and optional host-side sanitization.
-
-## Support This Project
-
-If this project saves your time, a small tip is appreciated.
-
-![Support docsjs](https://image.coding01.cn/Coding01%20%E8%B5%9E%E8%B5%8F%E7%A0%81.png)
-
-`“加个鸡腿💪(ﾟωﾟ💪)”`
+Transform documents with unprecedented fidelity and extensibility. Platform-grade security. PicGo-inspired extensibility. Ready for the next generation of document processing workflows.
