@@ -863,6 +863,7 @@ export interface SourceLocation {
 }
 
 /** Node with source location */
+export type LocatedNode = ASTNode & { position?: SourceLocation };
 export interface LocatedNode extends ASTNode {
   position?: SourceLocation;
 }

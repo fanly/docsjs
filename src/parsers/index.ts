@@ -1,7 +1,5 @@
-/**
- * Parsers Module
- * 
- * Input format parsers that convert various formats to DocumentAST.
- */
-
+export * from "./interface";
 export * from "./docx";
+export * from "./html";
+
+export * from "./html";

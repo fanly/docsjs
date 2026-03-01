@@ -1,0 +1,17 @@
+node_modules
+dist
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
+tests
+demos
+docs
+*.md
+!.dockerignore
+.git
+.gitignore
+infrastructure
+fixtures
+bin

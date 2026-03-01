@@ -15,11 +15,12 @@ import type {
 import type { CoreEngine } from '../engine/core';
 import type { 
   DocxParseOptions, 
-  DocxParseResult 
+  DocxParseResult,
+  HtmlParseResult 
 } from '../parsers';
+import { HtmlParser } from '../parsers/html/parser';
 import type { HtmlRenderOptions, HtmlRenderResult } from '../renderers';
-import { DOCXParser } from '../parsers/docx/parser';
-import { HTMLRenderer } from '../renderers/html/renderer';
+import { MarkdownRenderer } from '../renderers/markdown/renderer';
 import { DocumentAST } from '../ast/types';
 
 export const DEFAULT_PIPELINE_CONTEXT: PipelineContext = {
@@ -203,15 +204,36 @@ export class PipelineManager {
         throw new Error(`Unsupported file type: ${context.input.name}`);
       }
     } else if (typeof context.input === 'string') {
-      // For now, assume it's HTML - in the future this could be smarter
-      // This would connect to HTML parser, markdown parser, etc.
-      throw new Error('String input parsing not fully implemented yet');
+      // Parse string input as HTML
+      const htmlParser = new HtmlParser(context.profile.parse as any);
+      const htmlResult: HtmlParseResult = await htmlParser.parse(context.input);
+      
+      context.state.ast = htmlResult.ast;
+      context.metrics.processedBytes = htmlResult.report.byteSize || 0;
+      context.metrics.processedChars = htmlResult.report.characterCount || 0;
+      
+      // Process parser-generated diagnostics
+      if (htmlResult.report.warnings && htmlResult.report.warnings.length > 0) {
+        for (const warning of htmlResult.report.warnings) {
+          context.state.warnings.push({
+            code: 'PARSER_WARNING',
+            message: warning,
+            phase: 'parsing',
+            timestamp: Date.now()
+          });
+        }
+      }
+      
+      // Return early since we've handled everything
+      return;
     } else {
       throw new Error('Unsupported input type');
     }
     
     if (result) {
       context.state.ast = result.ast;
+      context.metrics.processedBytes = result.report.elapsedMs || 0;
+      context.metrics.processedChars = result.report.elapsedMs || 0;
       context.metrics.processedBytes = result.report.byteSize || 0;
       context.metrics.processedChars = result.report.characterCount || 0;
       
@@ -296,8 +318,18 @@ export class PipelineManager {
         break;
         
       case 'markdown':
-        // Would use MarkdownRenderer
-        throw new Error('Markdown renderer not implemented yet');
+        // Use MarkdownRenderer
+        const mdOpts = {
+          mode: 'gfm' as const,
+          includeFrontmatter: false,
+          includeTOC: context.profile.render.options?.generateTOC || false,
+          ...context.profile.render.options
+        };
+        const mdRenderer = new MarkdownRenderer(mdOpts);
+        const mdResult = mdRenderer.render(context.state.ast);
+        
+        context.state.intermediate.renderedOutput = mdResult.markdown;
+        break;
         
       case 'json':
         context.state.intermediate.renderedOutput = JSON.stringify(context.state.ast, null, 2);

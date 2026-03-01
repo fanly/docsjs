@@ -4,8 +4,9 @@
  * Defines the core interfaces and types for the new document transformation engine.
  */
 
-import type { DocumentAST, ExportResult, PipelineContext } from './pipeline';
-import type { PluginHooks, PluginPermissions } from './plugins';
+import type { DocumentAST } from '../ast/types';
+import type { ExportResult, PipelineContext } from '../pipeline/types';
+import type { PluginHooks, PluginPermissions } from '../plugins-v2/types';
 
 // Engine Configuration
 export interface EngineConfig {

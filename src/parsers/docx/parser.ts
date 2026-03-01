@@ -56,7 +56,7 @@ import {
   createHyperlinkNode,
   createSectionNode,
   createAuxiliaryContent,
-} from "../ast/utils";
+} from "../../ast/utils";
 
 // ============================================================================
 // TYPES

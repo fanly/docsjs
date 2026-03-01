@@ -477,9 +477,3 @@ export class PluginASTAdapter {
     return [...this.legacyPlugins, ...this.astPlugins];
   }
 }
-
-// ============================================================================
-// CONVENIENCE EXPORTS
-// ============================================================================
-
-export { htmlToASTNodes };

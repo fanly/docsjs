@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docsjs-config
+  labels:
+    app: docsjs
+data:
+  licenseUrl: "https://license.docsjs.cloud"
+  apiPort: "3000"
+  logLevel: "info"
+  rateLimit: "100"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: docsjs-secrets
+  labels:
+    app: docsjs
+type: Opaque
+stringData:
+  redisUrl: "redis://redis-master:6379"
+  databaseUrl: "postgresql://user:password@postgres:5432/docsjs"
+  jwtSecret: "change-me-in-production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: docsjs
+    component: redis
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: docsjs
+    component: redis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  labels:
+    app: docsjs
+    component: database
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docsjs
+      component: database
+  template:
+    metadata:
+      labels:
+        app: docsjs
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_DB
+          value: docsjs
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: docsjs-secrets
+              key: postgresUser
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: docsjs-secrets
+              key: postgresPassword
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi

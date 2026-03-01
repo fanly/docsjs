@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  docsjs-api:
+    image: docsjs/api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - LICENSE_SERVER_URL=${LICENSE_SERVER_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - STORAGE_TYPE=${STORAGE_TYPE:-local}
+      - RATE_LIMIT=${RATE_LIMIT:-100}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/docsjs}
+    volumes:
+      - uploads:/app/uploads
+      - logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - docsjs-network
+
+  docsjs-worker:
+    image: docsjs/api:latest
+    command: ["node", "dist/worker.js"]
+    environment:
+      - NODE_ENV=production
+      - LICENSE_SERVER_URL=${LICENSE_SERVER_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/docsjs}
+      - WORKER_CONCURRENCY=${WORKER_CONCURRENCY:-4}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    networks:
+      - docsjs-network
+
+  docsjs-license:
+    image: docsjs/license:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.license
+    ports:
+      - "${LICENSE_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=production
+      - LICENSE_PRIVATE_KEY=${LICENSE_PRIVATE_KEY}
+      - LICENSE_PUBLIC_KEY=${LICENSE_PUBLIC_KEY}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/docsjs}
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - docsjs-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - docsjs-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=docsjs
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - docsjs-network
+
+volumes:
+  uploads:
+  logs:
+  redis-data:
+  postgres-data:
+
+networks:
+  docsjs-network:
+    driver: bridge

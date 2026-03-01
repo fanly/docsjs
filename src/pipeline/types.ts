@@ -4,13 +4,13 @@
  * Defines the types for the enhanced document transformation pipeline system.
  */
 
-import type { CoreEngine } from '../engine/core';
+import type { EngineConfig, TransformationProfile } from '../types/engine';
 import type { EngineConfig, TransformationProfile } from '../types/engine';
 
 // Pipeline context
 export interface PipelineContext {
   // Engine references
-  engine: CoreEngine;
+  engine: unknown;
   profile: TransformationProfile;
   config: EngineConfig;
   

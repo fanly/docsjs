@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsjs-api
+  labels:
+    app: docsjs
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: docsjs
+      component: api
+  template:
+    metadata:
+      labels:
+        app: docsjs
+        component: api
+    spec:
+      containers:
+      - name: api
+        image: docsjs/api:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: LICENSE_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: docsjs-config
+Server              key: licenseUrl
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: docsjs-secrets
+              key: redisUrl
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: docsjs-secrets
+              key: databaseUrl
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: docsjs
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsjs-api
+  labels:
+    app: docsjs
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: docsjs
+    component: api
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: docsjs-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: docsjs-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
