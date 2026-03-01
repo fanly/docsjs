@@ -100,3 +100,14 @@ export type {
   StructureElement, 
   StructureAnalysis 
 } from "./structure";
+
+export { EDITOR_PROFILES, getEditorProfile, listEditorProfiles, createCustomEditorProfile } from "./profiles/editor-profiles";
+export type { EditorProfile } from "./profiles/editor-profiles";
+
+export { DocumentDiffer, diffDocuments, compareDocuments } from "./lib/diff";
+export type { DiffResult, DiffChange, ChangeHighlight, ComparisonReport, BlockDiff } from "./lib/diff";
+export type { 
+  DocumentStructureType, 
+  StructureElement, 
+  StructureAnalysis 
+} from "./structure";
