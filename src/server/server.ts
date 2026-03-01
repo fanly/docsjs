@@ -100,7 +100,19 @@ class DocsJSServer {
             console.log(`[${requestId}] ${req.method} ${url}`);
           }
 
+          // Basic health check
           if (url === `${apiPrefix}/health`) {
+            this.sendJson(res, 200, { success: true, data: { status: 'ok', timestamp: Date.now() } }, requestId, startTime);
+            return;
+          }
+
+          // Detailed health check
+          if (url === `${apiPrefix}/health/detailed` && req.method === 'GET') {
+            const health = await this.getDetailedHealth();
+            const statusCode = health.status === 'healthy' ? 200 : 503;
+            this.sendJson(res, statusCode, { success: true, data: health }, requestId, startTime);
+            return;
+          }
             this.sendJson(res, 200, { success: true, data: { status: 'ok', timestamp: Date.now() } }, requestId, startTime);
             return;
           }
@@ -433,6 +445,32 @@ class DocsJSServer {
       });
     } catch (error) {
       console.error('Webhook delivery failed:', error);
+    }
+  }
+
+  private async getDetailedHealth(): Promise<{
+    status: 'healthy' | 'degraded' | 'unhealthy';
+    timestamp: number;
+    uptime: number;
+    checks: {
+      memory: { status: 'ok' | 'warning' | 'error'; used: number; total: number };
+      jobs: { status: 'ok' | 'warning' | 'error'; active: number; pending: number };
+      storage: { status: 'ok' | 'warning' | 'error' };
+    };
+  }> {
+    const memUsage = process.memoryUsage();
+    const memUsedMB = memUsage.heapUsed / 1024 / 1024;
+    const memTotalMB = memUsage.heapTotal / 1024 / 1024;
+    const memStatus = memUsedMB / memTotalMB > 0.9 ? 'error' : memUsedMB / memTotalMB > 0.7 ? 'warning' : 'ok';
+    const jobStatus = this.usage.activeJobs > 10 || this.usage.pendingJobs > 100 ? 'error' : this.usage.activeJobs > 5 || this.usage.pendingJobs > 50 ? 'warning' : 'ok';
+    const overallStatus = memStatus === 'error' || jobStatus === 'error' ? 'unhealthy' : memStatus === 'warning' || jobStatus === 'warning' ? 'degraded' : 'healthy';
+    return { status: overallStatus, timestamp: Date.now(), uptime: process.uptime(), checks: {
+      memory: { status: memStatus as 'ok' | 'warning' | 'error', used: memUsedMB, total: memTotalMB },
+      jobs: { status: jobStatus as 'ok' | 'warning' | 'error', active: this.usage.activeJobs, pending: this.usage.pendingJobs },
+      storage: { status: 'ok' as const }
+    }};
+  }
+}
     }
   }
 }
