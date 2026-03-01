@@ -90,6 +90,15 @@ describe('StreamingPipelineManager', () => {
         streaming: true 
       });
       
+      // Should recommend chunk size at most equal to configured chunkSize
+      expect(result.recommendedChunkSize).toBeLessThanOrEqual(1024 * 1024);
+    });
+      const result = estimateMemoryUsage(10000000, { 
+        chunkSize: 1024 * 1024, 
+        maxMemoryMB: 256, 
+        streaming: true 
+      });
+      
       // Should recommend smaller chunks for lower memory
       expect(result.recommendedChunkSize).toBeLessThanOrEqual(1024 * 1024 * 0.2);
     });

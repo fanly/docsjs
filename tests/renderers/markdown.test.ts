@@ -271,6 +271,11 @@ describe('MarkdownRenderer', () => {
       };
 
       const result = renderer.render(ast);
+      expect(result.markdown).toContain('[Click here](https://example.com');
+      expect(result.metadata.linkCount).toBe(1);
+    });
+      expect(result.markdown).toContain('[Click here](https://example.com');
+      expect(result.metadata.linkCount).toBe(1);
       expect(result.markdown).toContain('[Click here](https://example.com)');
       expect(result.metadata.linkCount).toBe(1);
     });

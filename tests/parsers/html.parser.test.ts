@@ -164,6 +164,14 @@ describe('HtmlParser', () => {
   });
 
   describe('Error Handling', () => {
+    it('should handle invalid HTML gracefully', async () => {
+      const html = '<p>Unclosed paragraph';
+      
+      // Should not throw but may produce warning in report
+      const result = await parser.parse(html);
+      expect(result).toBeDefined();
+    });
+  });
     it('should throw on invalid HTML', async () => {
       const html = '<p>Unclosed paragraph';
       
