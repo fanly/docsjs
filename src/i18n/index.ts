@@ -434,3 +434,23 @@ export {
   transformCSSForRTL
 } from './rtl';
 export type { RTLConfig, RTLLanguage, TextDirection } from './rtl';
+
+// Platform features
+export {
+  TranslationMemory,
+  LocaleDetector,
+  AdvancedI18n,
+  ContentLanguageDetector,
+  createTranslationMemory,
+  createLocaleDetector,
+  createAdvancedI18n,
+  detectContentLanguage
+} from './platform';
+export type {
+  TranslationMemoryEntry,
+  LocaleDetectionOptions,
+  PluralRules,
+  GenderedTranslation,
+  TranslationContext,
+  LanguageDetectionResult
+} from './platform';

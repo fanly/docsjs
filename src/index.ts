@@ -213,3 +213,16 @@ export type {
   SalesRecord,
   Review
 } from "./marketplace/economy";
+
+
+// Enterprise Integration Hub
+export { IntegrationHub, createIntegration } from "./enterprise/integration";
+export type { IntegrationConfig, IntegrationType, IntegrationResult, SyncJob } from "./enterprise/integration";
+
+// LMS exports
+export { ExamQuestionExtractor, GradeBookManager } from "./lms/academic";
+export type { ExamQuestion, QuestionBank, ExtractionResult, GradeBook, GradeEntry, GradeStatistics } from "./lms/academic";
+
+// i18n Platform exports
+export { TranslationMemory, LocaleDetector, AdvancedI18n, detectContentLanguage, createTranslationMemory, createLocaleDetector, createAdvancedI18n } from "./i18n/platform";
+export type { LanguageDetectionResult, TranslationContext, GenderedTranslation } from "./i18n/platform";

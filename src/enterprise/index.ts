@@ -268,3 +268,31 @@ export function createEnterpriseFeatures(
     compliance: complianceManager,
   };
 }
+
+
+// Integration Hub
+export {
+  BaseIntegration,
+  IntegrationHub,
+  SAPIntegration,
+  SalesforceIntegration,
+  ServiceNowIntegration,
+  JiraIntegration,
+  SlackIntegration,
+  TeamsIntegration,
+  createIntegration
+} from './integration';
+export type {
+  IntegrationConfig,
+  IntegrationType,
+  IntegrationCredentials,
+  IntegrationResult,
+  SyncJob,
+  WebhookEvent,
+  SAPConfig,
+  SalesforceConfig,
+  ServiceNowConfig,
+  JiraConfig,
+  SlackConfig,
+  TeamsConfig
+} from './integration';
