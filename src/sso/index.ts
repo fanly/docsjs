@@ -196,7 +196,7 @@ export class SSOService {
   /**
    * Generate OAuth authorization URL
    */
-  getOAuthAuthorizationUrl(provider: SSOProvider, state: string): string {
+  async getOAuthAuthorizationUrl(provider: SSOProvider, state: string): Promise<string> {
     const config = this.oauthConfigs.get(provider);
     if (!config) {
       throw new Error(`OAuth not configured for provider: ${provider}`);

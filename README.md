@@ -188,6 +188,65 @@ const myPlugin = {
 - **Platform Capable**: Ready for CMS/blog editor integrations
 - **Extensible**: Internal plugin development enabled
 
+## 🌐 CMS & Platform Integrations
+
+DocsJS integrates with major content platforms:
+
+| Platform | Integration |
+|----------|-------------|
+| **WordPress** | Publish posts via REST API |
+| **Ghost** | Blog posts and newsletters |
+| **Notion** | Pages and databases |
+| **Confluence** | Enterprise documentation |
+| **GitBook** | Technical documentation |
+| **Moodle** | Educational content |
+| **Blackboard** | Course materials |
+| **SharePoint** | Enterprise documents |
+| **Box/OneDrive/GDrive** | Cloud storage |
+
+## 🔐 Enterprise Features
+
+- **SSO Integration**: SAML 2.0, OAuth 2.0/OIDC (Okta, Azure AD, Auth0)
+- **Multi-tenancy**: Organization-based isolation
+- **Audit Logging**: Full activity tracking
+- **Compliance**: SOX, FERPA, HIPAA ready profiles
+
+## 🤖 AI-Powered Features
+
+- **Document Generation**: Generate from templates (meeting notes, proposals, specs)
+- **Smart Extraction**: Extract contacts, tables, dates, links
+- **AI Comparison**: Semantic diff between documents
+- **Auto-structure Detection**: Automatically detect document type
+- **RAG Engine**: Semantic search over document content
+
+## 📱 Editor Adapters
+
+Convert between DocumentAST and popular editors:
+
+- **TipTap** - Headless editor framework
+- **Slate** - Customizable rich text
+- **ProseMirror** - Schema-based editing
+
+## 🌍 Internationalization
+
+- **20+ Languages**: Full i18n support
+- **RTL Languages**: Arabic, Hebrew, Persian, Urdu support
+- **RTL Layout**: Automatic layout mirroring
+
+## ☁️ Cloud & Enterprise
+
+- **REST API Server**: Convert, batch, async jobs
+- **Webhooks**: Event-driven workflows
+- **Rate Limiting**: Token bucket algorithm
+- **Storage**: Redis, PostgreSQL, memory backends
+
+## 💰 SaaS Platform Ready
+
+- **Organization Management**: Multi-team workspaces
+- **Subscription Billing**: Stripe/Paddle integration
+- **Usage-Based Billing**: API calls, storage, transformations
+- **Plugin Marketplace**: Commercial plugins with revenue sharing
+
 ## 🛡️ Security Model
 
 Security is built into the core:

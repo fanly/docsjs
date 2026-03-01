@@ -1,3 +1,4 @@
+// Core exports
 export { defineDocsWordElement, DocsWordElement } from "./core/DocsWordElement";
 
 export { collectSemanticStatsFromDocument, collectSemanticStatsFromHtml } from "./lib/semanticStats";
@@ -12,6 +13,7 @@ export type {
   DocsWordEditorErrorDetail, 
   DocsWordEditorReadyDetail
 } from "./core/types";
+
 
 export type {
   DocumentNode,
@@ -36,12 +38,15 @@ export { generateId, serializeAST, deserializeAST, cloneAST, walkAST, extractTex
 
 export { parseDocxToAST } from "./parsers/docx/parser";
 
+// Server exports
 export { DocsJSServer } from "./server/server";
 export type { ServerConfig, ConvertRequest, ConvertResponse, ApiResponse } from "./server/types";
 
+// Enterprise exports
 export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures } from "./enterprise";
 export type { LicenseInfo, LicenseValidationResult, ComplianceAuditLog, SecurityConfig } from "./enterprise";
 
+// CMS exports
 export { 
   createCMSAdapter, 
   createWordPressAdapter, 
@@ -64,11 +69,11 @@ export type {
   ConfluenceOptions,
   GitBookOptions
 } from "./cms";
-export type { CMSAdapter, CMSImportOptions, CMSContent } from "./cms";
 
+// Legacy alias
 export { parseDocxToHtmlSnapshot as legacyParseDocxToHtml } from "./lib/docxHtml";
 
-
+// Marketplace exports
 export { SecurePluginRegistry, MarketplaceAPISimulator } from "./marketplace/registry";
 export { PluginManager, generatePluginDocs } from "./marketplace/manager";
 export type { 
@@ -91,21 +96,13 @@ export type {
   PluginSubmissionRequest,
   PluginApprovalStatus
 } from "./marketplace/manager";
-export type { 
-  MarketplacePlugin, 
-  PluginAuthor, 
-  PluginSubmission, 
-  PluginReview, 
-  PluginSearchFilters,
-  MarketplaceConfig,
-  PluginInstallResult,
-  PluginUpdateInfo
-} from "./marketplace/types";
 
+// Editor exports
 export { astToTipTap, tipTapToAst } from "./editors/tiptap";
 export { astToSlate, slateToAst } from "./editors/slate";
 export { astToProseMirror, proseMirrorToAst } from "./editors/prosemirror";
 
+// SSO exports
 export { SSOService, createOktaOAuth, createAzureADOAuth, createAuth0OAuth, createOktaSAML, createAzureADSAML } from "./sso";
 export type { 
   OAuthConfig, 
@@ -115,6 +112,7 @@ export type {
   SSOUserProfile 
 } from "./sso";
 
+// Structure detection exports
 export { StructureDetector, autoDetectAndApply } from "./structure";
 export type { 
   DocumentStructureType, 
@@ -122,24 +120,21 @@ export type {
   StructureAnalysis 
 } from "./structure";
 
+// Editor profiles exports
 export { EDITOR_PROFILES, getEditorProfile, listEditorProfiles, createCustomEditorProfile } from "./profiles/editor-profiles";
 export type { EditorProfile } from "./profiles/editor-profiles";
 
+// Diff exports
 export { DocumentDiffer, diffDocuments, compareDocuments } from "./lib/diff";
 export type { DiffResult, DiffChange, ChangeHighlight, ComparisonReport, BlockDiff } from "./lib/diff";
-export type { 
-  DocumentStructureType, 
-  StructureElement, 
-  StructureAnalysis 
-} from "./structure";
 
+// SaaS exports
 export { 
   OrganizationManager,
   AdminManager,
   BillingManager,
   UsageBillingManager,
-  PLAN_PRICING,
-  REVENUE_SHARE
+  PLAN_PRICING
 } from "./saas";
 export type {
   Organization,
@@ -160,6 +155,7 @@ export type {
   CheckoutSession
 } from "./saas";
 
+// Embedded SDK exports
 export { createEmbeddedClient, createEmbed, OEMLicenseManager } from "./embedded";
 export type {
   EmbeddedSDKConfig,
@@ -173,6 +169,7 @@ export type {
   LicenseValidation
 } from "./embedded";
 
+// AI exports
 export { AIDocumentEngine, ExtractionEngine, AIDocumentComparison, DOCUMENT_TEMPLATES } from "./ai/advanced";
 export type {
   GenerationRequest,
@@ -196,7 +193,8 @@ export type {
   AIDiffResult
 } from "./ai/advanced";
 
-export { PluginEconomyManager } from "./marketplace/economy";
+// Plugin economy exports
+export { PluginEconomyManager, REVENUE_SHARE } from "./marketplace/economy";
 export type {
   PluginPricing,
   FeatureTier,

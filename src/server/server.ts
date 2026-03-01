@@ -116,9 +116,8 @@ class DocsJSServer {
             this.sendJson(res, statusCode, { success: true, data: health }, requestId, startTime);
             return;
           }
-            this.sendJson(res, 200, { success: true, data: { status: 'ok', timestamp: Date.now() } }, requestId, startTime);
-            return;
-          }
+
+          if (url === `${apiPrefix}/convert` && req.method === 'POST') {
 
           if (url === `${apiPrefix}/convert` && req.method === 'POST') {
             const result = await this.handleConvert(requestId, body);
@@ -619,8 +618,8 @@ class DocsJSServer {
     return { status: overallStatus, timestamp: Date.now(), uptime: process.uptime(), checks: {
       memory: { status: memStatus as 'ok' | 'warning' | 'error', used: memUsedMB, total: memTotalMB },
       jobs: { status: jobStatus as 'ok' | 'warning' | 'error', active: this.usage.activeJobs, pending: this.usage.pendingJobs },
-      storage: { status: 'ok' as const }
     }};
+  }
   }
 }
     }

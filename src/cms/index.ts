@@ -26,18 +26,6 @@ export type { ConfluencePage, ConfluenceSpace, ConfluenceAttachment } from './co
 
 export { GitBookAdapter, createGitBookAdapter } from './gitbook';
 export type { GitBookPage, GitBookContent, GitBookSpace, GitBookVersion } from './gitbook';
-  CMSAdapter, 
-  CMSImportOptions, 
-  CMSContent,
-  WordPressOptions,
-  ContentfulOptions,
-  StrapiOptions,
-  createWordPressAdapter,
-  createContentfulAdapter,
-  createStrapiAdapter,
-  createCMSAdapter
-} from './adapters';
-
 
 export { BlackboardAdapter, createBlackboardAdapter } from './lms';
 export type { BlackboardOptions, BlackboardCourse, BlackboardContent, BlackboardAttachment } from './lms';
