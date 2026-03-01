@@ -49,6 +49,27 @@ export { parseDocxToHtmlSnapshot as legacyParseDocxToHtml } from "./lib/docxHtml
 
 
 export { SecurePluginRegistry, MarketplaceAPISimulator } from "./marketplace/registry";
+export { PluginManager, generatePluginDocs } from "./marketplace/manager";
+export type { 
+  MarketplacePlugin, 
+  PluginAuthor, 
+  PluginSubmission, 
+  PluginReview, 
+  PluginSearchFilters,
+  MarketplaceConfig,
+  PluginInstallResult,
+  PluginUpdateInfo
+} from "./marketplace/types";
+export type { 
+  PluginVersion,
+  PluginMetrics,
+  PluginCompatibilityResult,
+  PluginSearchQuery,
+  PluginSearchResult,
+  MarketplacePluginBrief,
+  PluginSubmissionRequest,
+  PluginApprovalStatus
+} from "./marketplace/manager";
 export type { 
   MarketplacePlugin, 
   PluginAuthor, 
