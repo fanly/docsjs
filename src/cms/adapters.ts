@@ -269,7 +269,6 @@ export function createStrapiAdapter(options: StrapiOptions): StrapiAdapter {
 
 export function createCMSAdapter(
 
-export function createCMSAdapter(
   type: 'wordpress' | 'contentful' | 'strapi' | 'ghost' | 'notion' | 'confluence' | 'gitbook' | 'generic', 
   options: unknown
 ): CMSAdapter {

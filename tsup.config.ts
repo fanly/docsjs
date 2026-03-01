@@ -12,9 +12,7 @@ export default defineConfig((options) => [
     entry: ["src/index.ts"],
     format: ["esm", "cjs"],
     dts: false,
-    entry: ["src/index.ts"],
-    format: ["esm", "cjs"],
-    dts: true,
+
     sourcemap: Boolean(options.watch),
     minify: !options.watch,
     clean: true,

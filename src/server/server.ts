@@ -119,7 +119,6 @@ class DocsJSServer {
 
           if (url === `${apiPrefix}/convert` && req.method === 'POST') {
 
-          if (url === `${apiPrefix}/convert` && req.method === 'POST') {
             const result = await this.handleConvert(requestId, body);
             this.sendJson(res, 200, result, requestId, startTime);
             return;
@@ -448,8 +447,7 @@ class DocsJSServer {
     };
   }
 
-    return { success: true, data: stats };
-  }
+
 
   private async handleCreateWebhook(requestId: string, body: string): Promise<ApiResponse<WebhookRegistration>> {
     const req = this.parseBody<{ url: string; events: WebhookEventType[]; secret?: string }>(body);
@@ -620,10 +618,8 @@ class DocsJSServer {
       jobs: { status: jobStatus as 'ok' | 'warning' | 'error', active: this.usage.activeJobs, pending: this.usage.pendingJobs },
     }};
   }
-  }
-}
-    }
-  }
+
+
 }
 
 export { DocsJSServer };
