@@ -41,6 +41,9 @@ export type { BoxOptions, BoxItem, BoxFile } from './enterprise';
 
 export { OneDriveAdapter, createOneDriveAdapter } from './enterprise';
 export type { OneDriveOptions, OneDriveItem } from './enterprise';
-
-export { GoogleDriveAdapter, createGoogleDriveAdapter } from './enterprise';
 export type { GoogleDriveOptions, GoogleDriveFile } from './enterprise';
+
+// Academic exports
+export { ExamQuestionExtractor } from '../lms/academic';
+export type { ExamQuestion, QuestionBank, ExtractionResult, GradeBook, GradeEntry, GradeStatistics, StudentPerformance, AcademicAnalytics } from '../lms/academic';
+export { GradeBookManager } from '../lms/gradebook';
