@@ -199,6 +199,9 @@ export type {
   AIDiffResult
 } from "./ai/advanced";
 
+export { SemanticSimilarityEngine, QualityPredictionModel, LayoutOptimizer } from "./ai/similarity";
+export type { SimilarityResult, DocumentCluster, PlagiarismResult, QualityScore, QualityComponents, LayoutAnalysis, LayoutSuggestion } from "./ai/similarity";
+
 // Plugin economy exports
 export { PluginEconomyManager, REVENUE_SHARE } from "./marketplace/economy";
 export type {
