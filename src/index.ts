@@ -226,3 +226,11 @@ export type { ExamQuestion, QuestionBank, ExtractionResult, GradeBook, GradeEntr
 // i18n Platform exports
 export { TranslationMemory, LocaleDetector, AdvancedI18n, detectContentLanguage, createTranslationMemory, createLocaleDetector, createAdvancedI18n } from "./i18n/platform";
 export type { LanguageDetectionResult, TranslationContext, GenderedTranslation } from "./i18n/platform";
+
+// Benchmark exports
+export { BenchmarkRunner, createBenchmarkRunner, createRegressionChecker, createStandardBenchmarkSuite } from "./lib/benchmark";
+export type { BenchmarkResult, BenchmarkSuite, BenchmarkDefinition, BenchmarkReport, BenchmarkMetrics, RegressionThreshold } from "./lib/benchmark";
+
+// Collaboration exports
+export { CollaborationManager, createCollaborationManager, createPresenceSystem, createLockManager } from "./collaboration";
+export type { CollaborationSession, Participant, CursorPosition, Operation, Lock, CollaborationUser, CollaborationEvent } from "./collaboration";

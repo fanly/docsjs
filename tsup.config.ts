@@ -19,7 +19,7 @@ export default defineConfig((options) => [
     define: {
       __DOCSJS_VERSION__: JSON.stringify(packageVersion)
     },
-    external: ["react", "react-dom", "vue", "jszip"]
+    external: ["react", "react-dom", "vue", "jszip", "yjs"]
   },
   {
     entry: ["src/react.ts", "src/vue.ts"],
