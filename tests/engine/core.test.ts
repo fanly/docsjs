@@ -43,7 +43,12 @@ describe('CoreEngine', () => {
     expect(config.performance.maxWorkers).toBe(2);
   });
 
-  it('should manage profiles correctly', () => {
+  it('should manage profiles correctly', async () => {
+    // Initialize engine first to load profiles
+    await engine.initialize();
+    
+    // Should have system profiles
+    const initialProfiles = engine.listProfiles();
     // Initially should have system profiles
     const initialProfiles = engine.listProfiles();
     expect(initialProfiles.length).toBeGreaterThan(0);
@@ -54,7 +59,10 @@ describe('CoreEngine', () => {
     expect(defaultProfile!.id).toBe('default');
   });
 
-  it('should apply and get current profile', () => {
+  it('should apply and get current profile', async () => {
+    await engine.initialize();
+    
+    engine.applyProfile('knowledge-base');
     engine.applyProfile('knowledge-base');
 
     const currentProfile = engine.getProfile('knowledge-base');
