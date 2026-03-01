@@ -43,7 +43,7 @@ export { DocsJSServer } from "./server/server";
 export type { ServerConfig, ConvertRequest, ConvertResponse, ApiResponse } from "./server/types";
 
 // Enterprise exports
-export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures } from "./enterprise";
+export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures, ComplianceFramework, ComplianceFeature, OnPremisesDeploymentManager } from "./enterprise";
 export type { LicenseInfo, LicenseValidationResult, ComplianceAuditLog, SecurityConfig } from "./enterprise";
 
 // CMS exports
