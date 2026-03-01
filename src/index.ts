@@ -42,6 +42,10 @@ export { parseDocxToAST } from "./parsers/docx/parser";
 export { DocsJSServer } from "./server/server";
 export type { ServerConfig, ConvertRequest, ConvertResponse, ApiResponse } from "./server/types";
 
+// Cloud infrastructure exports
+export { DistributedQueue, BatchProcessor, CDNManager, WebhookManager, EdgeCache, createWebhookEvent } from "./cloud";
+export { createLambdaHandler, createVercelHandler, createNetlifyHandler } from "./cloud";
+export type { ServerlessConfig, QueueMessage, BatchJob, WebhookEvent, CDNConfig, ConversionRequest, ConversionResult, RateLimitConfig } from "./cloud";
 // Enterprise exports
 export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures, ComplianceFramework, ComplianceFeature, OnPremisesDeploymentManager } from "./enterprise";
 export type { LicenseInfo, LicenseValidationResult, ComplianceAuditLog, SecurityConfig } from "./enterprise";
