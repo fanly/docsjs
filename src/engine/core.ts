@@ -35,14 +35,16 @@ export class CoreEngine implements EngineInterface {
   constructor(initialConfig?: Partial<EngineConfig>) {
     this.config = this.getDefaultConfig();
     
+    // Initialize sub-components FIRST
+    this.pipelineManager = new PipelineManager(this);
+    
     // Override with initial config
     if (initialConfig) {
       this.configure(initialConfig);
     }
-    
-    // Initialize sub-components
-    this.pipelineManager = new PipelineManager(this);
   }
+
+  // Config management
 
   // Config management
   configure(config: Partial<EngineConfig>): void {

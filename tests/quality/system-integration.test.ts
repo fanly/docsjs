@@ -28,6 +28,31 @@ describe('System Integration Tests', () => {
         maxExecutionTimeMS: 30000 // 30 sec max execution time
       }
     });
+    
+    // Initialize the engine to load profiles
+    await engine.initialize();
+    
+    // Check that core functionality works with this configuration
+    const config = engine.getConfig();
+  it('works correctly in a real-world configuration scenario', async () => {
+    // Simulate initializing a new DocsJS instance with common configuration
+    const engine = new CoreEngine({
+      debug: true,
+      performance: {
+        maxMemoryMB: 1024,
+        maxWorkers: 4,
+        operationTimeoutMS: 60000
+      },
+      security: {
+        enableSandboxes: true,
+        allowedReadPaths: ['.'],
+        allowNetwork: false // Disable network for security
+      },
+      plugins: {
+        allowUnsigned: false,    // Require verified plugins
+        maxExecutionTimeMS: 30000 // 30 sec max execution time
+      }
+    });
 
     // Check that core functionality works with this configuration
     const config = engine.getConfig();
@@ -48,6 +73,12 @@ describe('System Integration Tests', () => {
   });
 
   it('processes document transformation with plugins and profiles', async () => {
+    const engine = new CoreEngine({ debug: false });
+    
+    // Initialize the engine to load profiles
+    await engine.initialize();
+    
+    // Apply a specific use-case profile
     const engine = new CoreEngine({ debug: false });
 
     // Apply a specific use-case profile
