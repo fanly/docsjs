@@ -17,6 +17,8 @@ import {
   type BatchConvertResultData,
   type JobStatus,
   type UsageStats,
+  type WebhookRegistration,
+  type WebhookEventType,
 } from './types';
 
 interface Job {
@@ -61,6 +63,7 @@ class DocsJSServer {
     lastReset: Date.now(),
   };
   private requestHandler: ((req: ConvertRequest) => Promise<ConvertResultData>) | null = null;
+  private webhooks: Map<string, WebhookRegistration> = new Map();
 
   constructor(config: Partial<ServerConfig> = {}) {
     this.config = { ...DEFAULT_SERVER_CONFIG, ...config } as ServerConfig;
@@ -158,6 +161,41 @@ class DocsJSServer {
             return;
           }
 
+          // Webhook endpoints
+          if (url === `${apiPrefix}/webhooks` && req.method === 'POST') {
+            const result = await this.handleCreateWebhook(requestId, body);
+            this.sendJson(res, 201, result, requestId, startTime);
+            return;
+          }
+
+          if (url === `${apiPrefix}/webhooks` && req.method === 'GET') {
+            const result = await this.handleListWebhooks(requestId);
+            this.sendJson(res, 200, result, requestId, startTime);
+            return;
+          }
+
+          if (url.match(/^\/api\/v1\/webhooks\/[\w-]+$/) && req.method === 'DELETE') {
+            const webhookId = url.split('/').pop();
+            const result = await this.handleDeleteWebhook(requestId, webhookId!);
+            if (result.success) {
+              this.sendJson(res, 200, result, requestId, startTime);
+            } else {
+              this.sendJson(res, 404, result, requestId, startTime);
+            }
+            return;
+          }
+
+          if (url.match(/^\/api\/v1\/webhooks\/[\w-]+\/test$/) && req.method === 'POST') {
+            const webhookId = url.split('/')[4];
+            const result = await this.handleTestWebhook(requestId, webhookId, body);
+            if (result.success) {
+              this.sendJson(res, 200, result, requestId, startTime);
+            } else {
+              this.sendJson(res, 404, result, requestId, startTime);
+            }
+            return;
+          }
+
           this.sendJson(res, 404, { success: false, error: { code: 'NOT_FOUND', message: 'Endpoint not found' } }, requestId, startTime);
         } catch (error) {
           console.error(`[${requestId}] Error:`, error);
@@ -194,8 +232,39 @@ class DocsJSServer {
     } else {
       data.meta = { requestId, timestamp: Date.now(), processingTimeMs: processingTime };
     }
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    
+    // CDN-ready headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, private',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Request-Id': requestId,
+      'X-Processing-Time-Ms': String(processingTime),
+    };
+    
+    // Add ETag for GET requests that can be cached
+    if (statusCode === 200 && data.success) {
+      const etag = this.generateETag(JSON.stringify(data));
+      headers['ETag'] = etag;
+      headers['Cache-Control'] = 'public, max-age=60, s-maxage=300';
+    }
+    
+    res.writeHead(statusCode, headers);
     res.end(JSON.stringify(data));
+  }
+
+  private generateETag(content: string): string {
+    return '"' + Math.abs(this.hashCode(content)).toString(16) + '"';
+  }
+
+  private hashCode(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash;
   }
 
   private parseBody<T>(body: string): T {
@@ -380,18 +449,101 @@ class DocsJSServer {
     };
   }
 
-  private async handleGetUsage(requestId: string): Promise<UsageResponse> {
-    this.checkUsageReset();
-    const stats: UsageStats = {
-      conversionsToday: this.usage.conversionsToday,
-      conversionsThisMonth: this.usage.conversionsThisMonth,
-      bytesProcessedToday: this.usage.bytesProcessedToday,
-      avgProcessingTimeMs: this.usage.totalConversions > 0 ? this.usage.totalProcessingTimeMs / this.usage.totalConversions : 0,
-      successRate: this.usage.totalConversions > 0 ? (this.usage.successfulConversions / this.usage.totalConversions) * 100 : 0,
-      activeJobs: this.usage.activeJobs,
-      pendingJobs: this.usage.pendingJobs,
-    };
     return { success: true, data: stats };
+  }
+
+  private async handleCreateWebhook(requestId: string, body: string): Promise<ApiResponse<WebhookRegistration>> {
+    const req = this.parseBody<{ url: string; events: WebhookEventType[]; secret?: string }>(body);
+    
+    if (!req.url) {
+      return { success: false, error: { code: 'INVALID_REQUEST', message: 'url is required' } };
+    }
+    
+    if (!req.events || req.events.length === 0) {
+      return { success: false, error: { code: 'INVALID_REQUEST', message: 'events array is required' } };
+    }
+    
+    const webhook: WebhookRegistration = {
+      id: randomUUID(),
+      url: req.url,
+      events: req.events,
+      secret: req.secret,
+      enabled: true,
+    };
+    
+    this.webhooks.set(webhook.id, webhook);
+    return { success: true, data: webhook };
+  }
+
+  private async handleListWebhooks(requestId: string): Promise<ApiResponse<WebhookRegistration[]>> {
+    const webhooks = Array.from(this.webhooks.values());
+    return { success: true, data: webhooks };
+  }
+
+  private async handleDeleteWebhook(requestId: string, webhookId: string): Promise<ApiResponse<{ deleted: boolean }>> {
+    const deleted = this.webhooks.delete(webhookId);
+    return { success: true, data: { deleted } };
+  }
+
+  private async handleTestWebhook(requestId: string, webhookId: string, body: string): Promise<ApiResponse<{ delivered: boolean; responseCode?: number }>> {
+    const webhook = this.webhooks.get(webhookId);
+    if (!webhook) {
+      return { success: false, error: { code: 'NOT_FOUND', message: 'Webhook not found' } };
+    }
+    
+    try {
+      const testPayload = {
+        event: 'test' as WebhookEventType,
+        timestamp: Date.now(),
+        requestId,
+        data: { message: 'Test webhook from DocsJS' },
+      };
+      
+      const response = await fetch(webhook.url, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-DocsJS-Webhook-Event': 'test',
+        },
+        body: JSON.stringify(testPayload),
+      });
+      
+      return { 
+        success: true, 
+        data: { delivered: response.ok, responseCode: response.status } 
+      };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: { code: 'DELIVERY_FAILED', message: error instanceof Error ? error.message : 'Unknown error' } 
+      };
+    }
+  }
+
+  private async notifyWebhooks(event: WebhookEventType, data: unknown) {
+    const payload = {
+      event,
+      timestamp: Date.now(),
+      requestId: randomUUID(),
+      data,
+    };
+    
+    for (const webhook of this.webhooks.values()) {
+      if (!webhook.enabled || !webhook.events.includes(event)) continue;
+      
+      try {
+        await fetch(webhook.url, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-DocsJS-Webhook-Event': event,
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch (error) {
+        console.error(`Webhook delivery failed for ${webhook.id}:`, error);
+      }
+    }
   }
 
   private updateUsage(bytesProcessed: number, success: boolean) {
