@@ -267,7 +267,12 @@ export function createStrapiAdapter(options: StrapiOptions): StrapiAdapter {
   return new StrapiAdapter(options);
 }
 
-export function createCMSAdapter(type: 'wordpress' | 'contentful' | 'strapi' | 'generic', options: unknown): CMSAdapter {
+}
+
+export function createCMSAdapter(
+  type: 'wordpress' | 'contentful' | 'strapi' | 'ghost' | 'notion' | 'confluence' | 'gitbook' | 'generic', 
+  options: unknown
+): CMSAdapter {
   switch (type) {
     case 'wordpress':
       return new WordPressAdapter(options as WordPressOptions);
@@ -275,6 +280,14 @@ export function createCMSAdapter(type: 'wordpress' | 'contentful' | 'strapi' | '
       return new ContentfulAdapter(options as ContentfulOptions);
     case 'strapi':
       return new StrapiAdapter(options as StrapiOptions);
+    case 'ghost':
+      return new GhostAdapter(options as GhostOptions);
+    case 'notion':
+      return new NotionAdapter(options as NotionOptions);
+    case 'confluence':
+      return new ConfluenceAdapter(options as ConfluenceOptions);
+    case 'gitbook':
+      return new GitBookAdapter(options as GitBookOptions);
     default:
       return new GenericAdapter();
   }

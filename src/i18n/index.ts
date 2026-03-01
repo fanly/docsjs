@@ -421,3 +421,16 @@ export function seti18n(instance: i18n): void {
 }
 
 export { SUPPORTED_LOCALES, BUILT_IN_TRANSLATIONS };
+
+
+export { 
+  BidirectionalHandler,
+  RTL_STYLES,
+  rtlUtils,
+  createRTLTransformer,
+  isRTLLanguage,
+  getTextDirection,
+  getCSSDirection,
+  transformCSSForRTL
+} from './rtl';
+export type { RTLConfig, RTLLanguage, TextDirection } from './rtl';

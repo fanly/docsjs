@@ -42,7 +42,28 @@ export type { ServerConfig, ConvertRequest, ConvertResponse, ApiResponse } from 
 export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures } from "./enterprise";
 export type { LicenseInfo, LicenseValidationResult, ComplianceAuditLog, SecurityConfig } from "./enterprise";
 
-export { createCMSAdapter, createWordPressAdapter, createContentfulAdapter, createStrapiAdapter } from "./cms";
+export { 
+  createCMSAdapter, 
+  createWordPressAdapter, 
+  createContentfulAdapter, 
+  createStrapiAdapter,
+  createGhostAdapter,
+  createNotionAdapter,
+  createConfluenceAdapter,
+  createGitBookAdapter
+} from "./cms";
+export type { 
+  CMSAdapter, 
+  CMSImportOptions, 
+  CMSContent,
+  WordPressOptions,
+  ContentfulOptions,
+  StrapiOptions,
+  GhostOptions,
+  NotionOptions,
+  ConfluenceOptions,
+  GitBookOptions
+} from "./cms";
 export type { CMSAdapter, CMSImportOptions, CMSContent } from "./cms";
 
 export { parseDocxToHtmlSnapshot as legacyParseDocxToHtml } from "./lib/docxHtml";
