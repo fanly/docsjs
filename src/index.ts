@@ -46,3 +46,36 @@ export { createCMSAdapter, createWordPressAdapter, createContentfulAdapter, crea
 export type { CMSAdapter, CMSImportOptions, CMSContent } from "./cms";
 
 export { parseDocxToHtmlSnapshot as legacyParseDocxToHtml } from "./lib/docxHtml";
+
+
+export { SecurePluginRegistry, MarketplaceAPISimulator } from "./marketplace/registry";
+export type { 
+  MarketplacePlugin, 
+  PluginAuthor, 
+  PluginSubmission, 
+  PluginReview, 
+  PluginSearchFilters,
+  MarketplaceConfig,
+  PluginInstallResult,
+  PluginUpdateInfo
+} from "./marketplace/types";
+
+export { astToTipTap, tipTapToAst } from "./editors/tiptap";
+export { astToSlate, slateToAst } from "./editors/slate";
+export { astToProseMirror, proseMirrorToAst } from "./editors/prosemirror";
+
+export { SSOService, createOktaOAuth, createAzureADOAuth, createAuth0OAuth, createOktaSAML, createAzureADSAML } from "./sso";
+export type { 
+  OAuthConfig, 
+  SAMLConfig, 
+  SSOProvider, 
+  SSOSession, 
+  SSOUserProfile 
+} from "./sso";
+
+export { StructureDetector, autoDetectAndApply } from "./structure";
+export type { 
+  DocumentStructureType, 
+  StructureElement, 
+  StructureAnalysis 
+} from "./structure";
