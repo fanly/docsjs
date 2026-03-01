@@ -132,3 +132,77 @@ export type {
   StructureElement, 
   StructureAnalysis 
 } from "./structure";
+
+export { 
+  OrganizationManager,
+  AdminManager,
+  BillingManager,
+  UsageBillingManager,
+  PLAN_PRICING,
+  REVENUE_SHARE
+} from "./saas";
+export type {
+  Organization,
+  OrganizationSettings,
+  OrganizationMember,
+  OrganizationInvitation,
+  OrganizationRole,
+  Subscription,
+  SubscriptionPlan,
+  UsageRecord,
+  BillingInfo,
+  Invoice,
+  AdminStats,
+  AdminAuditLog,
+  SystemHealth,
+  PaymentConfig,
+  PaymentIntent,
+  CheckoutSession
+} from "./saas";
+
+export { createEmbeddedClient, createEmbed, OEMLicenseManager } from "./embedded";
+export type {
+  EmbeddedSDKConfig,
+  WhiteLabelConfig,
+  SDKFeatures,
+  EmbedOptions,
+  EmbedInstance,
+  WidgetConfig,
+  WidgetInstance,
+  OEMLicense,
+  LicenseValidation
+} from "./embedded";
+
+export { AIDocumentEngine, ExtractionEngine, AIDocumentComparison, DOCUMENT_TEMPLATES } from "./ai/advanced";
+export type {
+  GenerationRequest,
+  GenerationParams,
+  GenerationResult,
+  DocumentTemplate,
+  TemplateField,
+  DocumentAnalysis,
+  Entity,
+  Topic,
+  ReadabilityScore,
+  AssistantConfig,
+  AssistantMessage,
+  AssistantSession,
+  ExtractionRequest,
+  ContactInfo,
+  TableData,
+  DateInfo,
+  LinkInfo,
+  ComparisonInsight,
+  AIDiffResult
+} from "./ai/advanced";
+
+export { PluginEconomyManager } from "./marketplace/economy";
+export type {
+  PluginPricing,
+  FeatureTier,
+  PluginRevenue,
+  CreatorPayout,
+  CreatorAccount,
+  SalesRecord,
+  Review
+} from "./marketplace/economy";
