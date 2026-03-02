@@ -131,7 +131,7 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
   'enterprise-document': {
     id: 'enterprise-document',
     name: 'Enterprise Document Profile',
-    description: 'Security and compliance-focused document processing',
+    description: 'Security and compliance-focused document processing for enterprise use',
     parse: {
       enablePlugins: true,
       features: {
@@ -430,9 +430,18 @@ export class ProfileManager {
       throw new Error(`Imported profile is invalid: ${validation.errors.join('; ')}`);
     }
     
-    this.addProfile(profile);
+    // Check if profile already exists - if so, update it; otherwise add new
+    if (this.profiles.has(profile.id)) {
+      this.profiles.set(profile.id, profile);
+    } else {
+      this.addProfile(profile);
+    }
+    
     return profile;
   }
+
+  /**
+   * Check if a profile is a system profile
 
   /**
    * Check if a profile is a system profile

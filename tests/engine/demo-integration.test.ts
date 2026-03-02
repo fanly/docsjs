@@ -88,7 +88,7 @@ describe('Demo Framework Integration', () => {
     
     const enterpriseProfile = engine.getProfile('enterprise-document');
     expect(enterpriseProfile).toBeDefined();
-    expect(enterpriseProfile!.description).toContain('security and compliance');
+    expect(enterpriseProfile!.description.toLowerCase()).toContain('security and compliance');
   });
 
   it('should be compatible with plugin patterns used in existing integrations', () => {
@@ -274,14 +274,12 @@ describe('Demo Framework Integration', () => {
       dependencies: []
     };
 
-    // Registering this plugin with network access should work here 
-    // since validation occurs at execution time
-    strictEngine.registerPlugin(pluginWithNetAccess);
+    // Registration should fail immediately because network is disabled but plugin requires it
+    expect(() => strictEngine.registerPlugin(pluginWithNetAccess)).toThrow('Plugin requires network access but engine network is disabled');
     
+    // Plugin should NOT be registered due to validation failure
     const registered = strictEngine.getPlugin('network-test-plugin');
-    expect(registered).toBeDefined();
-    // The validation of conflicting permissions with engine would happen during execution
-    
+    expect(registered).toBeUndefined();
     strictEngine.destroy();
   });
 

@@ -55,7 +55,9 @@ describe('Security & Isolation Tests', () => {
 
     const pluginManager = new PluginManagerImpl(secureEngine);
     
-    // Plugin requesting network access when engine prohibits it should be registered
+    // Plugin requesting network access when engine prohibits it should be REJECTED
+    // at registration time (immediate validation)
+    const riskyPlugin = {
     // but the actual policy enforcement would apply at runtime
     const riskyPlugin = {
       name: 'network-risky-plugin',
@@ -78,11 +80,14 @@ describe('Security & Isolation Tests', () => {
       // No init/destroy needed as this isn't an actual plugin function
     };
 
-    // Registering the plugin itself might not fail - validation could be deferred 
+    // Validation should fail immediately when network is disabled but plugin requires it
+    expect(() => secureEngine.registerPlugin(riskyPlugin)).toThrow('Plugin requires network access but engine network is disabled');
     // until actual execution time for greater flexibility
     secureEngine.registerPlugin(riskyPlugin);
 
-    // The risk assessment would be made at execution time
+    // Plugin should NOT be registered due to validation failure
+    const plugin = secureEngine.getPlugin('network-risky-plugin');
+    expect(plugin).toBeUndefined();
     const plugin = secureEngine.getPlugin('network-risky-plugin');
     expect(plugin).toBeDefined();
     expect(plugin!.permissions.network).toBe(true);

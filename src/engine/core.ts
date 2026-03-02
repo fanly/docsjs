@@ -65,6 +65,35 @@ export class CoreEngine implements EngineInterface {
 
   // Profile management
   registerProfile(profile: TransformationProfile): void {
+    // Validate profile before registration
+    const errors: string[] = [];
+    
+    if (!profile.id || !/^[a-z0-9][a-z0-9_-]*$/.test(profile.id)) {
+      errors.push("Profile ID must match pattern: /^[a-z0-9][a-z0-9_-]*$/");
+    }
+    if (!profile.name) {
+      errors.push("Profile must have a name");
+    }
+    if (!profile.description) {
+      errors.push("Profile must have a description");
+    }
+    
+    if (errors.length > 0) {
+      throw new Error(`Invalid profile: ${errors.join('; ')}`);
+    }
+    
+    if (this.profiles.has(profile.id)) {
+      return; // Idempotent - silent return for duplicates
+    }
+    // Validate profile before registration
+    const validation = this.profileManager?.validateProfile(profile);
+    if (validation && !validation.valid) {
+      throw new Error(`Invalid profile: ${validation.errors.join('; ')}`);
+    }
+    
+    if (this.profiles.has(profile.id)) {
+      return; // Idempotent - silent return for duplicates
+    }
     if (this.profiles.has(profile.id)) {
       throw new Error(`Profile with id '${profile.id}' already exists`);
     }
@@ -189,7 +218,22 @@ export class CoreEngine implements EngineInterface {
   }
 
   // Plugin management
+  // Plugin management
   registerPlugin(plugin: PluginHooks): void {
+    // Validate plugin
+    if (!plugin.name || plugin.name.trim() === '') {
+      throw new Error('Plugin must have a valid name');
+    }
+    if (!plugin.version) {
+      throw new Error('Plugin must have a version');
+    }
+    if (!plugin.availableHooks || !Array.isArray(plugin.availableHooks)) {
+      throw new Error('Plugin must specify availableHooks');
+    }
+    
+    if (this.plugins.has(plugin.name)) {
+      throw new Error(`Plugin with name '${plugin.name}' already registered`);
+    }
     if (this.plugins.has(plugin.name)) {
       throw new Error(`Plugin with name '${plugin.name}' already registered`);
     }
