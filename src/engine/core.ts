@@ -16,6 +16,7 @@ import type { PluginHooks, PluginPermissions, PluginContext } from '../plugins-v
 import { DEFAULT_PIPELINE_CONTEXT } from '../pipeline/context';
 import { PipelineManager } from '../pipeline/manager';
 import { SYSTEM_PROFILES } from '../profiles/profile-manager';
+import { SYSTEM_PROFILES } from '../profiles/profile-manager';
 
 export class CoreEngine implements EngineInterface {
   private config: EngineConfig;
@@ -76,10 +77,20 @@ export class CoreEngine implements EngineInterface {
   }
 
   getProfile(id: string): TransformationProfile | undefined {
+    // Auto-load from SYSTEM_PROFILES
+    if (!this.profiles.has(id) && (id in SYSTEM_PROFILES)) {
+      this.profiles.set(id, SYSTEM_PROFILES[id]);
+    }
     return this.profiles.get(id);
   }
 
   listProfiles(): string[] {
+    // Auto-load all SYSTEM_PROFILES
+    for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
+      if (!this.profiles.has(id)) {
+        this.profiles.set(id, profile);
+      }
+    }
     return Array.from(this.profiles.keys());
   }
 
