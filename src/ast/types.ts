@@ -78,6 +78,11 @@ export interface DocumentNode {
   auxiliary?: AuxiliaryContent;
 }
 
+/**
+ * DocumentAST - alias for DocumentNode for backward compatibility
+ */
+export type DocumentAST = DocumentNode;
+
 // ============================================================================
 // DOCUMENT PROPERTIES
 // ============================================================================

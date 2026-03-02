@@ -104,7 +104,7 @@ export class StructureDetector {
     const stats = this.calculateStats(doc);
     const type = this.detectType(elements, stats);
     const reasoning = this.generateReasoning(type, elements, stats);
-    const profile = this.recommendProfile(type);
+    const profile = this.recommendProfile(type.type);
     
     return {
       structureType: type.type,
@@ -433,11 +433,13 @@ export class StructureDetector {
         fn(block);
         
         // Walk children
-        if (block.children) {
+        if ('children' in block && block.children) {
           for (const child of block.children) {
             fn(child);
           }
         }
+        
+        // Walk table cells
         
         // Walk table cells
         if (block.type === "table" && (block as any).rows) {
