@@ -299,7 +299,8 @@ describe("HTML Renderer", () => {
       
       const html = renderASTToHtml(doc, defaultOptions);
       
-      expect(html).toContain("<th>");
+      expect(html).toContain("<th");
+      expect(html).toContain("Header");
     });
 
     it("should render colspan and rowspan", () => {

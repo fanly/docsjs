@@ -78,7 +78,8 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
         fidelityMode: true,
         includeImageData: true,
         enableSyntaxHighlighting: true,
-        generateTOC: true
+        generateTOC: true,
+        preserveOriginalFormatting: true
       }
     },
     security: {

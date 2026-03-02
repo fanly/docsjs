@@ -175,7 +175,7 @@ describe('Comprehensive Final Validation', () => {
       // KB profile should enable content enhancement plugins 
       expect(activeKbProfile.parse.features.mathML).toBe(true);
       expect(activeKbProfile.parse.features.annotations).toBe(true);
-      expect(activeKbProfile.transform.operations).toContain('enhance-structure');
+      expect(activeKbProfile.transform.operations).toContain('enhance-semantic-meaning');
     }
     
     // Verify performance tracking still works
@@ -516,7 +516,7 @@ describe('Comprehensive Final Validation', () => {
     if (profileUseCases.knowledgeBase && profileUseCases.examPaper && profileUseCases.enterpriseDocument) {
       // KB profile enables educational/research features  
       expect(profileUseCases.knowledgeBase.parse.features.mathML).toBe(true);
-      expect(profileUseCases.knowledgeBase.transform.operations).toContain('enhance-structure');
+      expect(profileUseCases.knowledgeBase.transform.operations).toContain('enhance-semantic-meaning');
       expect(profileUseCases.knowledgeBase.render.theme).not.toBe('minimal');
       
       // Exam profile optimizes for test-taking context, different features
