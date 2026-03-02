@@ -162,7 +162,8 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
       options: {
         enterpriseBranding: true,
         watermarkTemplate: 'CONFIDENTIAL',
-        trackChangesOverlay: true
+        trackChangesOverlay: true,
+        enableEnterpriseFeatures: true
       }
     },
     security: {
