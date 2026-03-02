@@ -15,6 +15,7 @@ import type {
 import type { PluginHooks, PluginPermissions, PluginContext } from '../plugins-v2';
 import { DEFAULT_PIPELINE_CONTEXT } from '../pipeline/context';
 import { PipelineManager } from '../pipeline/manager';
+import { SYSTEM_PROFILES } from '../profiles/profile-manager';
 
 export class CoreEngine implements EngineInterface {
   private config: EngineConfig;
@@ -201,9 +202,12 @@ export class CoreEngine implements EngineInterface {
   }
 
   async initialize(): Promise<void> {
-    // Initialize default profile if none registered
+    // Initialize all system profiles if none registered
     if (this.profiles.size === 0) {
-      this.registerProfile(this.getDefaultProfile());
+      // Load all system profiles
+      for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
+        this.registerProfile(profile);
+      }
     }
 
     // Initialize all registered plugins
