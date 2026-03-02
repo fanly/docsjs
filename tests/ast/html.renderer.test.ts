@@ -4,7 +4,7 @@
  * Tests for AST → HTML rendering
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   createEmptyDocument,
   createTextNode,

@@ -4,7 +4,7 @@
  * Benchmarks the new engine's performance against standards.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CoreEngine } from '../../src/engine/core';
 
 describe('Performance Benchmarks', () => {

@@ -393,7 +393,8 @@ describe('MarkdownRenderer', () => {
       expect(result.markdown).toContain('- [Background](#background)');
     });
   });
-});
+
+// Helper function to create test documents
 
 // Helper function to create test documents
 function createDocWithParagraph(children: any[]): DocumentNode {

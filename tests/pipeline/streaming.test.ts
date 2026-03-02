@@ -171,7 +171,8 @@ describe('StreamingPipelineManager', () => {
       expect(value).toBeDefined();
     });
   });
-});
+
+describe('ProcessingProgress', () => {
 
 describe('ProcessingProgress', () => {
   it('should calculate percentage correctly', async () => {

@@ -101,9 +101,8 @@ describe('LocaleDetector', () => {
       const locale = detector.detect({}, ['en']);
       expect(locale).toMatch(/^en/);
     });
-      const locale = detector.detect({}, ['en']);
-      expect(locale).toBe('en');
-    });
+
+    it('should persist locale', () => {
 
     it('should persist locale', () => {
       detector.persist('ja');

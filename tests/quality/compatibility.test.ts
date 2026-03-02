@@ -4,7 +4,7 @@
  * Verifies that the new engine architecture maintains compatibility with existing patterns.
  */
 
-import { describe, it, expect, beforeEach, vi, type MockInstance } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from 'vitest';
 import { CoreEngine } from '../../src/engine/core';
 import { getGlobalEngine } from '../../src/engine/core';
 

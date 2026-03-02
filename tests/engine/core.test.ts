@@ -49,8 +49,7 @@ describe('CoreEngine', () => {
     
     // Should have system profiles
     const initialProfiles = engine.listProfiles();
-    // Initially should have system profiles
-    const initialProfiles = engine.listProfiles();
+    expect(initialProfiles.length).toBeGreaterThan(0);
     expect(initialProfiles.length).toBeGreaterThan(0);
 
     // Should be able to get a specific profile
