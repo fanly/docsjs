@@ -5,6 +5,8 @@
  */
 
 import type { EngineConfig, TransformationProfile } from '../types/engine';
+
+// Pipeline context
 import type { EngineConfig, TransformationProfile } from '../types/engine';
 
 // Pipeline context

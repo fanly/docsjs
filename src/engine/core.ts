@@ -16,9 +16,10 @@ import type { PluginHooks, PluginPermissions, PluginContext } from '../plugins-v
 import { DEFAULT_PIPELINE_CONTEXT } from '../pipeline/context';
 import { PipelineManager } from '../pipeline/manager';
 import { SYSTEM_PROFILES } from '../profiles/profile-manager';
-import { SYSTEM_PROFILES } from '../profiles/profile-manager';
 
 export class CoreEngine implements EngineInterface {
+
+  private config: EngineConfig;
   private config: EngineConfig;
   private profiles: Map<string, TransformationProfile> = new Map();
   private plugins: Map<string, PluginHooks> = new Map();

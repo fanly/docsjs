@@ -52,7 +52,7 @@ export type {
 } from './ast/types';
 
 // Parsers
-export { DOCXParser } from './parsers/docx/parser';
+export { DocxParser as DOCXParser } from './parsers/docx/parser';
 export type { 
   DocxParseOptions, 
   DocxParseResult, 
@@ -61,7 +61,7 @@ export type {
 } from './parsers';
 
 // Renderers  
-export { HTMLRenderer } from './renderers/html/renderer';
+export { HtmlRenderer as HTMLRenderer } from './renderers/html/renderer';
 export type { 
   HtmlRenderOptions, 
   HtmlRenderResult,
@@ -72,6 +72,8 @@ export type {
 export { 
   // AST utilities
   generateId,
+  // htmlToASTNodes, // Not available
+  serializeAST,
   htmlToASTNodes,
   serializeAST,
   deserializeAST,
@@ -83,4 +85,4 @@ export {
 } from './ast/utils';
 
 // Plugin Adapters
-export { PluginAdapter } from './ast/pluginAdapter';
+export { PluginASTAdapter as PluginAdapter } from './ast/pluginAdapter';
