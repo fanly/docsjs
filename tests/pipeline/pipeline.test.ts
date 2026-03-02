@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PipelineManager } from '../../src/pipeline/manager';
 import { CoreEngine } from '../../src/engine/core';
-import { DEFAULT_PIPELINE_CONTEXT } from '../../src/pipeline/types';
+import { DEFAULT_PIPELINE_CONTEXT } from '../../src/pipeline/context';
 
 describe('PipelineManager', () => {
   let engine: CoreEngine;

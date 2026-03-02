@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CoreEngine } from '../../src/engine/core';
 import { SYSTEM_PROFILES } from '../../src/profiles/profile-manager';
-import { DEFAULT_PIPELINE_CONTEXT } from '../../src/pipeline/types';
+import { DEFAULT_PIPELINE_CONTEXT } from '../../src/pipeline/context';
 
 describe('Core Engine Integration', () => {
   let engine: CoreEngine;

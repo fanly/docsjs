@@ -41,6 +41,18 @@ export class PluginManagerImpl implements PluginManager {
     if (this.plugins.has(plugin.name) && !options?.overrideExisting) {
       throw new Error(`Plugin already registered: ${plugin.name}`);
     }
+    
+    // Validate dependencies
+    if (plugin.dependencies && plugin.dependencies.length > 0) {
+      for (const dep of plugin.dependencies) {
+        if (!this.plugins.has(dep)) {
+          throw new Error(`Dependency not found: ${dep} for plugin ${plugin.name}`);
+        }
+      }
+    }
+    if (this.plugins.has(plugin.name) && !options?.overrideExisting) {
+      throw new Error(`Plugin already registered: ${plugin.name}`);
+    }
 
     // Validate permissions against engine policy
     this.validatePermissions(plugin.permissions);
@@ -77,12 +89,16 @@ export class PluginManagerImpl implements PluginManager {
     // Sort by priority (highest first)
     return plugins.sort((a, b) => {
       const priorityOrder: PluginPriority[] = ['highest', 'high', 'normal', 'low', 'lowest'];
-      const priorityA = priorityOrder.indexOf(a.priority);
-      const priorityB = priorityOrder.indexOf(b.priority);
+      const priorityA = priorityOrder.indexOf(a.priority ?? 'normal');
+      const priorityB = priorityOrder.indexOf(b.priority ?? 'normal');
       
-      // Higher priority comes first
+      // Higher priority comes first (lower index = higher priority)
+      return priorityA - priorityB;
       return priorityB - priorityA;
     });
+  }
+
+  async runForHook(hook: PluginHook, context: PluginContext): Promise<PluginContext> {
   }
 
   async runForHook(hook: PluginHook, context: PluginContext): Promise<PluginContext> {

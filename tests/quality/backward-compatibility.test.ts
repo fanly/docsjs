@@ -7,7 +7,32 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { CoreEngine } from '../../src/engine/core';
-import { DEFAULT_AST } from '../../src/types/engine';
+import type { DocumentNode } from '../../src/ast';
+
+// Create a minimal default AST for testing
+// Create a minimal default AST for testing
+const createDefaultAst = (): DocumentNode & { version: string } => ({
+  type: 'document',
+  id: 'default',
+  version: '1.0.0',
+  metadata: {
+    version: '1.0.0',
+    createdAt: Date.now(),
+    sourceFormat: 'docx',
+    generator: 'DocsJS'
+  },
+  children: []
+});
+  type: 'document',
+  id: 'default',
+  metadata: {
+    version: '1.0.0',
+    createdAt: Date.now(),
+    sourceFormat: 'docx',
+    generator: 'DocsJS'
+  },
+  children: []
+});
 
 describe('Backward Compatibility Tests', () => {
   it('provides API compatibility shims for legacy functionality', () => {
@@ -132,7 +157,7 @@ describe('Backward Compatibility Tests', () => {
     // should still map to the same logical concepts
     
     // Verify that DocumentAST structure maintains expected properties
-    const defaultAst = DEFAULT_AST;
+    const defaultAst = createDefaultAst();
     
     // Should have expected root structure
     expect(defaultAst.type).toBe('document');

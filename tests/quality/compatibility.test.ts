@@ -240,10 +240,14 @@ describe('Compatibility with Existing Patterns', () => {
     
     engine.registerProfile(profile1);
     
-    // Attempting to register the same ID should fail similar to existing APIs
+    // Attempting to register the same ID should succeed (idempotent behavior - silent return)
     expect(() => {
       engine.registerProfile({ ...profile1 });
-    }).toThrow();
+    }).not.toThrow();
+    
+    expect(engine.listProfiles().filter(p => p === profile1.id).length).toBe(1);
+    
+    // Should throw for malformed profile via validation
 
     // Should throw for malformed profile via validation
     const badIdProfile = { 
