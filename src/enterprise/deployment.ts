@@ -198,7 +198,7 @@ export function generateDockerfile(config: {
   baseImage?: string;
   nodeVersion?: string;
   app?: string;
-}):Path string {
+}): string {
   const nodeVersion = config.nodeVersion || '20-alpine';
   const appPath = config.appPath || '/app';
 
