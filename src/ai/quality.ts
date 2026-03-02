@@ -212,7 +212,7 @@ export class QualityPredictionModel {
     let listCount = 0;
     let linkCount = 0;
 
-    const traverse = (n: DocumentNode) => {
+    const traverse = (n: any) => {
       if (n.type === 'text') {
         wordCount += n.content?.split(/\s+/).filter(w => w.length > 0).length || 0;
       }

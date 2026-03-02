@@ -256,7 +256,8 @@ export class LayoutOptimizer {
     }
 
     // AST-based detection
-    const traverse = (n: DocumentNode, depth: number) => {
+    // AST-based detection
+    const traverse = (n: any, depth: number) => {
       if (n.type === 'heading' && n.properties?.level === 1) {
         if (n.content?.toLowerCase().includes('abstract')) {
           sections.push({ type: 'main', position: 'top', size: { percentage: 10 }, confidence: 0.8 });
@@ -285,7 +286,7 @@ export class LayoutOptimizer {
     const levels = new Set<number>();
     let maxDepth = 0;
 
-    const traverse = (n: DocumentNode, depth: number) => {
+    const traverse = (n: any, depth: number) => {
       if (n.type?.startsWith('heading')) {
         const level = parseInt(n.type.replace('heading', '')) || 1;
         levels.add(level);
@@ -364,7 +365,7 @@ export class LayoutOptimizer {
   private hasFixedWidthElements(node: DocumentNode): boolean {
     let hasFixed = false;
     
-    const traverse = (n: DocumentNode) => {
+    const traverse = (n: any) => {
       if (n.properties?.style?.includes('width:') && !n.properties.style.includes('%') && !n.properties.style.includes('em')) {
         hasFixed = true;
       }
@@ -438,7 +439,7 @@ export class LayoutOptimizer {
 
   private optimizeForMobile(node: DocumentNode): DocumentNode {
     // Make images responsive, adjust font sizes
-    const traverse = (n: DocumentNode): DocumentNode => {
+    const traverse = (n: any): any => {
       if (n.type === 'image') {
         n.properties = { ...n.properties, style: 'max-width: 100%; height: auto;' };
       }
@@ -469,7 +470,7 @@ export class LayoutOptimizer {
 
   private extractText(node: DocumentNode): string {
     let text = '';
-    const traverse = (n: DocumentNode) => {
+    const traverse = (n: any) => {
       text += n.content || '';
       if (n.children) n.children.forEach(traverse);
     };
@@ -494,7 +495,7 @@ export class LayoutOptimizer {
     let hasCodeBlocks = false;
     const lengths: number[] = [];
 
-    const traverse = (n: DocumentNode) => {
+    const traverse = (n: any) => {
       if (n.type?.startsWith('heading')) {
         headingCount++;
         if (n.content?.match(/^\d+\./)) hasNumberedHeadings = true;
