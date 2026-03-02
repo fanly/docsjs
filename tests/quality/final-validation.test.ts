@@ -25,6 +25,11 @@ describe('Comprehensive Final Validation', () => {
         allowNetwork: false // Keep network disabled for security
       }
     });
+    
+    // Initialize engine to load profiles
+    await engine.initialize();
+    
+    // Phase 1: Configuration and Initialization
 
     // Phase 1: Configuration and Initialization
     // Verify the engine is properly set up with all the required components  
