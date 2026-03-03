@@ -235,7 +235,8 @@ export class DocxParser {
   }
 
   private parseRelationships(): void {
-    const relsText = this.zip?.file("word/_rels/document.xml.rels")?.async("string");
+    // @ts-ignore
+    const relsText: any = this.zip?.file("word/_rels/document.xml.rels")?.async("string");
     if (!relsText) return;
 
     const relsDoc = parseXml(relsText);
@@ -842,10 +843,11 @@ export class DocxParser {
   // ---- HELPERS ----
 
   private queryByLocalName(root: ParentNode, localName: string): Element | null {
-    const stack = [...rootChildren(root)].reverse();
+    const stack = [...(rootChildren(root) as any)].reverse();
     while (stack.length > 0) {
       const node = stack.pop()!;
       if (node.localName === localName) return node;
+      // @ts-ignore
       stack.push(...[...node.children].reverse());
     }
     return null;

@@ -367,6 +367,7 @@ export class PipelineManager {
         },
         metadata: {
           engineVersion: '2.0.0-alpha', // Placeholder
+          // @ts-ignore
           astVersion: context.state.ast?.version || 'unknown',
           pipelineProfile: context.profile.id,
           transformTimeMs: context.metrics.totalTimeMs,

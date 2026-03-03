@@ -188,7 +188,7 @@ export class SecurePluginRegistry {
       installed: plugin.installed,
       enabled: plugin.enabled,
       permissions: plugin.permissions,
-      compatibility: plugin.manifest?.compatibility,
+      compatibility: (plugin.manifest?.compatibility || []).join(','),
       metrics: plugin.metrics
     };
   }
@@ -272,7 +272,7 @@ export class SecurePluginRegistry {
     
     // Verify permissions are reasonable
     if (manifest.permissions?.network && 
-        !entry.publishers.includes('@official') && 
+        !(entry as any).publisher?.includes('@official') && 
         !this.config.trustedPublishers.includes(entry.publisher)) {
       return false; // Untrusted publishers shouldn't access network by default
     }
@@ -294,7 +294,7 @@ export class SecurePluginRegistry {
     // Check if plugin meets performance criteria
     return (
       (entry.manifest.sizeMB ?? 0) <= this.config.performanceLimits.maxInstallationSizeMB &&
-      (entry.manifest.permissions?.compute?.maxMemoryMB ?? 0) <= this.config.performanceLimits.maxMemoryMBPerPlugin &&
+      (entry.manifest.permissions?.compute?.maxMemoryMB ?? 0) <= this.config.performanceLimits.maxMemoryPerPluginMB &&
       (entry.manifest.permissions?.compute?.maxCpuSecs ?? 0) <= this.config.performanceLimits.maxCpuTimePerPluginSec
     );
   }
@@ -333,7 +333,10 @@ export class SecurePluginRegistry {
     // Actually load and initialize the plugin (mock for now)
     // Implementation would vary whether we're in browser vs Node
     return {
-      id: path.split('/')[3], // Extract from path
+      id: path.split('/')[3],
+      name: path.split('/')[3] || 'unknown',
+      version: '1.0.0',
+      path: path,
       plugin: {} as EnginePlugin,
       installed: true,
       enabled: true,
@@ -341,8 +344,8 @@ export class SecurePluginRegistry {
       signatureValid: false,
       publisher: 'unknown',
       rating: 0,
-      metrics: { installs: 0, errors: 0 },
-      manifest: {} as PluginManifest
+      metrics: { downloads: 0 },
+      manifest: { name: "plugin", version: "1.0.0" } as any
     };
   }
 
@@ -379,7 +382,7 @@ export class MarketplaceAPISimulator {
       rating: 4.8,
       downloads: 12500,
       lastUpdated: '2024-02-25',
-      manifest: {
+      manifest: { name: "plugin", version: "1.0.0",
         permissions: {
           read: ['.'],
           write: ['.'],
@@ -416,7 +419,7 @@ export class MarketplaceAPISimulator {
       rating: 4.6,
       downloads: 8500,
       lastUpdated: '2024-02-20',
-      manifest: {
+      manifest: { name: "plugin", version: "1.0.0",
         permissions: {
           read: ['.'],
           write: ['.'], 
@@ -453,7 +456,7 @@ export class MarketplaceAPISimulator {
       rating: 4.9,
       downloads: 450,
       lastUpdated: '2024-02-18',
-      manifest: {
+      manifest: { name: "plugin", version: "1.0.0",
         permissions: {
           read: ['.'],
           write: ['.'],

@@ -48,6 +48,7 @@ class PDFParser {
   async loadLibrary(): Promise<any> {
     if (!this.pdfjs) {
       try {
+        // @ts-ignore
         this.pdfjs = await import('pdf-parse');
       } catch {
         throw new Error('pdf-parse not installed');
