@@ -113,7 +113,8 @@ function replacer(_key: string, value: unknown): unknown {
 function reviver(_key: string, value: unknown): unknown {
   if (typeof value === "object" && value !== null && "__type" in value) {
     if ((value as { __type: string }).__type === "Map") {
-      return new Map((value as { data: [unknown, unknown][] }).data);
+      const mapData = value as unknown;
+      return new Map((mapData as { data: [unknown, unknown][] }).data);
     }
   }
   return value;
