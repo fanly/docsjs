@@ -76,6 +76,8 @@ export interface InstalledPlugin {
   verified?: boolean;
   signatureValid?: boolean;
   publisher?: string;
+  metrics?: { downloads?: number; rating?: number; reviewCount?: number };
+  rating?: number;
   id?: string;
 }
 
