@@ -92,7 +92,7 @@ export class PipelineManager {
       // Set up the context
       const execContext = { ...context };
       execContext.state.phase = 'initializing';
-      execContext.metrics.totalTimeMs = startTime;
+      context.metrics.totalTimeMs = startTime;
       
       // Run lifecycle hooks and operations
       await this.runBeforeParseHooks(execContext);
@@ -101,7 +101,7 @@ export class PipelineManager {
       execContext.state.phase = 'parsing';
       const parseStartTime = Date.now();
       await this.parseToAST(execContext);
-      execContext.metrics.phaseTimes.parsing += Date.now() - parseStartTime;
+      context.metrics.phaseTimes.parsing += Date.now() - parseStartTime;
       
       await this.runAfterParseHooks(execContext);
       
@@ -109,7 +109,7 @@ export class PipelineManager {
       execContext.state.phase = 'transforming';
       const transformStartTime = Date.now();
       await this.applyTransformations(execContext);
-      execContext.metrics.phaseTimes.transforming += Date.now() - transformStartTime;
+      context.metrics.phaseTimes.transforming += Date.now() - transformStartTime;
       
       await this.runAfterTransformHooks(execContext);
       
@@ -117,7 +117,7 @@ export class PipelineManager {
       execContext.state.phase = 'rendering';
       const renderStartTime = Date.now();
       await this.renderOutput(execContext);
-      execContext.metrics.phaseTimes.rendering += Date.now() - renderStartTime;
+      context.metrics.phaseTimes.rendering += Date.now() - renderStartTime;
       
       await this.runAfterRenderHooks(execContext);
       
@@ -126,8 +126,8 @@ export class PipelineManager {
       const exportResult = await this.prepareExport(execContext);
       
       execContext.state.phase = 'complete';
-      execContext.metrics.phaseTimes.complete = Date.now();
-      execContext.metrics.totalTimeMs = Date.now() - startTime;
+      context.metrics.phaseTimes.complete = Date.now();
+      context.metrics.totalTimeMs = Date.now() - startTime;
       
       await this.runAfterExportHooks(execContext);
       
@@ -144,8 +144,8 @@ export class PipelineManager {
       
       context.state.errors.push(pipelineError);
       context.state.phase = 'failed';
-      execContext.metrics.phaseTimes.failed = Date.now();
-      execContext.metrics.totalTimeMs = Date.now() - startTime;
+      context.metrics.phaseTimes.failed = Date.now();
+      context.metrics.totalTimeMs = Date.now() - startTime;
       
       throw error;
     }
@@ -219,8 +219,8 @@ export class PipelineManager {
       const htmlResult: HtmlParseResult = await htmlParser.parse(context.input);
       
       context.state.ast = htmlResult.ast;
-      context.metrics.processedBytes = htmlResult.report.byteSize || 0;
-      context.metrics.processedChars = htmlResult.report.characterCount || 0;
+      context.metrics.processedBytes = htmlResult.report.processedBytes || 0;
+      context.metrics.processedChars = htmlResult.report.processedChars || 0;
       
       // Process parser-generated diagnostics
       if (htmlResult.report.warnings && htmlResult.report.warnings.length > 0) {
@@ -244,8 +244,8 @@ export class PipelineManager {
       context.state.ast = result.ast;
       context.metrics.processedBytes = result.report.elapsedMs || 0;
       context.metrics.processedChars = result.report.elapsedMs || 0;
-      context.metrics.processedBytes = result.report.byteSize || 0;
-      context.metrics.processedChars = result.report.characterCount || 0;
+      context.metrics.processedBytes = result.report.processedBytes || 0;
+      context.metrics.processedChars = result.report.processedChars || 0;
       
       // Process parser-generated diagnostics
       if (result.report.warnings && result.report.warnings.length > 0) {

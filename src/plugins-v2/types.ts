@@ -22,14 +22,6 @@ export interface PluginContext {
   pipeline: PipelineContext;
   config: Record<string, unknown>;
 }
-import type { DocumentAST } from '../ast/types';
-
-// Context passed to plugins
-export interface PluginContext {
-  engine: CoreEngine;
-  pipeline: PipelineContext;
-  config: Record<string, unknown>;
-}
 
 // Permission system for plugins
 export interface PluginPermissions {
