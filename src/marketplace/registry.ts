@@ -235,7 +235,7 @@ export class SecurePluginRegistry {
     return response.json();
   }
 
-  private async verifyPlugin(entry: MarketplaceEntry): Promise<PluginVerification> {
+  private async verifyPlugin(entry: MarketplaceEntry): Promise<{ signatureValid: boolean; publisherTrusted: boolean; securityScanPassed: boolean; performanceCompliant: boolean }> {
     // Check signature validity
     const signatureValid = await this.verifySignature(entry);
     
