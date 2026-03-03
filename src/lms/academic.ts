@@ -513,3 +513,14 @@ interface ExtractorConfig {
   includeExplanation: boolean;
   autoDifficulty: boolean;
 }
+
+
+// Re-export from gradebook
+export {
+  GradeBookManager,
+  type GradeBook,
+  type GradeEntry,
+  type GradeStatistics,
+  type StudentPerformance,
+  type AcademicAnalytics
+} from './gradebook';

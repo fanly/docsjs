@@ -359,3 +359,10 @@ export interface SubmissionResult {
 }
 
 export { ApprovalStatus as default };
+
+
+// Re-export from other marketplace modules
+export { VersionConstraint, UpdateInfo } from './version';
+export { CompatibilityResult } from './types';
+export { UsageEvent, DashboardSummary } from './analytics';
+export { PerformanceMetrics } from './analytics';

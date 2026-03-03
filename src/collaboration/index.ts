@@ -228,3 +228,41 @@ export class WebSocketCollaborationProvider {
 }
 
 export { Y };
+
+// Additional collaboration types
+export interface CollaborationSession {
+  id: string;
+  users: CollaborationUser[];
+  documentId: string;
+  createdAt: number;
+}
+
+export interface Participant extends CollaborationUser {}
+
+export interface CursorPosition {
+  userId: string;
+  position: number;
+  selection?: { start: number; end: number };
+}
+
+export interface Operation {
+  type: string;
+  userId: string;
+  timestamp: number;
+  data: unknown;
+}
+
+export interface Lock {
+  id: string;
+  userId: string;
+  resourceId: string;
+  expiresAt: number;
+}
+
+export function createPresenceSystem(): { update: (userId: string, presence: unknown) => void } {
+  return { update: () => {} };
+}
+
+export function createLockManager(): { acquire: (resourceId: string, userId: string) => Promise<boolean>; release: (resourceId: string, userId: string) => Promise<void> } {
+  return { acquire: async () => true, release: async () => {} };
+}

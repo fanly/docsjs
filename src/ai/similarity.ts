@@ -391,3 +391,35 @@ interface SimilarityConfig {
   shingleSize: number;
   useSemantic: boolean;
 }
+
+
+// Additional AI types
+export interface QualityPredictionModel {
+  predict(document: DocumentNode): Promise<QualityScore>;
+}
+
+export interface LayoutOptimizer {
+  optimize(document: DocumentNode): Promise<LayoutAnalysis>;
+}
+
+export interface QualityScore {
+  overall: number;
+  components: QualityComponents;
+}
+
+export interface QualityComponents {
+  readability: number;
+  structure: number;
+  completeness: number;
+}
+
+export interface LayoutAnalysis {
+  pageCount: number;
+  suggestions: LayoutSuggestion[];
+}
+
+export interface LayoutSuggestion {
+  type: string;
+  message: string;
+  severity: 'info' | 'warning' | 'error';
+}

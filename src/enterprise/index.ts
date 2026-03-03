@@ -296,3 +296,22 @@ export type {
   SlackConfig,
   TeamsConfig
 } from './integration';
+
+// Compliance exports
+export {
+  ComplianceFramework,
+  ComplianceFeature,
+  ComplianceProfileConfig,
+  COMPLIANCE_PROFILES
+} from './compliance';
+export type {
+  ComplianceAuditConfig,
+  ComplianceProfile
+} from './compliance';
+
+// Deployment exports
+export { OnPremisesDeploymentManager } from './deployment';
+export type {
+  DeploymentConfig,
+  ContainerConfig
+} from './deployment';
