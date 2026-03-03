@@ -70,20 +70,6 @@ export interface HtmlRenderOptions {
   /** Math rendering format */
   mathFormat?: "mathml" | "katex" | "linear";
   
-  /** Include data attributes for semantic info */
-  includeDataAttrs: boolean;
-  
-  /** Include paragraph indices */
-  includeParagraphIndex: boolean;
-  
-  /** Wrap in full HTML document */
-  wrapAsDocument: boolean;
-  
-  /** Image handling */
-  imageHandling: "base64" | "reference" | "placeholder";
-  
-  /** Math rendering format */
-  mathFormat: "mathml" | "katex" | "linear";
   
   /** Custom renderers for custom node types */
   customRenderers?: Map<string, CustomRenderer>;
