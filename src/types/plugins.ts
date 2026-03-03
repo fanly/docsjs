@@ -48,6 +48,7 @@ export interface PluginPermissions {
     canAccessOriginal?: boolean;
     canExportRawAst?: boolean;
   };
+  export?: { canGenerateFiles?: boolean; canUpload?: boolean };
 }
 
 export interface EnginePlugin {
