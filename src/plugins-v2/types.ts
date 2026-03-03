@@ -4,8 +4,24 @@
  * Defines the new plugin interfaces for the v2 engine with lifecycle hooks.
  */
 
-import type { CoreEngine } from '../engine/core';
+// CoreEngine type - using minimal interface to avoid circular dependency
+// The actual CoreEngine will be assigned at runtime
 import type { PipelineContext } from '../pipeline/types';
+import type { DocumentAST } from '../ast/types';
+
+// Minimal interface to break circular dependency
+interface IEngine {
+  applyProfile(name: string): void;
+  transformDocument(file: File | string): Promise<any>;
+  registerPlugin(plugin: any): void;
+}
+
+// Context passed to plugins
+export interface PluginContext {
+  engine: IEngine;
+  pipeline: PipelineContext;
+  config: Record<string, unknown>;
+}
 import type { DocumentAST } from '../ast/types';
 
 // Context passed to plugins

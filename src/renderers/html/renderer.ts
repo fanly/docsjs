@@ -52,7 +52,23 @@ import type {
 
 export interface HtmlRenderOptions {
   /** Render mode */
-  mode: "fidelity" | "semantic" | "strict";
+  /** Render mode */
+  mode?: "fidelity" | "semantic" | "strict";
+  
+  /** Include data attributes for semantic info */
+  includeDataAttrs?: boolean;
+  
+  /** Include paragraph indices */
+  includeParagraphIndex?: boolean;
+  
+  /** Wrap in full HTML document */
+  wrapAsDocument?: boolean;
+  
+  /** Image handling */
+  imageHandling?: "base64" | "reference" | "placeholder";
+  
+  /** Math rendering format */
+  mathFormat?: "mathml" | "katex" | "linear";
   
   /** Include data attributes for semantic info */
   includeDataAttrs: boolean;

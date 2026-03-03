@@ -4,7 +4,7 @@
  * Administration, organization management, and billing for DocsJS cloud platform.
  */
 
-import type { User } from '../types';
+import type { User } from '../core/types';
 
 // ============================================================================
 // Organization Management

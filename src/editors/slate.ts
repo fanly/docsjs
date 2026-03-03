@@ -114,7 +114,7 @@ function codeBlockToSlate(code: BlockNode): SlateElement {
 function blockquoteToSlate(block: BlockNode): SlateElement {
   return {
     type: "block-quote",
-    children: block.children.map(blockToSlate),
+    children: (block as any).children.map(blockToSlate),
   };
 }
 

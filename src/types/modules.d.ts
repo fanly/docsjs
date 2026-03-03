@@ -2,6 +2,8 @@
  * Missing module declarations
  */
 
+export {};
+
 // Declaration for yjs (collaboration)
 declare module 'yjs' {
   export class Doc {

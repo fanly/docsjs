@@ -113,7 +113,7 @@ function codeBlockToProseMirror(code: BlockNode): ProseMirrorNode {
 function blockquoteToProseMirror(block: BlockNode): ProseMirrorNode {
   return {
     type: "blockquote",
-    content: block.children.map(blockToProseMirror),
+    content: (block as any).children.map(blockToProseMirror),
   };
 }
 
