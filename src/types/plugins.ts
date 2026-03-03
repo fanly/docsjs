@@ -11,7 +11,6 @@ export interface PluginManifest {
   main?: string;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-  // Additional properties
   permissions?: PluginPermissions;
   compatibility?: string[];
   supportedHooks?: string[];
@@ -30,7 +29,6 @@ export interface PluginMetadata {
   repository?: string;
   keywords?: string[];
   license?: string;
-  // Additional properties
   id?: string;
   compatibility?: string;
   permissions?: PluginPermissions;
@@ -43,6 +41,7 @@ export interface PluginPermissions {
   compute?: {
     maxMemoryMB?: number;
     maxCpuSecs?: number;
+    maxThreads?: number;
   };
   ast?: {
     canModifySemantics?: boolean;
@@ -65,10 +64,16 @@ export interface InstalledPlugin {
   version: string;
   path: string;
   enabled: boolean;
+  installed?: boolean;
+  cleanup?: () => void;
 }
 
 export interface PluginVerification {
   valid: boolean;
   signature?: string;
   checksum?: string;
+  signatureValid?: boolean;
+  publisherTrusted?: boolean;
+  securityScanPassed?: boolean;
+  performanceCompliant?: boolean;
 }
