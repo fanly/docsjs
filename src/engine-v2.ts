@@ -72,10 +72,11 @@ export type {
 export { 
   // AST utilities
   generateId,
-  // htmlToASTNodes, // Not available
+  // generateId deduped
+  // htmlToASTNodes - not available
   serializeAST,
-  htmlToASTNodes,
-  serializeAST,
+  // serializeAST - exported above
+  // deserializeAST follows
   deserializeAST,
   walkAST,
   findNodeById,

@@ -132,7 +132,15 @@ export class ContractParser extends BaseAIParser {
     try {
       const response = await this.callAPI(prompt);
       const result = this.parseResponse(response);
-      return { success: true, ...result };
+      return { 
+        success: true, 
+        documentType: result.documentType || 'other',
+        parties: result.parties || [],
+        amounts: result.amounts || [],
+        clauses: result.clauses || [],
+        risks: result.risks || [],
+        summary: result.summary || ''
+      };
     } catch (error) {
       return {
         success: false,
@@ -198,7 +206,15 @@ export class ResumeParser extends BaseAIParser {
     try {
       const response = await this.callAPI(prompt);
       const result = this.parseResponse(response);
-      return { success: true, ...result };
+      return { 
+        success: true, 
+        skills: result.skills || [],
+        experience: result.experience || [],
+        education: result.education || [],
+        certifications: result.certifications || [],
+        languages: result.languages || [],
+        ...result
+      };
     } catch (error) {
       return {
         success: false,

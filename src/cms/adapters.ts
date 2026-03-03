@@ -1,5 +1,11 @@
 import type { ConvertResultData } from '../server/types';
 
+// Import CMS adapters and options
+import { GhostAdapter, type GhostOptions } from './ghost';
+import { NotionAdapter, type NotionOptions } from './notion';
+import { ConfluenceAdapter, type ConfluenceOptions } from './confluence';
+import { GitBookAdapter, type GitBookOptions } from './gitbook';
+
 export interface CMSAdapter {
   name: string;
   version: string;

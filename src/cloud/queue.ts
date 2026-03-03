@@ -319,7 +319,7 @@ export class BatchProcessor {
       const totalFiles = job.inputFiles.length;
       
       for (let i = 0; i < totalFiles; i++) {
-        if (job.status === 'cancelled') {
+        if ((job.status as string) === 'cancelled') {
           break;
         }
 
@@ -328,7 +328,7 @@ export class BatchProcessor {
         job.progress = Math.round(((i + 1) / totalFiles) * 100);
       }
 
-      if (job.status !== 'cancelled') {
+      if ((job.status as string) !== 'cancelled') {
         job.status = 'completed';
         job.resultUrl = `/results/${job.id}`;
       }

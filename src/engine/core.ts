@@ -20,7 +20,7 @@ import { SYSTEM_PROFILES } from '../profiles/profile-manager';
 export class CoreEngine implements EngineInterface {
 
   private config: EngineConfig;
-  private config: EngineConfig;
+  // duplicate config removed
   private profiles: Map<string, TransformationProfile> = new Map();
   private plugins: Map<string, PluginHooks> = new Map();
   private pipelineManager: PipelineManager;

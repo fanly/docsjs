@@ -15,8 +15,8 @@ import type { EngineConfig, TransformationProfile } from "../types/engine";
 import type { CoreEngine } from "../engine/core";
 import type { DocxParseOptions, DocxParseResult } from "../parsers";
 import type { HtmlRenderOptions, HtmlRenderResult } from "../renderers";
-import { DOCXParser } from "../parsers/docx/parser";
-import { HTMLRenderer } from "../renderers/html/renderer";
+import { DocxParser } from "../parsers/docx/parser";
+import { HtmlRenderer } from "../renderers/html/renderer";
 import { MarkdownRenderer } from "../renderers/markdown/renderer";
 import { DocumentAST, AST_VERSION } from "../ast/types";
 
@@ -253,7 +253,7 @@ export class StreamingPipelineManager {
       output = `[String input processing - ${input.length} chars]`;
     } else {
       // Process file normally
-      const parser = new DOCXParser(profile.parse as DocxParseOptions);
+      const parser = new DocxParser(profile.parse as DocxParseOptions);
       const result = await parser.parse(input);
       
       // Render based on profile
@@ -264,7 +264,7 @@ export class StreamingPipelineManager {
         ...profile.render.options,
       };
       
-      const renderer = new HTMLRenderer(renderOpts);
+      const renderer = new HtmlRenderer(renderOpts);
       const renderResult = renderer.render(result.ast);
       output = renderResult.html;
     }

@@ -10,9 +10,19 @@ import type {
   PipelinePhase,
   PipelineHook,
   PipelineMetrics,
-  ExportResult
+  ExportResult,
+  PipelineError,
+  PipelineHooks
 } from './types';
 import type { CoreEngine } from '../engine/core';
+import type { EngineConfig } from '../types/engine';
+
+
+
+
+
+
+import { DocxParser } from '../parsers/docx/parser';
 import type { 
   DocxParseOptions, 
   DocxParseResult,
@@ -198,7 +208,7 @@ export class PipelineManager {
     
     if (context.input instanceof File) {
       if (context.input.name.endsWith('.docx')) {
-        const parser = new DOCXParser(context.profile.parse);
+        const parser = new DocxParser(context.profile.parse);
         result = await parser.parse(context.input);
       } else {
         throw new Error(`Unsupported file type: ${context.input.name}`);
@@ -311,7 +321,7 @@ export class PipelineManager {
           wrapAsDocument: false,
           ...context.profile.render.options
         };
-        const htmlRenderer = new HTMLRenderer(htmlOpts);
+        const htmlRenderer = new HtmlRenderer(htmlOpts);
         const htmlResult: HtmlRenderResult = htmlRenderer.render(context.state.ast);
         
         context.state.intermediate.renderedOutput = htmlResult.html;

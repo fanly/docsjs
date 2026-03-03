@@ -43,6 +43,14 @@ export interface GitBlock {
   [key: string]: unknown;
 }
 
+/** @alias GitBlock */
+export type GitBookBlock = GitBlock;
+export type GitBookBlock = GitBlock;
+
+
+
+
+
 export interface GitBookSpace {
   id: string;
   name: string;

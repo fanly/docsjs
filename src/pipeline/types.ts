@@ -7,7 +7,7 @@
 import type { EngineConfig, TransformationProfile } from '../types/engine';
 
 // Pipeline context
-import type { EngineConfig, TransformationProfile } from '../types/engine';
+// duplicate import removed
 
 // Pipeline context
 export interface PipelineContext {

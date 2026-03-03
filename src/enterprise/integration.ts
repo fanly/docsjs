@@ -129,7 +129,7 @@ export interface SAPConfig extends IntegrationConfig {
 }
 
 export class SAPIntegration extends BaseIntegration {
-  private config!: SAPConfig;
+  protected config!: SAPConfig;
 
   async connect(): Promise<boolean> {
     // SAP connection would use RFC/BAPI
@@ -188,7 +188,7 @@ export interface SalesforceConfig extends IntegrationConfig {
 }
 
 export class SalesforceIntegration extends BaseIntegration {
-  private config!: SalesforceConfig;
+  protected config!: SalesforceConfig;
 
   async connect(): Promise<boolean> {
     // OAuth2 flow for Salesforce
@@ -242,7 +242,7 @@ export interface ServiceNowConfig extends IntegrationConfig {
 }
 
 export class ServiceNowIntegration extends BaseIntegration {
-  private config!: ServiceNowConfig;
+  protected config!: ServiceNowConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -294,7 +294,7 @@ export interface JiraConfig extends IntegrationConfig {
 }
 
 export class JiraIntegration extends BaseIntegration {
-  private config!: JiraConfig;
+  protected config!: JiraConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -349,7 +349,7 @@ export interface SlackConfig extends IntegrationConfig {
 }
 
 export class SlackIntegration extends BaseIntegration {
-  private config!: SlackConfig;
+  protected config!: SlackConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -399,7 +399,7 @@ export interface TeamsConfig extends IntegrationConfig {
 }
 
 export class TeamsIntegration extends BaseIntegration {
-  private config!: TeamsConfig;
+  protected config!: TeamsConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;

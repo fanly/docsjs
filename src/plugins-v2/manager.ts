@@ -98,8 +98,8 @@ export class PluginManagerImpl implements PluginManager {
     });
   }
 
-  async runForHook(hook: PluginHook, context: PluginContext): Promise<PluginContext> {
-  }
+
+
 
   async runForHook(hook: PluginHook, context: PluginContext): Promise<PluginContext> {
     const plugins = this.listForHook(hook);
