@@ -273,7 +273,7 @@ export class CoreEngine implements EngineInterface {
     // Initialize all registered plugins
     for (const plugin of this.plugins.values()) {
       try {
-        await plugin.init?.({ engine: this } as PluginContext);
+        await plugin.init?.({ engine: this } as unknown as PluginContext);
       } catch (error) {
         console.error(`Failed to initialize plugin ${plugin.name}:`, error);
         throw error;

@@ -379,11 +379,11 @@ function htmlElementToInlineNode(el: Element): InlineNode | InlineNode[] | null 
  * Wrap inline nodes with a text mark
  */
 function wrapInlinesWithMark(inlines: InlineNode[], mark: { type: string }): InlineNode[] {
-  return inlines.map((inline) => {
+  return inlines.map((inline): InlineNode => {
     if (inline.type === "text") {
       return {
         ...inline,
-        marks: [...(inline.marks ?? []), mark],
+        marks: [...(inline.marks ?? []), mark as any],
       };
     }
     return inline;
