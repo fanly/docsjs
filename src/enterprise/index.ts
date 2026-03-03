@@ -305,13 +305,33 @@ export {
   COMPLIANCE_PROFILES
 } from './compliance';
 export type {
-  ComplianceAuditConfig,
-  ComplianceProfile
+  DataHandlingRules,
+  RetentionRequirements,
+  AccessControlRules,
+  EncryptionRequirements
+} from './compliance';
+  ComplianceProfileConfig,
+  DataHandlingRules,
+  RetentionRequirements,
+  AccessControlRules,
+  EncryptionRequirements
 } from './compliance';
 
 // Deployment exports
 export { OnPremisesDeploymentManager } from './deployment';
 export type {
-  DeploymentConfig,
-  ContainerConfig
+  DockerConfig,
+  DockerComposeConfig,
+  KubernetesConfig,
+  K8sSpec
 } from './deployment';
+
+
+
+
+
+
+
+
+
+
