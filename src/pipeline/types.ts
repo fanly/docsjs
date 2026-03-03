@@ -5,6 +5,7 @@
  */
 
 import type { EngineConfig, TransformationProfile } from '../types/engine';
+import type { DocumentAST } from '../ast/types';
 
 // Pipeline context
 // duplicate import removed

@@ -6,6 +6,7 @@
 
 import type { CoreEngine } from '../engine/core';
 import type { PipelineContext } from '../pipeline/types';
+import type { DocumentAST } from '../ast/types';
 
 // Context passed to plugins
 export interface PluginContext {
