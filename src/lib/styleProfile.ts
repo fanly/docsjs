@@ -111,13 +111,13 @@ function twipToPx(twip: number): number {
 }
 
 function getAttr(node: Element | null, attr: string): string | null {
-  if (!node) return null;
+  if (!node) {return null;}
   return node.getAttribute(attr);
 }
 
 function getTwipAttr(node: Element | null, attr: string): number | null {
   const raw = getAttr(node, attr);
-  if (!raw) return null;
+  if (!raw) {return null;}
   const parsed = Number.parseFloat(raw);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -174,17 +174,17 @@ function parseHeadingAlignFromDocument(documentXml: Document): "left" | "center"
   const paragraphs = queryAllByLocalName(documentXml, "p");
   for (const paragraph of paragraphs) {
     const pPr = queryAllByLocalName(paragraph, "pPr")[0] ?? null;
-    if (!pPr) continue;
+    if (!pPr) {continue;}
 
     const pStyle = queryAllByLocalName(pPr, "pStyle")[0] ?? null;
     const styleVal = getAttr(pStyle, "w:val") ?? getAttr(pStyle, "val") ?? "";
     const isHeading = styleVal === "1" || styleVal.toLowerCase().includes("heading");
-    if (!isHeading) continue;
+    if (!isHeading) {continue;}
 
     const jc = queryAllByLocalName(pPr, "jc")[0] ?? null;
     const alignRaw = (getAttr(jc, "w:val") ?? getAttr(jc, "val") ?? "").toLowerCase();
-    if (alignRaw === "center") return "center";
-    if (alignRaw === "right") return "right";
+    if (alignRaw === "center") {return "center";}
+    if (alignRaw === "right") {return "right";}
     return "left";
   }
 
@@ -200,8 +200,8 @@ function parseParagraphAlign(paragraph: Element): "left" | "center" | "right" {
   const pPr = queryAllByLocalName(paragraph, "pPr")[0] ?? null;
   const jc = pPr ? queryAllByLocalName(pPr, "jc")[0] ?? null : null;
   const alignRaw = (getAttr(jc, "w:val") ?? getAttr(jc, "val") ?? "").toLowerCase();
-  if (alignRaw === "center") return "center";
-  if (alignRaw === "right") return "right";
+  if (alignRaw === "center") {return "center";}
+  if (alignRaw === "right") {return "right";}
   return "left";
 }
 
@@ -267,26 +267,26 @@ type NumberingLevelSpec = {
 };
 
 function toInt(value: string | null): number | null {
-  if (!value) return null;
+  if (!value) {return null;}
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? n : null;
 }
 
 function parseNumberingMap(numberingXml: Document | null): Map<string, NumberingLevelSpec> {
   const levelMap = new Map<string, NumberingLevelSpec>();
-  if (!numberingXml) return levelMap;
+  if (!numberingXml) {return levelMap;}
 
   const abstractMap = new Map<number, Map<number, NumberingLevelSpec>>();
   const abstractNums = queryAllByLocalName(numberingXml, "abstractNum");
   for (const abs of abstractNums) {
     const absId = toInt(getAttr(abs, "w:abstractNumId") ?? getAttr(abs, "abstractNumId"));
-    if (absId === null) continue;
+    if (absId === null) {continue;}
 
     const lvlNodes = queryAllByLocalName(abs, "lvl");
     const lvlMap = new Map<number, NumberingLevelSpec>();
     for (const lvl of lvlNodes) {
       const ilvl = toInt(getAttr(lvl, "w:ilvl") ?? getAttr(lvl, "ilvl"));
-      if (ilvl === null) continue;
+      if (ilvl === null) {continue;}
       const numFmtNode = queryAllByLocalName(lvl, "numFmt")[0] ?? null;
       const lvlTextNode = queryAllByLocalName(lvl, "lvlText")[0] ?? null;
       lvlMap.set(ilvl, {
@@ -301,12 +301,12 @@ function parseNumberingMap(numberingXml: Document | null): Map<string, Numbering
   const nums = queryAllByLocalName(numberingXml, "num");
   for (const num of nums) {
     const numId = toInt(getAttr(num, "w:numId") ?? getAttr(num, "numId"));
-    if (numId === null) continue;
+    if (numId === null) {continue;}
     const abstractRefNode = queryAllByLocalName(num, "abstractNumId")[0] ?? null;
     const absId = toInt(getAttr(abstractRefNode, "w:val") ?? getAttr(abstractRefNode, "val"));
-    if (absId === null) continue;
+    if (absId === null) {continue;}
     const lvlMap = abstractMap.get(absId);
-    if (!lvlMap) continue;
+    if (!lvlMap) {continue;}
     for (const [lvl, spec] of lvlMap.entries()) {
       levelMap.set(`${numId}:${lvl}`, { ...spec });
     }
@@ -314,7 +314,7 @@ function parseNumberingMap(numberingXml: Document | null): Map<string, Numbering
     const lvlOverrides = queryAllByLocalName(num, "lvlOverride");
     for (const override of lvlOverrides) {
       const ilvl = toInt(getAttr(override, "w:ilvl") ?? getAttr(override, "ilvl"));
-      if (ilvl === null) continue;
+      if (ilvl === null) {continue;}
       const key = `${numId}:${ilvl}`;
       const base = levelMap.get(key) ?? { numFmt: null, lvlText: null, startAt: 1 };
 
@@ -612,7 +612,7 @@ function parseHeading1Style(stylesXml: Document): {
 }
 
 function parseFontTableFamilies(fontTableXml: Document | null): string[] {
-  if (!fontTableXml) return [];
+  if (!fontTableXml) {return [];}
   const fontNodes = queryAllByLocalName(fontTableXml, "font");
   const families = fontNodes
     .map((node) => getAttr(node, "w:name") ?? getAttr(node, "name") ?? "")

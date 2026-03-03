@@ -392,7 +392,7 @@ export class SSOService {
    */
   validateSession(sessionId: string): SSOSession | null {
     const session = this.sessions.get(sessionId);
-    if (!session) return null;
+    if (!session) {return null;}
     
     if (Date.now() > session.expiresAt) {
       this.sessions.delete(sessionId);
@@ -407,7 +407,7 @@ export class SSOService {
    */
   refreshSession(sessionId: string): SSOSession | null {
     const session = this.sessions.get(sessionId);
-    if (!session || !session.refreshToken) return null;
+    if (!session || !session.refreshToken) {return null;}
     
     // Refresh with provider
     session.expiresAt = Date.now() + (24 * 60 * 60 * 1000);

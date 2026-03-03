@@ -196,7 +196,7 @@ export class DocumentTransformationHandler {
     result: TransformResult,
     processingTime: number
   ): Promise<void> {
-    if (!request.callbackUrl) return;
+    if (!request.callbackUrl) {return;}
 
     // In production, would queue to a message queue
     console.log(`Queuing callback for request ${request.requestId}`);

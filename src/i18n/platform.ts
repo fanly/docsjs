@@ -3,7 +3,8 @@
  * Advanced i18n: translation memory, auto-detection, pluralization, gender
  */
 
-import { Locale, Translations, i18n as I18nClass } from './index';
+import type { Locale, i18n as I18nClass } from './index';
+import { Translations } from './index';
 
 // ============================================
 // Types
@@ -103,8 +104,8 @@ export class TranslationMemory {
   }
 
   private calculateSimilarity(a: string, b: string): number {
-    if (a === b) return 1;
-    if (a.length === 0 || b.length === 0) return 0;
+    if (a === b) {return 1;}
+    if (a.length === 0 || b.length === 0) {return 0;}
     
     const matrix: number[][] = [];
     
@@ -284,7 +285,7 @@ export class LocaleDetector {
   }
 
   private isValidLocale(locale: string, supported: Locale[]): boolean {
-    if (!supported.length) return true;
+    if (!supported.length) {return true;}
     return supported.includes(locale as Locale) || 
            supported.some(l => l.startsWith(locale.split('-')[0]));
   }

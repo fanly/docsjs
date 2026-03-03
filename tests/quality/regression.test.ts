@@ -442,7 +442,7 @@ describe('Full Regression Tests', () => {
       priority: 'normal' as const,
       dependencies: [],
       beforeRender: (ctx: any) => {
-        if (!ctx.lifecycleCheckPoint) ctx.lifecycleCheckPoint = 0;
+        if (!ctx.lifecycleCheckPoint) {ctx.lifecycleCheckPoint = 0;}
         ctx.lifecycleCheckPoint++;
         return ctx;
       }

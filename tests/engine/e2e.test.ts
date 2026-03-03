@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { CoreEngine } from '../../src/engine/core';
-import { EnginePlugin } from '../../src/plugins-v2/types';
+import type { EnginePlugin } from '../../src/plugins-v2/types';
 
 describe('Core Engine v2 - End-to-End', () => {
   let engine: CoreEngine;

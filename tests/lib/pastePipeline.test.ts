@@ -38,8 +38,8 @@ function makeDataTransfer(html: string, text: string, imageFile?: File): DataTra
     types: ["text/html", "text/plain"],
     clearData: () => undefined,
     getData: (format: string) => {
-      if (format === "text/html") return html;
-      if (format === "text/plain") return text;
+      if (format === "text/html") {return html;}
+      if (format === "text/plain") {return text;}
       return "";
     },
     setData: () => false,

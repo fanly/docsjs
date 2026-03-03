@@ -37,7 +37,7 @@ export class PluginRegistry {
   }
 
   async initialize(context: PluginContext): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {return;}
     
     const sorted = this.sortByPriority();
     for (const plugin of sorted) {

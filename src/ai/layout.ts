@@ -232,11 +232,11 @@ export class LayoutOptimizer {
   private detectFromText(text: string): LayoutType {
     const lowerText = text.toLowerCase();
     
-    if (lowerText.includes('references') || lowerText.includes('bibliography')) return 'academic';
-    if (lowerText.includes('function') || lowerText.includes('api')) return 'technical';
-    if (lowerText.includes('documentation') || lowerText.includes('guide')) return 'documentation';
-    if (lowerText.includes('contact') || lowerText.includes('buy')) return 'marketing';
-    if (lowerText.includes('table') && lowerText.includes('figure')) return 'report';
+    if (lowerText.includes('references') || lowerText.includes('bibliography')) {return 'academic';}
+    if (lowerText.includes('function') || lowerText.includes('api')) {return 'technical';}
+    if (lowerText.includes('documentation') || lowerText.includes('guide')) {return 'documentation';}
+    if (lowerText.includes('contact') || lowerText.includes('buy')) {return 'marketing';}
+    if (lowerText.includes('table') && lowerText.includes('figure')) {return 'report';}
     
     return 'article';
   }
@@ -266,7 +266,7 @@ export class LayoutOptimizer {
           sections.push({ type: 'toc', position: 'left', size: { percentage: 20 }, confidence: 0.9 });
         }
       }
-      if (n.children) n.children.forEach(c => traverse(c, depth + 1));
+      if (n.children) {n.children.forEach(c => traverse(c, depth + 1));}
     };
 
     traverse(node, 0);
@@ -292,7 +292,7 @@ export class LayoutOptimizer {
         levels.add(level);
         maxDepth = Math.max(maxDepth, level);
       }
-      if (n.children) n.children.forEach(c => traverse(c, depth + 1));
+      if (n.children) {n.children.forEach(c => traverse(c, depth + 1));}
     };
 
     traverse(node, 0);
@@ -369,7 +369,7 @@ export class LayoutOptimizer {
       if (n.properties?.style?.includes('width:') && !n.properties.style.includes('%') && !n.properties.style.includes('em')) {
         hasFixed = true;
       }
-      if (n.children) n.children.forEach(traverse);
+      if (n.children) {n.children.forEach(traverse);}
     };
 
     traverse(node);
@@ -472,7 +472,7 @@ export class LayoutOptimizer {
     let text = '';
     const traverse = (n: any) => {
       text += n.content || '';
-      if (n.children) n.children.forEach(traverse);
+      if (n.children) {n.children.forEach(traverse);}
     };
     traverse(node);
     return text;
@@ -498,16 +498,16 @@ export class LayoutOptimizer {
     const traverse = (n: any) => {
       if (n.type?.startsWith('heading')) {
         headingCount++;
-        if (n.content?.match(/^\d+\./)) hasNumberedHeadings = true;
+        if (n.content?.match(/^\d+\./)) {hasNumberedHeadings = true;}
       }
-      if (n.type === 'list') listCount++;
-      if (n.type === 'table') tableCount++;
+      if (n.type === 'list') {listCount++;}
+      if (n.type === 'table') {tableCount++;}
       if (n.type === 'paragraph') {
         paragraphCount++;
         lengths.push(n.content?.split(/\s+/).length || 0);
       }
-      if (n.type === 'code') hasCodeBlocks = true;
-      if (n.children) n.children.forEach(traverse);
+      if (n.type === 'code') {hasCodeBlocks = true;}
+      if (n.children) {n.children.forEach(traverse);}
     };
 
     traverse(node);

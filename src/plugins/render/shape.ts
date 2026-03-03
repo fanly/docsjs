@@ -13,10 +13,10 @@ export function createShapePlugin(): RunPlugin {
     
     parseRun(element: Element, _context: PluginContext): RunParseResult {
       const vmlShape = element.querySelector("w\\:pict, pict");
-      if (!vmlShape) return { html: "", handled: false };
+      if (!vmlShape) {return { html: "", handled: false };}
       
       const shapeType = vmlShape.querySelector("v\\:shape, v\\:rect, v\\:oval");
-      if (!shapeType) return { html: "", handled: false };
+      if (!shapeType) {return { html: "", handled: false };}
       
       const typeAttr = shapeType.getAttribute("type") || shapeType.tagName;
       const style = shapeType.getAttribute("style") || "";

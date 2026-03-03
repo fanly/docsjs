@@ -293,7 +293,7 @@ export class GradeBookManager {
    */
   getStudentPerformance(gradeBookId: string): StudentPerformance[] {
     const gradeBook = this.gradeBooks.get(gradeBookId);
-    if (!gradeBook) return [];
+    if (!gradeBook) {return [];}
 
     const studentMap = new Map<string, StudentAssignment[]>();
     const studentNames = new Map<string, string>();
@@ -414,11 +414,11 @@ export class GradeBookManager {
 
     const distribution: GradeDistribution = { a: 0, b: 0, c: 0, d: 0, f: 0 };
     for (const s of scores) {
-      if (s >= 90) distribution.a++;
-      else if (s >= 80) distribution.b++;
-      else if (s >= 70) distribution.c++;
-      else if (s >= 60) distribution.d++;
-      else distribution.f++;
+      if (s >= 90) {distribution.a++;}
+      else if (s >= 80) {distribution.b++;}
+      else if (s >= 70) {distribution.c++;}
+      else if (s >= 60) {distribution.d++;}
+      else {distribution.f++;}
     }
 
     const passRate = (scores.filter(s => s >= 60).length / scores.length) * 100;
@@ -447,15 +447,15 @@ export class GradeBookManager {
   }
 
   private scoreToLetter(score: number): string {
-    if (score >= 90) return 'A';
-    if (score >= 80) return 'B';
-    if (score >= 70) return 'C';
-    if (score >= 60) return 'D';
+    if (score >= 90) {return 'A';}
+    if (score >= 80) {return 'B';}
+    if (score >= 70) {return 'C';}
+    if (score >= 60) {return 'D';}
     return 'F';
   }
 
   private calculateTrend(scores: number[]): 'improving' | 'declining' | 'stable' {
-    if (scores.length < 3) return 'stable';
+    if (scores.length < 3) {return 'stable';}
     
     const recent = scores.slice(-3);
     const earlier = scores.slice(0, -3);
@@ -467,15 +467,15 @@ export class GradeBookManager {
     
     const diff = recentAvg - earlierAvg;
     
-    if (diff > 5) return 'improving';
-    if (diff < -5) return 'declining';
+    if (diff > 5) {return 'improving';}
+    if (diff < -5) {return 'declining';}
     return 'stable';
   }
 
   private predictFinalGrade(currentAvg: number, completed: number, total: number): number {
-    if (completed === 0) return currentAvg;
+    if (completed === 0) {return currentAvg;}
     const remaining = total - completed;
-    if (remaining === 0) return currentAvg;
+    if (remaining === 0) {return currentAvg;}
     
     // Weighted prediction - current grades weighted more
     return (currentAvg * completed + 70 * remaining) / total;
@@ -591,8 +591,8 @@ export class GradeBookManager {
   }
 
   private estimateDifficulty(stats: GradeStatistics): 'easy' | 'medium' | 'hard' {
-    if (stats.average > 80) return 'easy';
-    if (stats.average > 60) return 'medium';
+    if (stats.average > 80) {return 'easy';}
+    if (stats.average > 60) {return 'medium';}
     return 'hard';
   }
 

@@ -78,11 +78,11 @@ export async function buildDocxFile(options: DocxBuildOptions): Promise<File> {
   zip.file("word/_rels/document.xml.rels", options.relsXml ?? EMPTY_RELS);
 
   // 可选文件
-  if (options.stylesXml) zip.file("word/styles.xml", options.stylesXml);
-  if (options.numberingXml) zip.file("word/numbering.xml", options.numberingXml);
-  if (options.footnotesXml) zip.file("word/footnotes.xml", options.footnotesXml);
-  if (options.endnotesXml) zip.file("word/endnotes.xml", options.endnotesXml);
-  if (options.commentsXml) zip.file("word/comments.xml", options.commentsXml);
+  if (options.stylesXml) {zip.file("word/styles.xml", options.stylesXml);}
+  if (options.numberingXml) {zip.file("word/numbering.xml", options.numberingXml);}
+  if (options.footnotesXml) {zip.file("word/footnotes.xml", options.footnotesXml);}
+  if (options.endnotesXml) {zip.file("word/endnotes.xml", options.endnotesXml);}
+  if (options.commentsXml) {zip.file("word/comments.xml", options.commentsXml);}
 
   // 媒体文件
   for (const [path, bytes] of Object.entries(options.mediaFiles ?? {})) {

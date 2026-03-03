@@ -126,11 +126,11 @@ describe('Core Engine Integration', () => {
 
   it('should maintain state isolation across different components', () => {
     // Test profile isolation
-    let originalProfileCount = engine.listProfiles().length;
+    const originalProfileCount = engine.listProfiles().length;
     
     // Apply a profile that should exist
     engine.applyProfile('default');
-    let currentProfile = engine.getProfile('default');
+    const currentProfile = engine.getProfile('default');
     expect(currentProfile).toBeTruthy();
     
     // Check that changing something doesn't affect engine state in unexpected ways

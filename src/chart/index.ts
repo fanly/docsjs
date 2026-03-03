@@ -75,7 +75,7 @@ class ChartParser {
    */
   private extractChartData(xml: string): ChartData | null {
     // Check if this is a chart
-    if (!xml.includes('<c:chart') && !xml.includes('Chart')) return null;
+    if (!xml.includes('<c:chart') && !xml.includes('Chart')) {return null;}
 
     // Extract chart type
     const typeMatch = xml.match(/<c:type>([^<]+)<\/c:type>/);
@@ -109,7 +109,7 @@ class ChartParser {
   private extractCategories(xml: string): string[] {
     const categories: string[] = [];
     const catStart = xml.indexOf('<c:cat>');
-    if (catStart === -1) return categories;
+    if (catStart === -1) {return categories;}
 
     const catEnd = xml.indexOf('</c:cat>', catStart);
     const catSection = xml.slice(catStart, catEnd + 7);
@@ -132,7 +132,7 @@ class ChartParser {
     let serStart = xml.indexOf('<c:ser>');
     while (serStart !== -1) {
       const serEnd = xml.indexOf('</c:ser>', serStart);
-      if (serEnd === -1) break;
+      if (serEnd === -1) {break;}
       
       const serXml = xml.slice(serStart, serEnd + 8);
       
@@ -307,8 +307,8 @@ class ChartParser {
     
     const suffix = alpha !== undefined ? alpha : 0.2;
     const actualColors = baseColors.map(c => {
-      if (suffix === 0.2) return c.replace('rgb', 'rgba').replace(')', ', 0.2)');
-      if (suffix === 1) return c;
+      if (suffix === 0.2) {return c.replace('rgb', 'rgba').replace(')', ', 0.2)');}
+      if (suffix === 1) {return c;}
       return c.replace('rgb', 'rgba').replace(')', `, ${suffix})`);
     });
     

@@ -89,7 +89,7 @@ export class SharePointAdapter implements CMSAdapter {
       `${this.options.baseUrl}/v1.0/sites/${siteId}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`SharePoint API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
     return response.json();
   }
 
@@ -105,7 +105,7 @@ export class SharePointAdapter implements CMSAdapter {
       `${this.options.baseUrl}/v1.0${path}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`SharePoint API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
     const data = await response.json();
     return data.value || [];
   }
@@ -118,7 +118,7 @@ export class SharePointAdapter implements CMSAdapter {
       `${this.options.baseUrl}/v1.0/drives/${driveId}/items/${itemId}/content`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`SharePoint API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
     return response.text();
   }
 
@@ -134,7 +134,7 @@ export class SharePointAdapter implements CMSAdapter {
         body: content.body,
       }
     );
-    if (!response.ok) throw new Error(`SharePoint upload error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`SharePoint upload error: ${response.statusText}`);}
     return response.json();
   }
 
@@ -222,7 +222,7 @@ export class BoxAdapter implements CMSAdapter {
       `${this.options.baseUrl}/2.0/folders/${folderId}/items`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Box API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Box API error: ${response.statusText}`);}
     const data = await response.json();
     return data.entries || [];
   }
@@ -235,7 +235,7 @@ export class BoxAdapter implements CMSAdapter {
       `${this.options.baseUrl}/2.0/files/${fileId}/content`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Box API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Box API error: ${response.statusText}`);}
     return response.text();
   }
 
@@ -258,7 +258,7 @@ export class BoxAdapter implements CMSAdapter {
         body: formData,
       }
     );
-    if (!response.ok) throw new Error(`Box upload error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Box upload error: ${response.statusText}`);}
     return (await response.json()).entries[0];
   }
 
@@ -344,7 +344,7 @@ export class OneDriveAdapter implements CMSAdapter {
       `${this.options.baseUrl}/v1.0${path}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`OneDrive API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`OneDrive API error: ${response.statusText}`);}
     return response.json();
   }
 
@@ -356,7 +356,7 @@ export class OneDriveAdapter implements CMSAdapter {
       `${this.options.baseUrl}/v1.0/me/drive/items/${itemId}/content`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`OneDrive API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`OneDrive API error: ${response.statusText}`);}
     return response.text();
   }
 
@@ -375,7 +375,7 @@ export class OneDriveAdapter implements CMSAdapter {
         body: content.body,
       }
     );
-    if (!response.ok) throw new Error(`OneDrive upload error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`OneDrive upload error: ${response.statusText}`);}
     return response.json();
   }
 
@@ -462,7 +462,7 @@ export class GoogleDriveAdapter implements CMSAdapter {
       `${this.options.baseUrl}/drive/v3/files?q=${encodeURIComponent(query)}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Google Drive API error: ${response.statusText}`);}
     const data = await response.json();
     return data.files || [];
   }
@@ -475,7 +475,7 @@ export class GoogleDriveAdapter implements CMSAdapter {
       `${this.options.baseUrl}/drive/v3/files/${fileId}?alt=media`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Google Drive API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Google Drive API error: ${response.statusText}`);}
     return response.text();
   }
 
@@ -501,7 +501,7 @@ export class GoogleDriveAdapter implements CMSAdapter {
         body: formData,
       }
     );
-    if (!response.ok) throw new Error(`Google Drive upload error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Google Drive upload error: ${response.statusText}`);}
     return response.json();
   }
 

@@ -3,8 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+import type { 
+  BenchmarkRunner} from '../../src/lib/benchmark';
 import { 
-  BenchmarkRunner, 
   createBenchmarkRunner,
   createRegressionChecker,
   createStandardBenchmarkSuite
@@ -26,7 +27,7 @@ describe('BenchmarkRunner', () => {
       const result = await runner.run('simple-test', () => {
         // Simple synchronous operation
         let sum = 0;
-        for (let i = 0; i < 1000; i++) sum += i;
+        for (let i = 0; i < 1000; i++) {sum += i;}
       }, { iterations: 3, warmup: 0 });
 
       expect(result).toBeDefined();

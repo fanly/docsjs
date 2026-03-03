@@ -281,7 +281,7 @@ export class PluginManager {
    */
   approvePlugin(submissionId: string, reviewer: string, feedback?: string): boolean {
     const status = this.approvalStatus.get(submissionId);
-    if (!status) return false;
+    if (!status) {return false;}
     
     status.status = 'approved';
     status.reviewer = reviewer;
@@ -296,7 +296,7 @@ export class PluginManager {
    */
   rejectPlugin(submissionId: string, reviewer: string, feedback: string): boolean {
     const status = this.approvalStatus.get(submissionId);
-    if (!status) return false;
+    if (!status) {return false;}
     
     status.status = 'rejected';
     status.reviewer = reviewer;
@@ -446,8 +446,8 @@ export class PluginManager {
     for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
       const partA = partsA[i] || 0;
       const partB = partsB[i] || 0;
-      if (partA > partB) return 1;
-      if (partA < partB) return -1;
+      if (partA > partB) {return 1;}
+      if (partA < partB) {return -1;}
     }
     return 0;
   }
@@ -504,7 +504,7 @@ ${manifest.license || 'MIT'}
 }
 
 function renderPermissions(permissions?: PluginPermissions): string {
-  if (!permissions) return 'None required';
+  if (!permissions) {return 'None required';}
   
   const lines: string[] = [];
   

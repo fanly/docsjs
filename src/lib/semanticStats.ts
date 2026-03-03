@@ -23,8 +23,8 @@ function countElements(root: ParentNode, selector: string): number {
 }
 
 function isListLikeParagraph(p: Element): boolean {
-  if (p.hasAttribute("data-word-list")) return true;
-  if (p.querySelector("span.__word-list-marker")) return true;
+  if (p.hasAttribute("data-word-list")) {return true;}
+  if (p.querySelector("span.__word-list-marker")) {return true;}
   const style = (p.getAttribute("style") ?? "").toLowerCase();
   return style.includes("mso-list");
 }

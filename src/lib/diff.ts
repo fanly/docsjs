@@ -161,7 +161,7 @@ export class DocumentDiffer {
       const section1 = doc1.children[i];
       const section2 = doc2.children[i];
       
-      if (!section1 || !section2) continue;
+      if (!section1 || !section2) {continue;}
       
       for (let j = 0; j < Math.max(section1.children.length, section2.children.length); j++) {
         const block1 = section1.children[j];
@@ -283,8 +283,8 @@ export class DocumentDiffer {
     const text1 = this.extractDocumentText(doc1);
     const text2 = this.extractDocumentText(doc2);
     
-    if (text1 === text2) return 1;
-    if (!text1 || !text2) return 0;
+    if (text1 === text2) {return 1;}
+    if (!text1 || !text2) {return 0;}
     
     const words1 = text1.split(/\s+/);
     const words2 = text2.split(/\s+/);

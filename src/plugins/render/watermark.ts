@@ -12,12 +12,12 @@ export function createWatermarkPlugin(): TransformPlugin {
     execute() {},
     
     transform(html: string, context: PluginContext): string {
-      if (!context.documentXml) return html;
+      if (!context.documentXml) {return html;}
       const sectPr = context.documentXml.querySelector("w\\:sectPr, sectPr");
-      if (!sectPr) return html;
+      if (!sectPr) {return html;}
       
       const watermark = sectPr.querySelector("w\\:watermark, watermark");
-      if (!watermark) return html;
+      if (!watermark) {return html;}
       
       const text = watermark.querySelector("w\\:text, text")?.textContent || "CONFIDENTIAL";
       

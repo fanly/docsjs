@@ -252,7 +252,7 @@ export class ExamQuestionExtractor {
 
   private parseQuestion(text: string, index: number): ExamQuestion | null {
     // Basic parsing - would be more sophisticated in production
-    if (text.length < 10) return null;
+    if (text.length < 10) {return null;}
 
     return {
       id: `q_${Date.now()}_${index}`,
@@ -353,8 +353,8 @@ export class ExamQuestionExtractor {
     const words = text.split(/\s+/).length;
     const hasComplexWords = /\b(analyze|evaluate|synthesize|compare|contrast)\b/i.test(text);
     
-    if (words > 50 || hasComplexWords) return 'hard';
-    if (words > 20) return 'medium';
+    if (words > 50 || hasComplexWords) {return 'hard';}
+    if (words > 20) {return 'medium';}
     return 'easy';
   }
 
@@ -435,7 +435,7 @@ export class ExamQuestionExtractor {
     let text = '';
     const traverse = (n: any) => {
       text += n.content || '';
-      if (n.children) n.children.forEach(traverse);
+      if (n.children) {n.children.forEach(traverse);}
     };
     traverse(node);
     return text;

@@ -12,9 +12,9 @@ export function createSectionPlugin(): TransformPlugin {
     execute() {},
     
     transform(html: string, context: PluginContext): string {
-      if (!context.documentXml) return html;
+      if (!context.documentXml) {return html;}
       const sectPr = context.documentXml.querySelector("w\\:sectPr, sectPr");
-      if (!sectPr) return html;
+      if (!sectPr) {return html;}
       
       const pgSz = sectPr.querySelector("w\\:pgSz, pgSz");
       const pgMar = sectPr.querySelector("w\\:pgMar, pgMar");

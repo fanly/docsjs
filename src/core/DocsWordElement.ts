@@ -187,7 +187,7 @@ export class DocsWordElement extends HTMLElement {
 
   private async onUpload(): Promise<void> {
     const file = this.fileInput.files?.[0];
-    if (!file) return;
+    if (!file) {return;}
     await this.applyDocx(file);
     this.fileInput.value = "";
   }
@@ -223,7 +223,7 @@ export class DocsWordElement extends HTMLElement {
   }
 
   private async applyFromClipboardData(data: DataTransfer | null): Promise<void> {
-    if (!data) return;
+    if (!data) {return;}
     const payload = await extractFromClipboardDataTransfer(data);
     this.applyPayload(payload.html, payload.text);
   }
@@ -245,7 +245,7 @@ export class DocsWordElement extends HTMLElement {
 
   private onFrameLoad(): void {
     const doc = this.frame.contentDocument;
-    if (!doc) return;
+    if (!doc) {return;}
 
     applyWordRenderModel({
       doc,
@@ -259,10 +259,10 @@ export class DocsWordElement extends HTMLElement {
 
   private syncHeight(): void {
     const doc = this.frame.contentDocument;
-    if (!doc) return;
+    if (!doc) {return;}
     const measured = Math.max(760, doc.body.scrollHeight, doc.documentElement.scrollHeight);
     const next = measured + 24;
-    if (Math.abs(next - this.frameHeight) < 2) return;
+    if (Math.abs(next - this.frameHeight) < 2) {return;}
     this.frameHeight = next;
     this.frame.style.height = `${next}px`;
   }

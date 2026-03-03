@@ -14,7 +14,7 @@ function escapeAttr(value: string): string {
 let cleanupPluginsInitialized = false;
 
 function initializeCleanupPlugins(): void {
-  if (cleanupPluginsInitialized) return;
+  if (cleanupPluginsInitialized) {return;}
   globalRegistry.register(createGoogleDocsCleanupPlugin());
   globalRegistry.register(createWpsCleanupPlugin());
   globalRegistry.register(createWordCleanupPlugin());
@@ -39,7 +39,7 @@ async function fileToDataUrl(file: File): Promise<string> {
   const buffer = await new Response(file).arrayBuffer();
   const bytes = new Uint8Array(buffer);
   let binary = "";
-  for (const b of bytes) binary += String.fromCharCode(b);
+  for (const b of bytes) {binary += String.fromCharCode(b);}
   const base64 = btoa(binary);
   const mime = file.type || "application/octet-stream";
   return `data:${mime};base64,${base64}`;
@@ -58,7 +58,7 @@ function isUnstableImageSrc(src: string): boolean {
 }
 
 async function replaceUnstableImageSrc(rawHtml: string, imageFiles: File[]): Promise<string> {
-  if (!rawHtml.trim() || imageFiles.length === 0) return rawHtml;
+  if (!rawHtml.trim() || imageFiles.length === 0) {return rawHtml;}
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, "text/html");
@@ -79,7 +79,7 @@ async function replaceUnstableImageSrc(rawHtml: string, imageFiles: File[]): Pro
 }
 
 async function buildImageOnlyHtml(imageFiles: File[]): Promise<string> {
-  if (imageFiles.length === 0) return "";
+  if (imageFiles.length === 0) {return "";}
   const urls = await Promise.all(imageFiles.map((f) => fileToDataUrl(f)));
   return urls.map((url) => `<p><img src="${escapeAttr(url)}" alt="clipboard-image" /></p>`).join("\n");
 }
@@ -126,7 +126,7 @@ export async function extractFromClipboardItems(items: ClipboardItem[]): Promise
     }
 
     for (const type of item.types) {
-      if (!type.startsWith("image/")) continue;
+      if (!type.startsWith("image/")) {continue;}
       const blob = await item.getType(type);
       const name = `clipboard-${Date.now()}-${imageFiles.length}.${type.split("/")[1] ?? "bin"}`;
       imageFiles.push(new File([blob], name, { type }));

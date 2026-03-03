@@ -157,7 +157,7 @@ export class HtmlRenderer {
     // Render auxiliary sections
     if (doc.auxiliary) {
       const auxHtml = this.renderAuxiliarySections(doc.auxiliary, ctx);
-      if (auxHtml) parts.push(auxHtml);
+      if (auxHtml) {parts.push(auxHtml);}
     }
 
     return parts.join("\n");
@@ -168,7 +168,7 @@ export class HtmlRenderer {
 
     for (const block of section.children) {
       const html = this.renderBlock(block, ctx);
-      if (html) parts.push(html);
+      if (html) {parts.push(html);}
     }
 
     return parts.join("\n");
@@ -467,8 +467,8 @@ export class HtmlRenderer {
       const { width, height, unit } = img.dimensions;
       const style: string[] = [];
       
-      if (width) style.push(`width:${width}${unit}`);
-      if (height) style.push(`height:${height}${unit}`);
+      if (width) {style.push(`width:${width}${unit}`);}
+      if (height) {style.push(`height:${height}${unit}`);}
       style.push("max-width:100%");
       
       attrs.push(`style="${style.join(";")}"`);
@@ -635,7 +635,7 @@ export class HtmlRenderer {
     
     if (p.semantics && this.options.mode === "fidelity") {
       const style = this.semanticsToStyle(p.semantics);
-      if (style) attrs.push(`style="${style}"`);
+      if (style) {attrs.push(`style="${style}"`);}
     }
     
     return attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
@@ -664,16 +664,16 @@ export class HtmlRenderer {
     
     if (semantics.indent) {
       const { left, right, firstLine, hanging, unit } = semantics.indent;
-      if (left) parts.push(`margin-left:${left}${unit}`);
-      if (right) parts.push(`margin-right:${right}${unit}`);
-      if (firstLine) parts.push(`text-indent:${firstLine}${unit}`);
-      if (hanging) parts.push(`text-indent:-${hanging}${unit}`);
+      if (left) {parts.push(`margin-left:${left}${unit}`);}
+      if (right) {parts.push(`margin-right:${right}${unit}`);}
+      if (firstLine) {parts.push(`text-indent:${firstLine}${unit}`);}
+      if (hanging) {parts.push(`text-indent:-${hanging}${unit}`);}
     }
     
     if (semantics.spacing) {
       const { before, after, unit } = semantics.spacing;
-      if (before) parts.push(`margin-top:${before}${unit}`);
-      if (after) parts.push(`margin-bottom:${after}${unit}`);
+      if (before) {parts.push(`margin-top:${before}${unit}`);}
+      if (after) {parts.push(`margin-bottom:${after}${unit}`);}
     }
     
     return parts.join(";");

@@ -28,7 +28,7 @@ class MemoryStorage {
 
   async get(key: string): Promise<unknown | null> {
     const item = this.store.get(key);
-    if (!item) return null;
+    if (!item) {return null;}
     if (item.expiry && item.expiry < Date.now()) {
       this.store.delete(key);
       return null;

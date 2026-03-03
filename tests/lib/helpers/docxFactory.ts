@@ -18,9 +18,9 @@ export async function makeDocxFile(input: DocxFactoryInput): Promise<File> {
   const zip = new JSZip();
   zip.file("word/document.xml", input.documentXml);
   zip.file("word/_rels/document.xml.rels", input.relsXml ?? EMPTY_RELS);
-  if (input.footnotesXml) zip.file("word/footnotes.xml", input.footnotesXml);
-  if (input.endnotesXml) zip.file("word/endnotes.xml", input.endnotesXml);
-  if (input.commentsXml) zip.file("word/comments.xml", input.commentsXml);
+  if (input.footnotesXml) {zip.file("word/footnotes.xml", input.footnotesXml);}
+  if (input.endnotesXml) {zip.file("word/endnotes.xml", input.endnotesXml);}
+  if (input.commentsXml) {zip.file("word/comments.xml", input.commentsXml);}
 
   for (const [path, bytes] of Object.entries(input.media ?? {})) {
     zip.file(`word/${path}`, bytes);

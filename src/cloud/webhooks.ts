@@ -121,7 +121,7 @@ export class WebhookManager {
     updates: Partial<Pick<WebhookRegistration, 'url' | 'events' | 'active'>>
   ): WebhookRegistration | undefined {
     const webhook = this.webhooks.get(webhookId);
-    if (!webhook) return undefined;
+    if (!webhook) {return undefined;}
 
     Object.assign(webhook, updates);
     return webhook;
@@ -190,7 +190,7 @@ export class WebhookManager {
   }
 
   private async processQueue(): Promise<void> {
-    if (this.eventQueue.length === 0) return;
+    if (this.eventQueue.length === 0) {return;}
 
     const events = this.eventQueue.splice(0, this.config.batchSize);
 
@@ -198,7 +198,7 @@ export class WebhookManager {
       const webhooks = this.list(event.type as WebhookEventType);
       
       for (const webhook of webhooks) {
-        if (this.deliveryInProgress.has(webhook.id)) continue;
+        if (this.deliveryInProgress.has(webhook.id)) {continue;}
         
         this.deliveryInProgress.add(webhook.id);
         this.deliver(webhook, event).finally(() => {

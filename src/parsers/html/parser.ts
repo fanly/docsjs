@@ -158,7 +158,7 @@ export class HtmlParser {
     return {
       body: this.createSimpleElement("body", bodyContent),
       querySelector: (selector: string) => {
-        if (selector === "body") return this.createSimpleElement("body", bodyContent);
+        if (selector === "body") {return this.createSimpleElement("body", bodyContent);}
         if (selector.startsWith("meta[name=")) {
           const match = html.match(/<meta name="([^"]+)" content="([^"]*)"/);
           if (match) {
@@ -167,8 +167,8 @@ export class HtmlParser {
               nodeName: "META",
               tagName: "meta",
               getAttribute: (name: string) => {
-                if (name === "name") return match[1];
-                if (name === "content") return match[2];
+                if (name === "name") {return match[1];}
+                if (name === "content") {return match[2];}
                 return null;
               }
             } as unknown as Element;
@@ -182,10 +182,10 @@ export class HtmlParser {
 
   private extractBodyContent(html: string): string {
     const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-    if (bodyMatch) return bodyMatch[1];
+    if (bodyMatch) {return bodyMatch[1];}
     
     const htmlMatch = html.match(/<html[^>]*>([\s\S]*)<\/html>/i);
-    if (htmlMatch) return htmlMatch[1];
+    if (htmlMatch) {return htmlMatch[1];}
     
     return html;
   }
@@ -291,7 +291,7 @@ export class HtmlParser {
     for (const child of children) {
       if (child.nodeType === Node.ELEMENT_NODE) {
         const block = this.parseElement(child as Element);
-        if (block) blocks.push(block);
+        if (block) {blocks.push(block);}
       } else if (child.nodeType === Node.TEXT_NODE) {
         const text = (child as Text).textContent?.trim();
         if (text) {
@@ -425,10 +425,10 @@ export class HtmlParser {
             childBlocks.length = 0;
           }
           const listBlock = this.parseElement(el);
-          if (listBlock) blocks.push(listBlock);
+          if (listBlock) {blocks.push(listBlock);}
         } else {
           const block = this.parseElement(el);
-          if (block) childBlocks.push(block);
+          if (block) {childBlocks.push(block);}
         }
       }
     }
@@ -564,7 +564,7 @@ export class HtmlParser {
         }
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const inline = this.parseInlineElement(child as Element);
-        if (inline) inlines.push(inline);
+        if (inline) {inlines.push(inline);}
       }
     }
 
@@ -649,7 +649,7 @@ export class HtmlParser {
   }
 
   private mergeAdjacentTextNodes(inlines: InlineNode[]): InlineNode[] {
-    if (inlines.length <= 1) return inlines;
+    if (inlines.length <= 1) {return inlines;}
 
     const result: InlineNode[] = [];
     let currentText: TextNode | null = null;
@@ -686,13 +686,13 @@ export class HtmlParser {
     marks1?: TextMark[], 
     marks2?: TextMark[]
   ): TextMark[] | undefined {
-    if (!marks1) return marks2;
-    if (!marks2) return marks1;
+    if (!marks1) {return marks2;}
+    if (!marks2) {return marks1;}
     return [...marks1, ...marks2];
   }
 
   private resolveUrl(url: string): string {
-    if (!url) return "";
+    if (!url) {return "";}
     if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
       return url;
     }

@@ -8,16 +8,16 @@ export interface FidelityScore {
 }
 
 function ratioScore(actual: number, expected: number): number {
-  if (expected <= 0 && actual <= 0) return 1;
-  if (expected <= 0 || actual < 0) return 0;
+  if (expected <= 0 && actual <= 0) {return 1;}
+  if (expected <= 0 || actual < 0) {return 0;}
   const delta = Math.abs(actual - expected);
   const penalty = delta / expected;
   return Math.max(0, 1 - penalty);
 }
 
 function clamp01(v: number): number {
-  if (v < 0) return 0;
-  if (v > 1) return 1;
+  if (v < 0) {return 0;}
+  if (v > 1) {return 1;}
   return v;
 }
 

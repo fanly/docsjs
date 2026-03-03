@@ -101,7 +101,7 @@ export class CollaborationManager {
 
   async leaveDocument(docId: string, userId: string): Promise<void> {
     const doc = this.docs.get(docId);
-    if (!doc) return;
+    if (!doc) {return;}
 
     doc.users.delete(userId);
 
@@ -130,7 +130,7 @@ export class CollaborationManager {
 
   applyUpdate(docId: string, update: Uint8Array, origin: string = 'remote'): void {
     const doc = this.docs.get(docId);
-    if (!doc) return;
+    if (!doc) {return;}
 
     Y.applyUpdate(doc.ydoc, update);
   }

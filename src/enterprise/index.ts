@@ -148,10 +148,10 @@ export class AuditLogger {
     endTime?: number;
   }): ComplianceAuditLog[] {
     return this.logs.filter(log => {
-      if (filters.userId && log.userId !== filters.userId) return false;
-      if (filters.action && log.action !== filters.action) return false;
-      if (filters.startTime && log.timestamp < filters.startTime) return false;
-      if (filters.endTime && log.timestamp > filters.endTime) return false;
+      if (filters.userId && log.userId !== filters.userId) {return false;}
+      if (filters.action && log.action !== filters.action) {return false;}
+      if (filters.startTime && log.timestamp < filters.startTime) {return false;}
+      if (filters.endTime && log.timestamp > filters.endTime) {return false;}
       return true;
     });
   }
@@ -237,7 +237,7 @@ export class ComplianceManager {
   }
 
   shouldDelete(timestamp: number): boolean {
-    if (!this.retentionPolicy.autoDelete) return false;
+    if (!this.retentionPolicy.autoDelete) {return false;}
     
     const ageMs = Date.now() - timestamp;
     const ageDays = ageMs / (1000 * 60 * 60 * 24);

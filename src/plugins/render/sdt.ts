@@ -13,7 +13,7 @@ export function createSdtPlugin(): ParagraphPlugin {
     
     parseParagraph(element: Element, _context: PluginContext): ParagraphParseResult {
       const sdt = element.querySelector("w\\:sdt, sdt");
-      if (!sdt) return { html: "", handled: false };
+      if (!sdt) {return { html: "", handled: false };}
       
       const sdtPr = sdt.querySelector("w\\:sdtPr, sdtPr");
       const sdtContent = sdt.querySelector("w\\:sdtContent, sdtContent");

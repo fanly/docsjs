@@ -17,7 +17,7 @@ export function createCrossRefPlugin(): ParagraphPlugin {
       
       for (const ref of refs) {
         const parent = ref.parentElement;
-        if (!parent) continue;
+        if (!parent) {continue;}
         
         const instrText = parent.querySelector('w\\:instrText, instrText');
         if (instrText && instrText.textContent?.includes("REF")) {

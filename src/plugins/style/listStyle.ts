@@ -12,17 +12,17 @@ export function createListStylePlugin(): TransformPlugin {
     execute() {},
     
     transform(html: string, context: PluginContext): string {
-      if (!context.numberingXml) return html;
+      if (!context.numberingXml) {return html;}
       
       const abstractNums = Array.from(context.numberingXml.querySelectorAll("w\\:abstractNum, abstractNum"));
       const listStyles: Record<string, { format: string; text: string }> = {};
       
       for (const abs of abstractNums) {
         const abstractNumId = abs.getAttribute("w:abstractNumId");
-        if (!abstractNumId) continue;
+        if (!abstractNumId) {continue;}
         
         const lvl = abs.querySelector("w\\:lvl, lvl");
-        if (!lvl) continue;
+        if (!lvl) {continue;}
         
         const lvlText = lvl.querySelector("w\\:lvlText, lvlText");
         const numFmt = lvl.querySelector("w\\:numFmt, numFmt");

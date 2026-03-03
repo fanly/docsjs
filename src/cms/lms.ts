@@ -86,7 +86,7 @@ export class BlackboardAdapter implements CMSAdapter {
       `${this.options.baseUrl}/learn/api/public/v1/courses/${courseId}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Blackboard API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Blackboard API error: ${response.statusText}`);}
     return response.json();
   }
 
@@ -98,7 +98,7 @@ export class BlackboardAdapter implements CMSAdapter {
       `${this.options.baseUrl}/learn/api/public/v1/courses/${courseId}/contents`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Blackboard API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Blackboard API error: ${response.statusText}`);}
     const data = await response.json();
     return data.results || [];
   }
@@ -111,7 +111,7 @@ export class BlackboardAdapter implements CMSAdapter {
       `${this.options.baseUrl}/learn/api/public/v1/courses/${courseId}/contents/${contentId}`,
       { headers: this.getHeaders() }
     );
-    if (!response.ok) throw new Error(`Blackboard API error: ${response.statusText}`);
+    if (!response.ok) {throw new Error(`Blackboard API error: ${response.statusText}`);}
     return response.json();
   }
 

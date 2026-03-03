@@ -143,8 +143,8 @@ export class QualityPredictionModel {
     const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
     
     let direction: 'improving' | 'declining' | 'stable' = 'stable';
-    if (avgChange > 2) direction = 'improving';
-    else if (avgChange < -2) direction = 'declining';
+    if (avgChange > 2) {direction = 'improving';}
+    else if (avgChange < -2) {direction = 'declining';}
 
     return {
       direction,
@@ -216,12 +216,12 @@ export class QualityPredictionModel {
       if (n.type === 'text') {
         wordCount += n.content?.split(/\s+/).filter(w => w.length > 0).length || 0;
       }
-      if (n.type === 'paragraph') paragraphCount++;
-      if (n.type === 'image') imageCount++;
-      if (n.type === 'table') tableCount++;
-      if (n.type?.startsWith('heading')) headingCount++;
-      if (n.type === 'list') listCount++;
-      if (n.type === 'link') linkCount++;
+      if (n.type === 'paragraph') {paragraphCount++;}
+      if (n.type === 'image') {imageCount++;}
+      if (n.type === 'table') {tableCount++;}
+      if (n.type?.startsWith('heading')) {headingCount++;}
+      if (n.type === 'list') {listCount++;}
+      if (n.type === 'link') {linkCount++;}
       
       if (n.children) {
         n.children.forEach(traverse);
@@ -260,15 +260,15 @@ export class QualityPredictionModel {
     let score = 50;
 
     // Headings
-    if (chars.headingCount > 0) score += 15;
-    if (chars.headingCount > 3) score += 10;
+    if (chars.headingCount > 0) {score += 15;}
+    if (chars.headingCount > 3) {score += 10;}
 
     // Paragraphs
-    if (chars.paragraphCount > 5) score += 10;
-    if (chars.avgParagraphLength > 30 && chars.avgParagraphLength < 150) score += 10;
+    if (chars.paragraphCount > 5) {score += 10;}
+    if (chars.avgParagraphLength > 30 && chars.avgParagraphLength < 150) {score += 10;}
 
     // TOC
-    if (chars.hasTOC) score += 5;
+    if (chars.hasTOC) {score += 5;}
 
     return Math.min(100, score);
   }
@@ -277,14 +277,14 @@ export class QualityPredictionModel {
     let score = 60;
 
     // Images
-    if (chars.imageCount > 0) score += 10;
-    if (chars.imageCount > 3) score += 10;
+    if (chars.imageCount > 0) {score += 10;}
+    if (chars.imageCount > 3) {score += 10;}
 
     // Tables
-    if (chars.tableCount > 0) score += 10;
+    if (chars.tableCount > 0) {score += 10;}
 
     // Lists
-    if (chars.listCount > 0) score += 10;
+    if (chars.listCount > 0) {score += 10;}
 
     return Math.min(100, score);
   }
@@ -293,15 +293,15 @@ export class QualityPredictionModel {
     let score = 50;
 
     // Word count
-    if (chars.wordCount > 100) score += 10;
-    if (chars.wordCount > 500) score += 10;
-    if (chars.wordCount > 1000) score += 10;
+    if (chars.wordCount > 100) {score += 10;}
+    if (chars.wordCount > 500) {score += 10;}
+    if (chars.wordCount > 1000) {score += 10;}
 
     // Links
-    if (chars.linkCount > 0) score += 10;
+    if (chars.linkCount > 0) {score += 10;}
 
     // Metadata
-    if (chars.hasMetadata) score += 10;
+    if (chars.hasMetadata) {score += 10;}
 
     return Math.min(100, score);
   }
@@ -311,11 +311,11 @@ export class QualityPredictionModel {
 
     // Alt text would be checked in AST
     // Language declaration
-    if (chars.language) score += 20;
+    if (chars.language) {score += 20;}
 
     // Structure helps accessibility
-    if (chars.headingCount > 0) score += 15;
-    if (chars.listCount > 0) score += 15;
+    if (chars.headingCount > 0) {score += 15;}
+    if (chars.listCount > 0) {score += 15;}
 
     return Math.min(100, score);
   }
@@ -324,8 +324,8 @@ export class QualityPredictionModel {
     // Simplified - would analyze actual formatting consistency
     let score = 70;
 
-    if (chars.paragraphCount > 10) score += 10;
-    if (chars.avgParagraphLength > 20 && chars.avgParagraphLength < 200) score += 10;
+    if (chars.paragraphCount > 10) {score += 10;}
+    if (chars.avgParagraphLength > 20 && chars.avgParagraphLength < 200) {score += 10;}
 
     return Math.min(100, score);
   }
@@ -442,9 +442,9 @@ export class QualityPredictionModel {
   private calculateConfidence(chars: DocumentCharacteristics): number {
     let confidence = 0.5;
 
-    if (chars.wordCount > 500) confidence += 0.2;
-    if (chars.paragraphCount > 10) confidence += 0.15;
-    if (chars.headingCount > 0) confidence += 0.15;
+    if (chars.wordCount > 500) {confidence += 0.2;}
+    if (chars.paragraphCount > 10) {confidence += 0.15;}
+    if (chars.headingCount > 0) {confidence += 0.15;}
 
     return Math.min(0.95, confidence);
   }

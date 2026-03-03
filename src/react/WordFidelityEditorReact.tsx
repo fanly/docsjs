@@ -29,7 +29,7 @@ export function WordFidelityEditorReact({
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) return;
+    if (!node) {return;}
 
     const onChangeEvent = (event: Event) => {
       const detail = (event as CustomEvent<DocsWordEditorChangeDetail>).detail;

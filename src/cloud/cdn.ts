@@ -148,7 +148,7 @@ export class CDNManager {
     distributionId: string
   ): Promise<DistributionStatus | undefined> {
     const config = this.distributions.get(distributionId);
-    if (!config) return undefined;
+    if (!config) {return undefined;}
     return this.provider.getStatus(distributionId);
   }
 
@@ -251,7 +251,7 @@ export class EdgeCache {
    */
   get(key: string): CachedResponse | undefined {
     const entry = this.cache.get(key);
-    if (!entry) return undefined;
+    if (!entry) {return undefined;}
 
     if (entry.expiresAt < Date.now()) {
       this.cache.delete(key);

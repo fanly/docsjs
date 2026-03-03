@@ -167,7 +167,7 @@ export class PluginEconomyManager {
     settings: Partial<Pick<CreatorAccount, 'payoutSchedule' | 'minimumPayout' | 'stripeAccountId' | 'paypalEmail' | 'bankAccount'>>
   ): Promise<CreatorAccount | null> {
     const creator = this.creators.get(creatorId);
-    if (!creator) return null;
+    if (!creator) {return null;}
 
     Object.assign(creator, settings);
     this.creators.set(creatorId, creator);
@@ -215,7 +215,7 @@ export class PluginEconomyManager {
    */
   async processRefund(saleId: string, amount?: number): Promise<boolean> {
     const sale = this.sales.get(saleId);
-    if (!sale || sale.refunded) return false;
+    if (!sale || sale.refunded) {return false;}
 
     const refundAmount = amount || sale.amount;
     sale.refunded = true;
@@ -296,7 +296,7 @@ export class PluginEconomyManager {
    */
   async requestPayout(creatorId: string, method: CreatorPayout['method']): Promise<CreatorPayout | null> {
     const creator = this.creators.get(creatorId);
-    if (!creator || creator.pendingBalance < creator.minimumPayout) return null;
+    if (!creator || creator.pendingBalance < creator.minimumPayout) {return null;}
 
     const payout: CreatorPayout = {
       id: 'payout_' + this.generateId(),
@@ -369,7 +369,7 @@ export class PluginEconomyManager {
    */
   async markReviewHelpful(reviewId: string): Promise<boolean> {
     const review = this.reviews.get(reviewId);
-    if (!review) return false;
+    if (!review) {return false;}
 
     review.helpful++;
     this.reviews.set(reviewId, review);
@@ -381,7 +381,7 @@ export class PluginEconomyManager {
    */
   async respondToReview(reviewId: string, response: string): Promise<boolean> {
     const review = this.reviews.get(reviewId);
-    if (!review) return false;
+    if (!review) {return false;}
 
     review.developerResponse = {
       content: response,

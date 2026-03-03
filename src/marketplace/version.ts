@@ -117,7 +117,7 @@ export class PluginVersionManager {
    */
   getLatestVersion(pluginId: string, includeDeprecated: boolean = false): PluginVersion | null {
     const versions = this.versions.get(pluginId);
-    if (!versions || versions.length === 0) return null;
+    if (!versions || versions.length === 0) {return null;}
 
     if (includeDeprecated) {
       return versions[0];
@@ -138,7 +138,7 @@ export class PluginVersionManager {
    */
   getVersion(pluginId: string, version: string): PluginVersion | null {
     const versions = this.versions.get(pluginId);
-    if (!versions) return null;
+    if (!versions) {return null;}
     return versions.find(v => v.version === version) || null;
   }
 
@@ -228,7 +228,7 @@ export class PluginVersionManager {
    */
   getDeprecatedVersions(pluginId: string): PluginVersion[] {
     const versions = this.versions.get(pluginId);
-    if (!versions) return [];
+    if (!versions) {return [];}
     return versions.filter(v => v.deprecated);
   }
 
@@ -237,10 +237,10 @@ export class PluginVersionManager {
    */
   deprecateVersion(pluginId: string, version: string, message: string): void {
     const versions = this.versions.get(pluginId);
-    if (!versions) throw new Error('Plugin not found');
+    if (!versions) {throw new Error('Plugin not found');}
 
     const v = versions.find(v => v.version === version);
-    if (!v) throw new Error(`Version ${version} not found`);
+    if (!v) {throw new Error(`Version ${version} not found`);}
 
     v.deprecated = true;
     v.deprecationMessage = message;
@@ -251,7 +251,7 @@ export class PluginVersionManager {
    */
   supportsEngineVersion(pluginId: string, engineVersion: string): boolean {
     const latest = this.getLatestVersion(pluginId, true);
-    if (!latest) return false;
+    if (!latest) {return false;}
 
     return latest.engineVersions.some(constraint => {
       return this.satisfies(engineVersion, constraint);
@@ -288,8 +288,8 @@ export class PluginVersionManager {
     for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
       const n1 = p1[i] || 0;
       const n2 = p2[i] || 0;
-      if (n1 > n2) return 1;
-      if (n1 < n2) return -1;
+      if (n1 > n2) {return 1;}
+      if (n1 < n2) {return -1;}
     }
     return 0;
   }
@@ -351,9 +351,9 @@ export class PluginVersionManager {
 
     // Determine confidence
     let confidence: 'high' | 'medium' | 'low' = 'high';
-    if (errors.length > 0) confidence = 'high';
-    else if (warnings.length > 2) confidence = 'medium';
-    else if (version.engineVersions.length > 3) confidence = 'low';
+    if (errors.length > 0) {confidence = 'high';}
+    else if (warnings.length > 2) {confidence = 'medium';}
+    else if (version.engineVersions.length > 3) {confidence = 'low';}
 
     return {
       compatible: errors.length === 0,
@@ -386,10 +386,10 @@ export class PluginCompatibilityChecker {
         
         const conflict = this.findConflict(p1, p2);
         if (conflict) {
-          if (!conflicts.has(p1)) conflicts.set(p1, []);
+          if (!conflicts.has(p1)) {conflicts.set(p1, []);}
           conflicts.get(p1)!.push(p2);
           
-          if (!conflicts.has(p2)) conflicts.set(p2, []);
+          if (!conflicts.has(p2)) {conflicts.set(p2, []);}
           conflicts.get(p2)!.push(p1);
         }
       }

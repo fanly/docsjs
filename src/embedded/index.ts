@@ -172,7 +172,7 @@ export class DocsJSEmbeddedClient {
    * Initialize SDK
    */
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {return;}
     
     // Validate API key
     await this.validateApiKey();
@@ -328,7 +328,7 @@ class EmbedInstanceImpl implements EmbedInstance {
   }
 
   private applyStyles(): void {
-    if (!this.container) return;
+    if (!this.container) {return;}
 
     const theme = this.options.theme || 'light';
     const primaryColor = this.config.whiteLabel?.primaryColor || '#0066cc';
@@ -344,17 +344,17 @@ class EmbedInstanceImpl implements EmbedInstance {
   }
 
   async loadDocument(content: string, format?: string): Promise<void> {
-    if (!this.initialized) throw new Error('Embed not initialized');
+    if (!this.initialized) {throw new Error('Embed not initialized');}
     // Load document logic
   }
 
   async getContent(format?: string): Promise<string> {
-    if (!this.initialized) throw new Error('Embed not initialized');
+    if (!this.initialized) {throw new Error('Embed not initialized');}
     return '';
   }
 
   async save(): Promise<void> {
-    if (!this.initialized) throw new Error('Embed not initialized');
+    if (!this.initialized) {throw new Error('Embed not initialized');}
     const content = await this.getContent();
     this.options.onSave?.(content);
   }
@@ -502,7 +502,7 @@ export class OEMLicenseManager {
    */
   useSeat(licenseKey: string): boolean {
     const license = this.licenses.get(licenseKey);
-    if (!license) return false;
+    if (!license) {return false;}
     
     if (license.currentSeats < license.maxSeats) {
       license.currentSeats++;
@@ -516,7 +516,7 @@ export class OEMLicenseManager {
    */
   releaseSeat(licenseKey: string): boolean {
     const license = this.licenses.get(licenseKey);
-    if (!license) return false;
+    if (!license) {return false;}
     
     if (license.currentSeats > 0) {
       license.currentSeats--;

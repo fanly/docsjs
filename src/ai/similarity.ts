@@ -166,7 +166,7 @@ export class SemanticSimilarityEngine {
     const results: SimilarityResult[] = [];
 
     for (const [storedId, storedFp] of this.fingerprints) {
-      if (storedId === docId) continue;
+      if (storedId === docId) {continue;}
 
       const similarity = this.calculateCosineSimilarity(fp.vector, storedFp.vector);
       
@@ -203,7 +203,7 @@ export class SemanticSimilarityEngine {
 
     // Find clusters
     for (let i = 0; i < documents.length; i++) {
-      if (assigned.has(documents[i].id)) continue;
+      if (assigned.has(documents[i].id)) {continue;}
 
       const cluster: DocumentCluster = {
         id: `cluster_${clusters.length}`,
@@ -216,7 +216,7 @@ export class SemanticSimilarityEngine {
 
       // Find all similar documents
       for (let j = i + 1; j < documents.length; j++) {
-        if (assigned.has(documents[j].id)) continue;
+        if (assigned.has(documents[j].id)) {continue;}
         
         if (matrix[i][j] >= thresholdValue) {
           cluster.documents.push(documents[j].id);
@@ -300,7 +300,7 @@ export class SemanticSimilarityEngine {
   }
 
   private calculateCosineSimilarity(a: number[], b: number[]): number {
-    if (a.length === 0 || b.length === 0) return 0;
+    if (a.length === 0 || b.length === 0) {return 0;}
     
     const maxLen = Math.max(a.length, b.length);
     const vecA = [...a, ...new Array(maxLen - a.length).fill(0)];
@@ -314,14 +314,14 @@ export class SemanticSimilarityEngine {
   }
 
   private determineType(score: number): SimilarityResult['type'] {
-    if (score >= 0.95) return 'exact';
-    if (score >= 0.8) return 'near';
-    if (score >= 0.5) return 'partial';
+    if (score >= 0.95) {return 'exact';}
+    if (score >= 0.8) {return 'near';}
+    if (score >= 0.5) {return 'partial';}
     return 'semantic';
   }
 
   private findMatches(contentA: string, contentB: string, similarity: number): SimilarityMatch[] {
-    if (similarity < 0.3) return [];
+    if (similarity < 0.3) {return [];}
     
     return [{
       sectionA: contentA.substring(0, Math.min(100, contentA.length)),

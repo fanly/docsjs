@@ -353,7 +353,7 @@ export class StreamingPipelineManager {
   }
 
   private reportProgress(phase: PipelinePhase, bytesProcessed: number, totalBytes: number): void {
-    if (!this.options.onProgress) return;
+    if (!this.options.onProgress) {return;}
 
     const percentage = totalBytes > 0 
       ? Math.min(100, Math.round((bytesProcessed / totalBytes) * 100))

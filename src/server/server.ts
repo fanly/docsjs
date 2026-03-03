@@ -385,7 +385,7 @@ class DocsJSServer {
 
   private async processJobAsync(jobId: string) {
     const job = this.jobs.get(jobId);
-    if (!job) return;
+    if (!job) {return;}
 
     job.status = 'processing';
     job.startedAt = Date.now();
@@ -542,7 +542,7 @@ class DocsJSServer {
     };
     
     for (const webhook of this.webhooks.values()) {
-      if (!webhook.enabled || !webhook.events.includes(event)) continue;
+      if (!webhook.enabled || !webhook.events.includes(event)) {continue;}
       
       try {
         await fetch(webhook.url, {
@@ -595,7 +595,7 @@ class DocsJSServer {
   }
 
   private async sendWebhook(job: Job) {
-    if (!job.callbackUrl) return;
+    if (!job.callbackUrl) {return;}
     try {
       const payload = {
         event: job.type === 'convert' ? 'conversion.completed' : 'batch.completed',

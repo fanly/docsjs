@@ -13,10 +13,10 @@ export function createDropCapPlugin(): RunPlugin {
     
     parseRun(element: Element, _context: PluginContext): RunParseResult {
       const pPr = element.parentElement?.querySelector(":scope > w\\:pPr, pPr");
-      if (!pPr) return { html: "", handled: false };
+      if (!pPr) {return { html: "", handled: false };}
       
       const dropCap = pPr.querySelector("w\\:dropCap, dropCap");
-      if (!dropCap) return { html: "", handled: false };
+      if (!dropCap) {return { html: "", handled: false };}
       
       const type = dropCap.getAttribute("w:val");
       

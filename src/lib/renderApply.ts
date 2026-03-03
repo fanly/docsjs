@@ -24,22 +24,22 @@ function escapeHtml(text: string): string {
 
 function runStyleToCss(run: RunStyleProfile): string {
   const declarations: string[] = [];
-  if (run.fontSizePx !== null) declarations.push(`font-size:${run.fontSizePx.toFixed(2)}px`);
-  if (run.color) declarations.push(`color:${run.color}`);
-  if (run.highlightColor) declarations.push(`background-color:${run.highlightColor}`);
-  if (run.shadingColor) declarations.push(`background-color:${run.shadingColor}`);
-  if (run.charSpacingPx !== null) declarations.push(`letter-spacing:${run.charSpacingPx.toFixed(2)}px`);
-  if (run.shadow) declarations.push("text-shadow:0.5px 0.5px 0 rgba(0,0,0,0.28)");
-  if (run.bold) declarations.push("font-weight:700");
-  if (run.italic) declarations.push("font-style:italic");
+  if (run.fontSizePx !== null) {declarations.push(`font-size:${run.fontSizePx.toFixed(2)}px`);}
+  if (run.color) {declarations.push(`color:${run.color}`);}
+  if (run.highlightColor) {declarations.push(`background-color:${run.highlightColor}`);}
+  if (run.shadingColor) {declarations.push(`background-color:${run.shadingColor}`);}
+  if (run.charSpacingPx !== null) {declarations.push(`letter-spacing:${run.charSpacingPx.toFixed(2)}px`);}
+  if (run.shadow) {declarations.push("text-shadow:0.5px 0.5px 0 rgba(0,0,0,0.28)");}
+  if (run.bold) {declarations.push("font-weight:700");}
+  if (run.italic) {declarations.push("font-style:italic");}
   const textDecorations: string[] = [];
-  if (run.underline) textDecorations.push("underline");
-  if (run.strike) textDecorations.push("line-through");
-  if (textDecorations.length > 0) declarations.push(`text-decoration:${textDecorations.join(" ")}`);
-  if (run.superscript) declarations.push("vertical-align:super");
-  if (run.subscript) declarations.push("vertical-align:sub");
-  if (run.superscript || run.subscript) declarations.push("font-size:0.83em");
-  if (run.fontFamily) declarations.push(`font-family:${run.fontFamily}`);
+  if (run.underline) {textDecorations.push("underline");}
+  if (run.strike) {textDecorations.push("line-through");}
+  if (textDecorations.length > 0) {declarations.push(`text-decoration:${textDecorations.join(" ")}`);}
+  if (run.superscript) {declarations.push("vertical-align:super");}
+  if (run.subscript) {declarations.push("vertical-align:sub");}
+  if (run.superscript || run.subscript) {declarations.push("font-size:0.83em");}
+  if (run.fontFamily) {declarations.push(`font-family:${run.fontFamily}`);}
   return declarations.join(";");
 }
 
@@ -49,7 +49,7 @@ function paragraphToRunHtml(runs: RunStyleProfile[]): string {
       const css = runStyleToCss(run);
       const parts = run.text.split("\n");
       const html = parts.map((part) => escapeHtml(part)).join("<br/>");
-      if (!css) return html;
+      if (!css) {return html;}
       return `<span style="${css}">${html}</span>`;
     })
     .join("");
@@ -57,7 +57,7 @@ function paragraphToRunHtml(runs: RunStyleProfile[]): string {
 
 function toLowerLetter(n: number): string {
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
-  if (n <= 0) return "a";
+  if (n <= 0) {return "a";}
   let x = n;
   let out = "";
   while (x > 0) {
@@ -69,7 +69,7 @@ function toLowerLetter(n: number): string {
 }
 
 function toRoman(num: number): string {
-  if (num <= 0) return "I";
+  if (num <= 0) {return "I";}
   const map: Array<[number, string]> = [
     [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
     [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
@@ -116,10 +116,10 @@ function formatListMarkerByPattern(
 
   const replaced = pattern.replace(/%(\d+)/g, (_, g1: string) => {
     const level1Based = Number.parseInt(g1, 10);
-    if (!Number.isFinite(level1Based) || level1Based <= 0) return "";
+    if (!Number.isFinite(level1Based) || level1Based <= 0) {return "";}
     const levelIdx = level1Based - 1;
     const n = countersByLevel[levelIdx] ?? 0;
-    if (n <= 0) return "";
+    if (n <= 0) {return "";}
     if (levelIdx === currentLevel) {
       return formatListMarker(currentFormat, n).replace(/\.$/, "");
     }
@@ -212,15 +212,15 @@ function applyInlineLayoutGuards(doc: Document, styleProfile: WordStyleProfile):
   setImportantStyle(body, "font-family", styleProfile.bodyFontFamily);
 
   for (const child of Array.from(body.children)) {
-    if (!(child instanceof HTMLElement)) continue;
+    if (!(child instanceof HTMLElement)) {continue;}
     const tag = child.tagName.toLowerCase();
-    if (tag === "script" || tag === "style") continue;
+    if (tag === "script" || tag === "style") {continue;}
     setImportantStyle(child, "box-sizing", "border-box");
     setImportantStyle(child, "max-width", "100%");
   }
 
   for (const img of Array.from(doc.body.querySelectorAll("img"))) {
-    if (!(img instanceof HTMLElement)) continue;
+    if (!(img instanceof HTMLElement)) {continue;}
     setImportantStyle(img, "max-width", "100%");
     setImportantStyle(img, "height", "auto");
   }
@@ -245,7 +245,7 @@ function hasMeaningfulParagraphAfter(paragraphs: HTMLElement[], index: number): 
     const p = paragraphs[i];
     const hasText = (p.textContent ?? "").trim().length > 0;
     const hasVisual = p.querySelector("img,table,svg,canvas") !== null;
-    if (hasText || hasVisual) return true;
+    if (hasText || hasVisual) {return true;}
   }
   return false;
 }
@@ -318,22 +318,22 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
   for (const target of resolvedTargets) {
     const para = target.node;
     const profile = target.profile;
-    if (!para) continue;
+    if (!para) {continue;}
     orderedTargets.push(para);
     para.removeAttribute("data-word-list");
 
     para.style.textAlign = profile.align;
-    if (profile.beforePx !== null) para.style.marginTop = `${profile.beforePx.toFixed(2)}px`;
-    if (profile.afterPx !== null) para.style.marginBottom = `${profile.afterPx.toFixed(2)}px`;
+    if (profile.beforePx !== null) {para.style.marginTop = `${profile.beforePx.toFixed(2)}px`;}
+    if (profile.afterPx !== null) {para.style.marginBottom = `${profile.afterPx.toFixed(2)}px`;}
     if (profile.lineHeightRule === "auto" && profile.lineHeightRatio !== null) {
       para.style.lineHeight = profile.lineHeightRatio.toFixed(6);
     } else if ((profile.lineHeightRule === "exact" || profile.lineHeightRule === "atLeast") && profile.lineHeightPx !== null) {
       para.style.lineHeight = `${profile.lineHeightPx.toFixed(2)}px`;
     }
-    if (profile.indentLeftPx !== null) para.style.marginLeft = `${profile.indentLeftPx.toFixed(2)}px`;
-    if (profile.indentRightPx !== null) para.style.marginRight = `${profile.indentRightPx.toFixed(2)}px`;
-    if (profile.firstLinePx !== null) para.style.textIndent = `${profile.firstLinePx.toFixed(2)}px`;
-    if (profile.hangingPx !== null) para.style.textIndent = `${(-profile.hangingPx).toFixed(2)}px`;
+    if (profile.indentLeftPx !== null) {para.style.marginLeft = `${profile.indentLeftPx.toFixed(2)}px`;}
+    if (profile.indentRightPx !== null) {para.style.marginRight = `${profile.indentRightPx.toFixed(2)}px`;}
+    if (profile.firstLinePx !== null) {para.style.textIndent = `${profile.firstLinePx.toFixed(2)}px`;}
+    if (profile.hangingPx !== null) {para.style.textIndent = `${(-profile.hangingPx).toFixed(2)}px`;}
 
     if (profile.runs.length > 0 && para.querySelector("img,table,svg,canvas") === null) {
       const currentTextNormalized = (para.textContent ?? "").replace(/\s+/g, "");
@@ -385,14 +385,14 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
 
 function paragraphHeightPx(paragraph: HTMLElement): number {
   const rect = paragraph.getBoundingClientRect();
-  if (rect.height > 0) return rect.height;
+  if (rect.height > 0) {return rect.height;}
   const lh = Number.parseFloat(getComputedStyle(paragraph).lineHeight || "0");
-  if (Number.isFinite(lh) && lh > 0) return lh;
+  if (Number.isFinite(lh) && lh > 0) {return lh;}
   return 16;
 }
 
 function insertPageSpacerBefore(doc: Document, paragraph: HTMLElement, heightPx: number): void {
-  if (heightPx <= 0.5) return;
+  if (heightPx <= 0.5) {return;}
   const spacer = doc.createElement("div");
   spacer.dataset.wordPageSpacer = "1";
   spacer.style.height = `${heightPx.toFixed(2)}px`;
@@ -408,12 +408,12 @@ function removePaginationSpacers(doc: Document): void {
 
 function estimateGroupHeight(paragraphs: HTMLElement[], idx: number, profile: ParagraphStyleProfile, contentHeight: number): number {
   const currentH = paragraphHeightPx(paragraphs[idx]);
-  if (!profile.keepNext) return currentH;
+  if (!profile.keepNext) {return currentH;}
   const next = paragraphs[idx + 1];
-  if (!next) return currentH;
+  if (!next) {return currentH;}
   const nextH = paragraphHeightPx(next);
   const sum = currentH + nextH;
-  if (sum > contentHeight) return currentH;
+  if (sum > contentHeight) {return currentH;}
   return sum;
 }
 

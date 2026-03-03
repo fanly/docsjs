@@ -9,15 +9,16 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  // Types
-  DocumentNode,
+import type {
   ParagraphNode,
   TextNode,
   HeadingNode,
+  TextMark} from "../../src/ast";
+import {
+  // Types
+  DocumentNode,
   ListNode,
   TableNode,
-  TextMark,
   
   // Utilities
   generateId,

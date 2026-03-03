@@ -17,21 +17,21 @@ export function createFieldPlugin(): ParagraphPlugin {
       
       for (const begin of fldCharBegins) {
         const parent = begin.parentElement;
-        if (!parent) continue;
+        if (!parent) {continue;}
         
         const instrText = parent.querySelector('w\\:instrText, instrText');
         if (instrText) {
           const instr = instrText.textContent?.trim() || "";
           let type = "unknown";
           
-          if (instr.startsWith("PAGE ")) type = "page";
-          else if (instr.startsWith("NUMPAGES")) type = "totalPages";
-          else if (instr.startsWith("DATE ")) type = "date";
-          else if (instr.startsWith("TIME ")) type = "time";
-          else if (instr.startsWith("TOC")) type = "toc";
-          else if (instr.startsWith("AUTHOR")) type = "author";
-          else if (instr.startsWith("TITLE")) type = "title";
-          else if (instr.startsWith("FILENAME")) type = "fileName";
+          if (instr.startsWith("PAGE ")) {type = "page";}
+          else if (instr.startsWith("NUMPAGES")) {type = "totalPages";}
+          else if (instr.startsWith("DATE ")) {type = "date";}
+          else if (instr.startsWith("TIME ")) {type = "time";}
+          else if (instr.startsWith("TOC")) {type = "toc";}
+          else if (instr.startsWith("AUTHOR")) {type = "author";}
+          else if (instr.startsWith("TITLE")) {type = "title";}
+          else if (instr.startsWith("FILENAME")) {type = "fileName";}
           
           fields.push({ type, instr });
         }

@@ -495,8 +495,8 @@ export class ProfileManager {
       let matches = true;
       
       // Test top-level matches
-      if (filter.id && profile.id !== filter.id) matches = false;
-      if (filter.name && profile.name !== filter.name) matches = false;
+      if (filter.id && profile.id !== filter.id) {matches = false;}
+      if (filter.name && profile.name !== filter.name) {matches = false;}
       
       // Test nested matches if needed
       if (filter.render?.outputFormat !== undefined && 

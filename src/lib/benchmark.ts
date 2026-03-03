@@ -69,7 +69,7 @@ export class BenchmarkRunner {
   private version: string = '2.0.0';
 
   constructor(version?: string) {
-    if (version) this.version = version;
+    if (version) {this.version = version;}
   }
 
   /**
@@ -307,7 +307,7 @@ export class RegressionChecker {
 
     for (const currentResult of current.results) {
       const baselineResult = baseline.results.find(r => r.name === currentResult.name);
-      if (!baselineResult) continue;
+      if (!baselineResult) {continue;}
 
       for (const threshold of this.thresholds) {
         const baselineValue = baselineResult[threshold.metric];

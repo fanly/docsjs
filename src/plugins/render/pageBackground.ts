@@ -12,9 +12,9 @@ export function createPageBackgroundPlugin(): TransformPlugin {
     execute() {},
     
     transform(html: string, context: PluginContext): string {
-      if (!context.documentXml) return html;
+      if (!context.documentXml) {return html;}
       const sectPr = context.documentXml.querySelector("w\\:sectPr, sectPr");
-      if (!sectPr) return html;
+      if (!sectPr) {return html;}
       
       const pgFill = sectPr.querySelector("w\\:pgFill, pgFill");
       
@@ -28,7 +28,7 @@ export function createPageBackgroundPlugin(): TransformPlugin {
         }
       }
       
-      if (!bgStyle) return html;
+      if (!bgStyle) {return html;}
       
       const bodyMatch = html.match(/<body[^>]*>/);
       if (bodyMatch) {

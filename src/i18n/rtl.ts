@@ -74,7 +74,7 @@ export function getCSSDirection(locale: string): string {
  * Apply RTL transformation to CSS
  */
 export function transformCSSForRTL(css: string, enable: boolean = true): string {
-  if (!enable) return css;
+  if (!enable) {return css;}
 
   const rtlReplacements: Record<string, string> = {
     'margin-left': 'margin-right',
@@ -113,7 +113,7 @@ export class BidirectionalHandler {
    * Wrap text with Unicode bidirectional marks
    */
   wrapBidiText(text: string, baseDirection: TextDirection = 'auto'): string {
-    if (!this.enableBidi) return text;
+    if (!this.enableBidi) {return text;}
 
     const dir = baseDirection === 'auto' ? this.detectBaseDirection(text) : baseDirection;
     const mark = dir === 'rtl' ? '\u202B' : '\u202A';
@@ -128,7 +128,7 @@ export class BidirectionalHandler {
   detectBaseDirection(text: string): TextDirection {
     // Strong first character determines direction
     const firstStrong = this.getFirstStrongCharacter(text);
-    if (!firstStrong) return 'ltr';
+    if (!firstStrong) {return 'ltr';}
 
     // Check for RTL Unicode ranges
     const rtlRanges = [
@@ -158,8 +158,8 @@ export class BidirectionalHandler {
     const strongRTL = /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u08A0-\u08FF]/;
 
     for (const char of text) {
-      if (strongLTR.test(char)) return char;
-      if (strongRTL.test(char)) return char;
+      if (strongLTR.test(char)) {return char;}
+      if (strongRTL.test(char)) {return char;}
     }
 
     return null;
@@ -326,7 +326,7 @@ export const rtlUtils = {
    */
   flipIcon: (iconName: string, direction: 'ltr' | 'rtl'): string => {
     const flipOnRTL = ['arrow-left', 'arrow-right', 'chevron-left', 'chevron-right', 'back', 'forward'];
-    if (!flipOnRTL.includes(iconName)) return iconName;
+    if (!flipOnRTL.includes(iconName)) {return iconName;}
     
     if (direction === 'rtl') {
       return iconName.replace('left', '___temp').replace('right', 'left').replace('___temp', 'right');

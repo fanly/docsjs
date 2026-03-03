@@ -272,7 +272,7 @@ export class PipelineManager {
     // For now, we'll simulate transformation plugin applications
 
     // Get the AST from context
-    let currentAST = context.state.ast;
+    const currentAST = context.state.ast;
 
     // Run "beforeTransform" lifecycle hooks that could potentially
     // modify the AST in ways that transformations expect

@@ -145,7 +145,7 @@ export class BillingManager {
    */
   async confirmPayment(paymentId: string): Promise<PaymentIntent | null> {
     const payment = this.payments.get(paymentId);
-    if (!payment) return null;
+    if (!payment) {return null;}
 
     payment.status = 'succeeded';
     this.payments.set(paymentId, payment);
@@ -164,7 +164,7 @@ export class BillingManager {
    */
   async updateSubscription(organizationId: string, update: SubscriptionUpdate): Promise<Subscription | null> {
     const current = this.subscriptions.get(organizationId);
-    if (!current) return null;
+    if (!current) {return null;}
 
     const updated: Subscription = {
       ...current,
@@ -181,7 +181,7 @@ export class BillingManager {
    */
   async cancelSubscription(organizationId: string): Promise<boolean> {
     const subscription = this.subscriptions.get(organizationId);
-    if (!subscription) return false;
+    if (!subscription) {return false;}
 
     subscription.cancelAtPeriodEnd = true;
     this.subscriptions.set(organizationId, subscription);
@@ -193,7 +193,7 @@ export class BillingManager {
    */
   async reactivateSubscription(organizationId: string): Promise<boolean> {
     const subscription = this.subscriptions.get(organizationId);
-    if (!subscription) return false;
+    if (!subscription) {return false;}
 
     subscription.cancelAtPeriodEnd = false;
     this.subscriptions.set(organizationId, subscription);
@@ -413,7 +413,7 @@ export class UsageBillingManager {
     const usage = this.getUsage(organizationId);
     const overages = usage.filter(r => r.used > r.limit && r.limit > 0);
 
-    if (overages.length === 0) return null;
+    if (overages.length === 0) {return null;}
 
     const amount = this.billingManager.calculateUsageCost(overages);
 

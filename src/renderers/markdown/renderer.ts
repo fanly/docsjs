@@ -147,13 +147,13 @@ export class MarkdownRenderer {
 
     for (const section of doc.children) {
       const rendered = this.renderSection(section);
-      if (rendered) parts.push(rendered);
+      if (rendered) {parts.push(rendered);}
     }
 
     // Render auxiliary sections (footnotes, etc.)
     if (doc.auxiliary) {
       const auxMarkdown = this.renderAuxiliarySections(doc.auxiliary);
-      if (auxMarkdown) parts.push(auxMarkdown);
+      if (auxMarkdown) {parts.push(auxMarkdown);}
     }
 
     return parts.join("\n\n");
@@ -191,7 +191,7 @@ export class MarkdownRenderer {
 
     for (const block of section.children) {
       const markdown = this.renderBlock(block);
-      if (markdown) parts.push(markdown);
+      if (markdown) {parts.push(markdown);}
     }
 
     return parts.join("\n\n");
@@ -263,7 +263,7 @@ export class MarkdownRenderer {
   }
 
   private renderTable(table: TableNode): string {
-    if (!table.rows || table.rows.length === 0) return "";
+    if (!table.rows || table.rows.length === 0) {return "";}
 
     const parts: string[] = [];
     
@@ -477,7 +477,7 @@ export class MarkdownRenderer {
 
   private generateTOC(): string {
     const items = this.headingItems.filter(h => h.level <= this.options.tocMaxLevel);
-    if (items.length === 0) return "";
+    if (items.length === 0) {return "";}
 
     const lines: string[] = ["## Table of Contents\n"];
     

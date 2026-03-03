@@ -289,7 +289,7 @@ export class OrganizationManager {
    */
   async updateOrganization(id: string, updates: Partial<Organization>): Promise<Organization | null> {
     const org = this.organizations.get(id);
-    if (!org) return null;
+    if (!org) {return null;}
 
     const updated = { ...org, ...updates, updatedAt: Date.now() };
     this.organizations.set(id, updated);
@@ -308,7 +308,7 @@ export class OrganizationManager {
    */
   async addMember(organizationId: string, userId: string, role: OrganizationRole = 'member'): Promise<OrganizationMember> {
     const org = this.organizations.get(organizationId);
-    if (!org) throw new Error('Organization not found');
+    if (!org) {throw new Error('Organization not found');}
 
     const member: OrganizationMember = {
       id: 'mem_' + this.generateId(),
@@ -330,7 +330,7 @@ export class OrganizationManager {
    */
   async removeMember(organizationId: string, userId: string): Promise<boolean> {
     const org = this.organizations.get(organizationId);
-    if (!org) return false;
+    if (!org) {return false;}
 
     const member = Array.from(this.members.values()).find(
       m => m.organizationId === organizationId && m.userId === userId
@@ -388,7 +388,7 @@ export class OrganizationManager {
    */
   async acceptInvitation(invitationId: string, userId: string): Promise<OrganizationMember | null> {
     const invitation = this.invitations.get(invitationId);
-    if (!invitation || invitation.expiresAt < Date.now()) return null;
+    if (!invitation || invitation.expiresAt < Date.now()) {return null;}
 
     // Add member
     const member = await this.addMember(invitation.organizationId, userId, invitation.role);
@@ -405,7 +405,7 @@ export class OrganizationManager {
    */
   getUsage(organizationId: string): UsageRecord[] {
     const org = this.organizations.get(organizationId);
-    if (!org) return [];
+    if (!org) {return [];}
 
     const plan = PLAN_PRICING[org.plan];
     // Mock usage data - real impl would query actual metrics

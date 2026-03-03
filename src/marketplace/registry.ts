@@ -149,7 +149,7 @@ export class SecurePluginRegistry {
 
   async uninstall(pluginId: string): Promise<boolean> {
     const plugin = this.plugins.get(pluginId);
-    if (!plugin) return false;
+    if (!plugin) {return false;}
     
     try {
       // Notify plugin to cleanup resources
@@ -177,7 +177,7 @@ export class SecurePluginRegistry {
 
   getPluginMetadata(pluginId: string): PluginMetadata | undefined {
     const plugin = this.plugins.get(pluginId);
-    if (!plugin) return undefined;
+    if (!plugin) {return undefined;}
     
     return {
       id: pluginId,
@@ -213,10 +213,10 @@ export class SecurePluginRegistry {
   private calculateTrustScore(plugin: InstalledPlugin): number {
     let score = 0;
     
-    if (plugin.verified) score += 200;
-    if (plugin.signatureValid) score += 100;
-    if (this.config.trustedPublishers.includes(plugin.publisher)) score += 150;
-    if (plugin.rating > 4.0) score += 50;
+    if (plugin.verified) {score += 200;}
+    if (plugin.signatureValid) {score += 100;}
+    if (this.config.trustedPublishers.includes(plugin.publisher)) {score += 150;}
+    if (plugin.rating > 4.0) {score += 50;}
     
     return score;
   }
@@ -494,7 +494,7 @@ export class MarketplaceAPISimulator {
   search(query: string): MarketplaceEntry[] {
     const allEntries = Array.from(this.listings.values());
     
-    if (!query) return allEntries;
+    if (!query) {return allEntries;}
     
     return allEntries.filter(entry => 
       entry.id.includes(query) ||

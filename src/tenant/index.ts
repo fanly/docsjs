@@ -98,7 +98,7 @@ export class TenantManager {
 
   async updateTenant(id: string, updates: Partial<Pick<Tenant, 'name' | 'plan' | 'settings'>>): Promise<Tenant | null> {
     const tenant = this.tenants.get(id);
-    if (!tenant) return null;
+    if (!tenant) {return null;}
 
     const updated: Tenant = {
       ...tenant,

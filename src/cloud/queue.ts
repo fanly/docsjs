@@ -85,7 +85,7 @@ export class DistributedQueue {
     const processLoop = async () => {
       while (!queue.isEmpty()) {
         const message = queue.dequeue();
-        if (!message) break;
+        if (!message) {break;}
 
         try {
           await handler(message.payload);
@@ -301,7 +301,7 @@ export class BatchProcessor {
    */
   async cancelJob(jobId: string): Promise<boolean> {
     const job = this.jobs.get(jobId);
-    if (!job) return false;
+    if (!job) {return false;}
     if (job.status === 'completed' || job.status === 'failed') {
       return false;
     }

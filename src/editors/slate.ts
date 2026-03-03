@@ -273,11 +273,11 @@ function slateToInline(node: SlateNode): InlineNode | null {
 function slateToMarks(node: SlateText): any[] {
   const marks: any[] = [];
   
-  if (node.bold) marks.push({ type: "bold" });
-  if (node.italic) marks.push({ type: "italic" });
-  if (node.underline) marks.push({ type: "underline" });
-  if (node.strikethrough) marks.push({ type: "strikethrough" });
-  if (node.code) marks.push({ type: "code" });
+  if (node.bold) {marks.push({ type: "bold" });}
+  if (node.italic) {marks.push({ type: "italic" });}
+  if (node.underline) {marks.push({ type: "underline" });}
+  if (node.strikethrough) {marks.push({ type: "strikethrough" });}
+  if (node.code) {marks.push({ type: "code" });}
   
   return marks;
 }

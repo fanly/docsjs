@@ -80,7 +80,7 @@ export interface ParagraphASTResult {
  * Convert legacy HTML output to AST nodes
  */
 export function htmlToASTNodes(html: string): BlockNode[] {
-  if (!html || !html.trim()) return [];
+  if (!html || !html.trim()) {return [];}
 
   const nodes: BlockNode[] = [];
   
@@ -89,7 +89,7 @@ export function htmlToASTNodes(html: string): BlockNode[] {
   const doc = parser.parseFromString(`<div>${html}</div>`, "text/html");
   const container = doc.body.firstElementChild;
   
-  if (!container) return nodes;
+  if (!container) {return nodes;}
 
   for (const child of Array.from(container.children)) {
     const node = htmlElementToASTNode(child);

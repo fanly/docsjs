@@ -137,7 +137,7 @@ export class StructureDetector {
       switch (node.type) {
         case "heading":
           headingCount++;
-          if (node.id) headingIds.push(node.id);
+          if (node.id) {headingIds.push(node.id);}
           break;
         case "list":
           listCount++;
@@ -275,9 +275,9 @@ export class StructureDetector {
         }
       }
       
-      if (node.type === "table") hasTables = true;
-      if (node.type === "image") hasImages = true;
-      if (node.type === "hyperlink") hasHyperlinks = true;
+      if (node.type === "table") {hasTables = true;}
+      if (node.type === "image") {hasImages = true;}
+      if (node.type === "hyperlink") {hasHyperlinks = true;}
     });
     
     return {
@@ -312,39 +312,39 @@ export class StructureDetector {
     };
     
     // Knowledge base detection
-    if (stats.hasCodeBlocks) scores["knowledge-base"] += 0.4;
-    if (stats.hasTables) scores["knowledge-base"] += 0.2;
-    if (this.hasMultipleHeadingLevels(stats.headingDepth)) scores["knowledge-base"] += 0.2;
-    if (elements.find(e => e.type === "heading" && e.count > 5)) scores["knowledge-base"] += 0.2;
+    if (stats.hasCodeBlocks) {scores["knowledge-base"] += 0.4;}
+    if (stats.hasTables) {scores["knowledge-base"] += 0.2;}
+    if (this.hasMultipleHeadingLevels(stats.headingDepth)) {scores["knowledge-base"] += 0.2;}
+    if (elements.find(e => e.type === "heading" && e.count > 5)) {scores["knowledge-base"] += 0.2;}
     
     // Exam paper detection
-    if (elements.find(e => e.type === "list" && e.count > 3)) scores["exam-paper"] += 0.3;
-    if (stats.hasTables && !stats.hasImages) scores["exam-paper"] += 0.2;
-    if (this.hasShortParagraphs(stats.avgParagraphLength)) scores["exam-paper"] += 0.3;
-    if (this.containsNumberedQuestions(stats)) scores["exam-paper"] += 0.3;
+    if (elements.find(e => e.type === "list" && e.count > 3)) {scores["exam-paper"] += 0.3;}
+    if (stats.hasTables && !stats.hasImages) {scores["exam-paper"] += 0.2;}
+    if (this.hasShortParagraphs(stats.avgParagraphLength)) {scores["exam-paper"] += 0.3;}
+    if (this.containsNumberedQuestions(stats)) {scores["exam-paper"] += 0.3;}
     
     // Business report detection
-    if (stats.hasTables) scores["business-report"] += 0.3;
-    if (stats.hasImages) scores["business-report"] += 0.2;
+    if (stats.hasTables) {scores["business-report"] += 0.3;}
+    if (stats.hasImages) {scores["business-report"] += 0.2;}
     if (elements.find(e => e.type === "heading")?.count && 
-        elements.find(e => e.type === "heading")!.count < 10) scores["business-report"] += 0.2;
-    if (elements.find(e => e.type === "blockquote")) scores["business-report"] += 0.1;
+        elements.find(e => e.type === "heading")!.count < 10) {scores["business-report"] += 0.2;}
+    if (elements.find(e => e.type === "blockquote")) {scores["business-report"] += 0.1;}
     
     // Scientific paper detection
-    if (stats.hasMathFormulas) scores["scientific-paper"] += 0.5;
-    if (stats.hasTables && stats.hasImages) scores["scientific-paper"] += 0.3;
-    if (this.hasAcademicHeadings(stats.headingDepth)) scores["scientific-paper"] += 0.2;
+    if (stats.hasMathFormulas) {scores["scientific-paper"] += 0.5;}
+    if (stats.hasTables && stats.hasImages) {scores["scientific-paper"] += 0.3;}
+    if (this.hasAcademicHeadings(stats.headingDepth)) {scores["scientific-paper"] += 0.2;}
     
     // Legal document detection
-    if (this.containsLegalPhrases(stats)) scores["legal-document"] += 0.5;
+    if (this.containsLegalPhrases(stats)) {scores["legal-document"] += 0.5;}
     if (!stats.hasCodeBlocks && !stats.hasMathFormulas && 
-        stats.paragraphCount > 20) scores["legal-document"] += 0.2;
+        stats.paragraphCount > 20) {scores["legal-document"] += 0.2;}
     
     // Web content detection
-    if (stats.hasHyperlinks && !stats.hasTables) scores["web-content"] += 0.3;
+    if (stats.hasHyperlinks && !stats.hasTables) {scores["web-content"] += 0.3;}
     if (!stats.hasCodeBlocks && !stats.hasTables && 
-        stats.avgParagraphLength < 200) scores["web-content"] += 0.3;
-    if (!stats.hasMathFormulas) scores["web-content"] += 0.1;
+        stats.avgParagraphLength < 200) {scores["web-content"] += 0.3;}
+    if (!stats.hasMathFormulas) {scores["web-content"] += 0.1;}
     
     // Find highest score
     let maxType: DocumentStructureType = "general";
@@ -374,27 +374,27 @@ export class StructureDetector {
     
     switch (type.type) {
       case "knowledge-base":
-        if (stats.hasCodeBlocks) reasoning.push("Contains code blocks indicating technical documentation");
-        if (elements.find(e => e.type === "heading" && e.count > 5)) reasoning.push("Multiple headings suggest structured documentation");
+        if (stats.hasCodeBlocks) {reasoning.push("Contains code blocks indicating technical documentation");}
+        if (elements.find(e => e.type === "heading" && e.count > 5)) {reasoning.push("Multiple headings suggest structured documentation");}
         break;
       case "exam-paper":
-        if (elements.find(e => e.type === "list" && e.count > 3)) reasoning.push("Multiple lists suggest questions or exercises");
-        if (this.hasShortParagraphs(stats.avgParagraphLength)) reasoning.push("Short paragraphs suggest questions or answers");
+        if (elements.find(e => e.type === "list" && e.count > 3)) {reasoning.push("Multiple lists suggest questions or exercises");}
+        if (this.hasShortParagraphs(stats.avgParagraphLength)) {reasoning.push("Short paragraphs suggest questions or answers");}
         break;
       case "business-report":
-        if (stats.hasTables) reasoning.push("Contains tables typical of business reports");
-        if (stats.hasImages) reasoning.push("Contains images typical of business documents");
+        if (stats.hasTables) {reasoning.push("Contains tables typical of business reports");}
+        if (stats.hasImages) {reasoning.push("Contains images typical of business documents");}
         break;
       case "scientific-paper":
-        if (stats.hasMathFormulas) reasoning.push("Contains mathematical formulas");
-        if (stats.hasTables && stats.hasImages) reasoning.push("Contains tables and figures typical of academic papers");
+        if (stats.hasMathFormulas) {reasoning.push("Contains mathematical formulas");}
+        if (stats.hasTables && stats.hasImages) {reasoning.push("Contains tables and figures typical of academic papers");}
         break;
       case "legal-document":
         reasoning.push("Document structure consistent with legal contracts");
         break;
       case "web-content":
-        if (stats.hasHyperlinks) reasoning.push("Contains hyperlinks suggesting web content");
-        if (stats.avgParagraphLength < 200) reasoning.push("Short paragraphs typical of blog posts");
+        if (stats.hasHyperlinks) {reasoning.push("Contains hyperlinks suggesting web content");}
+        if (stats.avgParagraphLength < 200) {reasoning.push("Short paragraphs typical of blog posts");}
         break;
       default:
         reasoning.push("No specific structure detected, using general profile");
@@ -512,7 +512,7 @@ export class StructureDetector {
   private hasMultipleHeadingLevels(depths: number[]): boolean {
     let levelsWithHeadings = 0;
     for (const d of depths) {
-      if (d > 0) levelsWithHeadings++;
+      if (d > 0) {levelsWithHeadings++;}
     }
     return levelsWithHeadings >= 3;
   }

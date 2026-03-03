@@ -101,7 +101,7 @@ export class NotionAdapter implements CMSAdapter {
 
     do {
       const params = new URLSearchParams();
-      if (cursor) params.set('start_cursor', cursor);
+      if (cursor) {params.set('start_cursor', cursor);}
 
       const response = await fetch(
         `https://api.notion.com/v1/blocks/${pageId}/children?${params}`,

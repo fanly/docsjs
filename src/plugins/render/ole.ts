@@ -13,7 +13,7 @@ export function createOlePlugin(): RunPlugin {
     
     parseRun(element: Element, _context: PluginContext): RunParseResult {
       const object = element.querySelector("w\\:object, object");
-      if (!object) return { html: "", handled: false };
+      if (!object) {return { html: "", handled: false };}
       
       const oleObj = object.querySelector("o\\:OLEObject, OLEObject");
       const progId = oleObj?.getAttribute("ProgID") || "unknown";

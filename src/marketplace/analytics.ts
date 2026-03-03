@@ -308,7 +308,7 @@ export class PluginAnalytics {
    * Flush events (send to backend)
    */
   private async flush(): Promise<void> {
-    if (this.events.length === 0) return;
+    if (this.events.length === 0) {return;}
 
     // In real implementation, would send to analytics backend
     console.log(`[Analytics] Flushing ${this.events.length} events`);

@@ -346,7 +346,7 @@ export class AIDocumentEngine {
    */
   async sendMessage(sessionId: string, message: string): Promise<string> {
     const session = this.sessions.get(sessionId);
-    if (!session) throw new Error('Session not found');
+    if (!session) {throw new Error('Session not found');}
 
     session.messages.push({
       role: 'user',

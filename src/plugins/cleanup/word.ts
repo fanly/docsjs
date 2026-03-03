@@ -25,11 +25,11 @@ export function createWordCleanupPlugin(): CleanupPlugin {
       result = result.replace(/<\/w:[^>]*>/gi, "");
       
       result = result.replace(/<span([^>]*)>\s*<\/span>/gi, (match, attrs: string) => {
-        if (/\sdata-word-[^=\s]+=/i.test(attrs)) return match;
+        if (/\sdata-word-[^=\s]+=/i.test(attrs)) {return match;}
         return "";
       });
       result = result.replace(/<span([^>]*)>&nbsp;<\/span>/gi, (match, attrs: string) => {
-        if (/\sdata-word-[^=\s]+=/i.test(attrs)) return match;
+        if (/\sdata-word-[^=\s]+=/i.test(attrs)) {return match;}
         return "";
       });
       

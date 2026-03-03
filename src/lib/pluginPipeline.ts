@@ -100,7 +100,7 @@ export class DocxPluginPipeline {
     numberingXml: Document | null,
     relsMap: Record<string, string>
   ): Promise<void> {
-    if (this.initialized || !this.config.enabled) return;
+    if (this.initialized || !this.config.enabled) {return;}
 
     this.registerAllPlugins();
 
@@ -119,7 +119,7 @@ export class DocxPluginPipeline {
   }
 
   async executeTransformPhase(html: string): Promise<string> {
-    if (!this.config.enabled) return html;
+    if (!this.config.enabled) {return html;}
 
     const context: PluginContext = {
       zip: null as unknown as JSZip,
@@ -135,7 +135,7 @@ export class DocxPluginPipeline {
   }
 
   async executeCleanupPhase(html: string): Promise<string> {
-    if (!this.config.enabled) return html;
+    if (!this.config.enabled) {return html;}
 
     if (!this.initialized) {
       this.registerAllPlugins();

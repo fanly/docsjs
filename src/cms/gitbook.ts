@@ -127,7 +127,7 @@ export class GitBookAdapter implements CMSAdapter {
     );
 
     if (!response.ok) {
-      if (response.status === 404) return null;
+      if (response.status === 404) {return null;}
       throw new Error(`GitBook API error: ${response.statusText}`);
     }
 
@@ -143,7 +143,7 @@ export class GitBookAdapter implements CMSAdapter {
 
     do {
       const params = new URLSearchParams();
-      if (cursor) params.set('cursor', cursor);
+      if (cursor) {params.set('cursor', cursor);}
 
       const response = await fetch(
         `${this.options.apiUrl}/v1/spaces/${spaceId}/pages?${params}`,
@@ -206,7 +206,7 @@ export class GitBookAdapter implements CMSAdapter {
     );
 
     if (!response.ok) {
-      if (response.status === 404) return null;
+      if (response.status === 404) {return null;}
       throw new Error(`GitBook API error: ${response.statusText}`);
     }
 

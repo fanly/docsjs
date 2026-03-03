@@ -295,9 +295,9 @@ export async function runCompleteVerification(): Promise<boolean> {
     const secPerms = secPlugin.permissions;
     
     // Verify all security aspects are properly configured
-    if (secPerms.network !== false) throw new Error("Network access not disabled");
-    if (secPerms.compute.maxMemoryMB !== 5) throw new Error("Memory limit not enforced");
-    if (secPerms.ast.canExportRawAst !== false) throw new Error("AST export not blocked");
+    if (secPerms.network !== false) {throw new Error("Network access not disabled");}
+    if (secPerms.compute.maxMemoryMB !== 5) {throw new Error("Memory limit not enforced");}
+    if (secPerms.ast.canExportRawAst !== false) {throw new Error("AST export not blocked");}
     
     console.log("  │   └── ✅ Security compliance confirmed");
     

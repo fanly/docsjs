@@ -358,7 +358,7 @@ export function walkAST(
   path: string[] = []
 ): void {
   const result = visitor(node, parent, path);
-  if (result === false) return;
+  if (result === false) {return;}
 
   const children = getNodeChildren(node);
   if (children) {
@@ -437,9 +437,9 @@ function getNodeChildren(node: ASTNode): ASTNode[] | null {
  * Get the key name for children property
  */
 function getChildrenKey(node: ASTNode): string | null {
-  if (node.type === "list") return "items";
-  if (node.type === "table") return "rows";
-  if (node.type === "tableRow") return "cells";
+  if (node.type === "list") {return "items";}
+  if (node.type === "table") {return "rows";}
+  if (node.type === "tableRow") {return "cells";}
   return "children";
 }
 
@@ -534,7 +534,7 @@ export function addMark(node: TextNode, mark: TextMark): TextNode {
  * Remove a mark from text node
  */
 export function removeMark(node: TextNode, markType: TextMark["type"]): TextNode {
-  if (!node.marks) return node;
+  if (!node.marks) {return node;}
   const marks = node.marks.filter((m) => m.type !== markType);
   if (marks.length === 0) {
     const { marks: _, ...rest } = node;

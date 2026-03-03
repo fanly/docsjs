@@ -165,7 +165,7 @@ class VectorStore {
     
     for (const doc of this.documents.values()) {
       for (const chunk of doc.chunks) {
-        if (!chunk.embedding) continue;
+        if (!chunk.embedding) {continue;}
         
         const score = this.cosineSimilarity(queryEmbedding, chunk.embedding);
         results.push({ chunk, score });
@@ -187,7 +187,7 @@ class VectorStore {
     const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
     const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
     
-    if (magnitudeA === 0 || magnitudeB === 0) return 0;
+    if (magnitudeA === 0 || magnitudeB === 0) {return 0;}
     return dotProduct / (magnitudeA * magnitudeB);
   }
 
@@ -279,7 +279,7 @@ Answer:`;
 
   private calculateConfidence(answer: string, sources: DocumentChunk[]): number {
     // Simple confidence based on source relevance
-    if (sources.length === 0) return 0;
+    if (sources.length === 0) {return 0;}
     const avgScore = sources.reduce((sum, s) => sum + (s.embedding ? 1 : 0), 0) / sources.length;
     return Math.min(0.95, avgScore + 0.3);
   }
