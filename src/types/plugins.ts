@@ -68,6 +68,15 @@ export interface InstalledPlugin {
   enabled: boolean;
   installed?: boolean;
   cleanup?: () => void;
+  author?: string;
+  description?: string;
+  permissions?: PluginPermissions;
+  manifest?: PluginManifest;
+  plugin?: EnginePlugin;
+  verified?: boolean;
+  signatureValid?: boolean;
+  publisher?: string;
+  id?: string;
 }
 
 export interface PluginVerification {
