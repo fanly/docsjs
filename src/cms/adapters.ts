@@ -6,6 +6,12 @@ import { NotionAdapter, type NotionOptions } from './notion';
 import { ConfluenceAdapter, type ConfluenceOptions } from './confluence';
 import { GitBookAdapter, type GitBookOptions } from './gitbook';
 
+// Re-export types
+export type { GhostOptions } from './ghost';
+export type { NotionOptions } from './notion';
+export type { ConfluenceOptions } from './confluence';
+export type { GitBookOptions } from './gitbook';
+
 export interface CMSAdapter {
   name: string;
   version: string;

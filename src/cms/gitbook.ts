@@ -44,8 +44,9 @@ export interface GitBlock {
 }
 
 /** @alias GitBlock */
+/** @alias */
 export type GitBookBlock = GitBlock;
-export type GitBookBlock = GitBlock;
+
 
 
 

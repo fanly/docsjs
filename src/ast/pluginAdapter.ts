@@ -157,10 +157,11 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
               type: "tableCell" as const,
               id: generateId("tc"),
               children: [createParagraphNode(htmlChildrenToInlines(cell))],
-              colspan: (cell as HTMLElement).colSpan > 1 ? (cell as HTMLElement).colSpan : undefined,
-              rowspan: (cell as HTMLElement).rowSpan > 1 ? (cell as HTMLElement).rowSpan : undefined,
-              colspan: cell.colSpan > 1 ? cell.colSpan : undefined,
-              rowspan: cell.rowSpan > 1 ? cell.rowSpan : undefined,
+              colspan: (cell as HTMLTableCellElement).colSpan > 1 ? (cell as HTMLTableCellElement).colSpan : undefined,
+              rowspan: (cell as HTMLTableCellElement).rowSpan > 1 ? (cell as HTMLTableCellElement).rowSpan : undefined
+
+
+
             })),
         }));
       return {
