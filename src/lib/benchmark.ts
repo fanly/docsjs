@@ -312,16 +312,12 @@ export class RegressionChecker {
       for (const threshold of this.thresholds) {
         const baselineValue = baselineResult[threshold.metric];
         const currentValue = currentResult[threshold.metric];
-        const percentChange = ((currentValue - baselineValue) / baselineValue) * 100;
+        const baselineNum = Number(baselineValue);
+        const currentNum = Number(currentValue);
+        const percentChange = ((currentNum - baselineNum) / baselineNum) * 100;
 
         if (percentChange > threshold.threshold) {
-          regressions.push({
-            name: currentResult.name,
-            metric: threshold.metric,
-            baselineValue,
-            currentValue,
-            percentChange
-          });
+          regressions.push({ name: currentResult.name, metric: threshold.metric, baselineValue: Number(baselineValue), currentValue: Number(currentValue), percentChange } as any);
         }
       }
     }

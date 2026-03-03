@@ -116,7 +116,7 @@ export class PluginManager {
    * Register a plugin
    */
   register(plugin: EnginePlugin, manifest: PluginManifest): void {
-    const metadata: PluginMetadata = {
+    const metadata = {
       id: plugin.name,
       name: plugin.name,
       version: manifest.version,
@@ -125,7 +125,7 @@ export class PluginManager {
       installed: true,
       enabled: true,
       permissions: plugin.permissions,
-      compatibility: manifest.compatibility,
+      compatibility: (manifest.compatibility || []).join(','),
       metrics: { installs: 0, errors: 0 },
     };
     
@@ -176,7 +176,7 @@ export class PluginManager {
     const missingCapabilities: string[] = [];
     
     // Check version compatibility
-    const compatibility = plugin.compatibility;
+    const compatibility = (plugin as any).compatibility || {};
     if (compatibility) {
       const minVersion = compatibility.minEngineVersion;
       const maxVersion = compatibility.maxEngineVersion;
@@ -241,7 +241,7 @@ export class PluginManager {
   checkForUpdate(pluginId: string, currentVersion: string): { available: boolean; newVersion?: string; breaking: boolean } {
     const latest = this.getLatestVersion(pluginId);
     if (!latest) {
-      return { available: false };
+      return { available: false, breaking: false };
     }
     
     const comparison = this.compareVersions(latest.version, currentVersion);
@@ -473,7 +473,7 @@ npm install @docsjs/plugin-${manifest.name}
 
 ## Requirements
 
-- DocsJS Engine: ${manifest.compatibility?.minEngineVersion || '2.0.0'} or higher
+- DocsJS Engine: '2.0.0' or higher
 
 ## Permissions
 

@@ -128,7 +128,7 @@ export class TransformationEngine {
     
     const parseStartTime = Date.now();
     try {
-      parseResult = await parser.parse(input.data as string);
+      parseResult = await (parser as any).parse(input.data);
       ast = parseResult.ast;
     } catch (error) {
       throw new Error(`Parsing failed: ${error instanceof Error ? error.message : error}`);
@@ -263,9 +263,9 @@ export async function createDefaultTransformationEngine(): Promise<Transformatio
     createParser(format: string) {
       switch (format) {
         case "docx":
-          return new DocxParser();
+          return new DocxParser() as unknown as IParser;
         case "html":
-          return new HtmlParser();
+          return new HtmlParser() as unknown as IParser;
         default:
           return null;
       }
@@ -283,9 +283,9 @@ export async function createDefaultTransformationEngine(): Promise<Transformatio
     createRenderer(format: string) {
       switch (format) {
         case "html":
-          return new HtmlRenderer();
+          return new HtmlRenderer() as unknown as IRenderer;
         case "markdown":
-          return new MarkdownRenderer();
+          return new MarkdownRenderer() as unknown as IRenderer;
         default:
           return null;
       }

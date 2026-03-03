@@ -173,7 +173,8 @@ export class ExamQuestionExtractor {
   async importFromFile(file: string, format: 'qti' | 'csv' | 'json'): Promise<ExamQuestion[]> {
     switch (format) {
       case 'qti':
-       TI(file);
+        // TODO: Implement QTI import
+        throw new Error('QTI import not yet implemented');
       case 'csv':
         return this.parseCSV(file);
       case 'json':
@@ -189,6 +190,8 @@ export class ExamQuestionExtractor {
   async exportToFile(questions: ExamQuestion[], format: 'qti' | 'csv' | 'json'): Promise<string> {
     switch (format) {
       case 'qti':
+        // TODO: Implement QTI import
+        throw new Error('QTI import not yet implemented');
         return this.toQTI(questions);
       case 'csv':
         return this.toCSV(questions);
@@ -203,12 +206,18 @@ export class ExamQuestionExtractor {
     // Simplified - would use actual parser
     return {
       type: 'document',
-      children: content.split('\n').map((line, i) => ({
-        type: 'paragraph',
-        id: `p-${i}`,
-        content: line
-      }))
-    } as DocumentNode;
+      id: `doc-${Date.now()}`,
+      metadata: { version: '1.0', generator: 'docsjs' },
+      children: [{
+        type: 'section',
+        id: `section-1`,
+        children: content.split('\n').map((line, i) => ({
+          type: 'paragraph',
+          id: `p-${i}`,
+          children: [{ type: 'text', content: line }]
+        }))
+      }]
+    } as unknown as DocumentNode;
   }
 
   private findQuestions(node: DocumentNode): ExamQuestion[] {
@@ -424,7 +433,7 @@ export class ExamQuestionExtractor {
 
   private extractText(node: DocumentNode): string {
     let text = '';
-    const traverse = (n: DocumentNode) => {
+    const traverse = (n: any) => {
       text += n.content || '';
       if (n.children) n.children.forEach(traverse);
     };

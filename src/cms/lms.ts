@@ -242,7 +242,7 @@ export class MoodleAdapter implements CMSAdapter {
     const response = await this.callMoodle('core_course_get_contents', {
       courseid: courseId,
     });
-    return response;
+    return response as MoodleCourse;
   }
 
   /**
@@ -252,7 +252,7 @@ export class MoodleAdapter implements CMSAdapter {
     const response = await this.callMoodle('core_course_get_contents', {
       courseid: courseId,
     });
-    return response;
+    return response as MoodleSection[];
   }
 
   /**
@@ -262,7 +262,7 @@ export class MoodleAdapter implements CMSAdapter {
     const response = await this.callMoodle('core_course_get_course_module', {
       cmid: moduleId,
     });
-    return response;
+    return response as MoodleModule;
   }
 
   /**
@@ -277,7 +277,8 @@ export class MoodleAdapter implements CMSAdapter {
       course: this.options.courseId,
       ...data,
     });
-    return { cmid: response.id };
+    const res = response as { id: number };
+    return { cmid: res.id };
   }
 
   private async createMoodleContent(content: CMSContent): Promise<{ cmid: number }> {

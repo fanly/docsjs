@@ -32,6 +32,9 @@ export interface PluginMetadata {
   id?: string;
   compatibility?: string;
   permissions?: PluginPermissions;
+  installed?: boolean;
+  enabled?: boolean;
+  metrics?: { installs?: number; rating?: number; reviewCount?: number; };
 }
 
 export interface PluginPermissions {

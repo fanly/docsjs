@@ -135,7 +135,7 @@ export class StreamingPipelineManager {
     }
 
     // Stream large files
-    for await (const chunk of this.readFileChunks(input)) {
+    for await (const chunk of this.readFileChunks(input as File)) {
       // Check for abort
       if (this.options.abortSignal?.aborted) {
         throw new Error("Processing aborted");
@@ -212,7 +212,7 @@ export class StreamingPipelineManager {
     // Read file in chunks
     const chunks: Uint8Array[] = [];
     
-    for await (const chunk of this.readFileChunks(input)) {
+    for await (const chunk of this.readFileChunks(input as File)) {
       if (this.options.abortSignal?.aborted) {
         throw new Error("Processing aborted");
       }

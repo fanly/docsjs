@@ -222,7 +222,7 @@ export class PipelineManager {
       context.state.ast = htmlResult.ast;
       context.metrics.processedBytes = (htmlResult.report as any).processedBytes || 0;
       context.metrics.processedChars = (htmlResult.report as any).processedChars || 0;
-      context.metrics.processedChars = htmlResult.report.processedChars || 0;
+      context.metrics.processedChars = (htmlResult.report as any).processedChars || 0;
       
       // Process parser-generated diagnostics
       if (htmlResult.report.warnings && htmlResult.report.warnings.length > 0) {
@@ -248,8 +248,6 @@ export class PipelineManager {
       context.metrics.processedChars = result.report.elapsedMs || 0;
       context.metrics.processedBytes = (result.report as any).processedBytes || 0;
       context.metrics.processedChars = (result.report as any).processedChars || 0;
-      context.metrics.processedChars = result.report.processedChars || 0;
-      
       // Process parser-generated diagnostics
       if (result.report.warnings && result.report.warnings.length > 0) {
         for (const warning of result.report.warnings) {
@@ -338,7 +336,7 @@ export class PipelineManager {
           includeTOC: context.profile.render.options?.generateTOC || false,
           ...context.profile.render.options
         };
-        const mdRenderer = new MarkdownRenderer(mdOpts);
+        const mdRenderer = new MarkdownRenderer(mdOpts as any);
         const mdResult = mdRenderer.render(context.state.ast);
         
         context.state.intermediate.renderedOutput = mdResult.markdown;

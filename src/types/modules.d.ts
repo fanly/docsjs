@@ -26,20 +26,6 @@ declare module 'yjs' {
   };
   export default Y;
 }
-declare module 'yjs' {
-  export class Doc {
-    constructor();
-    getMap(name?: string): any;
-    getArray(name?: string): any;
-    getText(name?: string): any;
-  }
-  export class Awareness {
-    setLocalState(state: any): void;
-    getLocalState(): any;
-    on(event: string, callback: Function): void;
-  }
-  export function createDoc(): Doc;
-}
 
 // Declaration for pdf-parse
 declare module 'pdf-parse' {

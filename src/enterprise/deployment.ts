@@ -198,6 +198,7 @@ export function generateDockerfile(config: {
   baseImage?: string;
   nodeVersion?: string;
   app?: string;
+  appPath?: string;
 }): string {
   const nodeVersion = config.nodeVersion || '20-alpine';
   const appPath = config.appPath || '/app';
@@ -251,7 +252,7 @@ export function generateDockerCompose(services: {
     version: '3.8',
     services: {
       docsjs: {
-        build: { context: '.', dockerfile: 'Dockerfile' },
+        build: { context: '.', dockerfile: 'Dockerfile', args: {} },
         container_name: 'docsjs-enterprise',
         ports: ['3000:3000', '3001:3001'],
         environment: {
@@ -471,7 +472,7 @@ curl -f http://localhost:3000/api/v1/health || exit 1
 
 echo "Deployment complete!"`,
 
-    'kubernetes/deployment.yaml': generateKubernetesManifest('docsjs'),
+    'kubernetes/deployment.yaml': generateKubernetesManifest('docsjs', {}),
     'kubernetes/ingress.yaml': generateNginxIngress('docsjs'),
     'kubernetes/values.yaml': generateHelmValues('docsjs')
   };
@@ -546,7 +547,7 @@ export class OnPremisesDeploymentManager {
       mkdirSync(k8sDir, { recursive: true });
     }
 
-    const deployment = generateKubernetesManifest('docsjs');
+    const deployment = generateKubernetesManifest('docsjs', {});
     writeFileSync(resolve(k8sDir, 'deployment.yaml'), JSON.stringify(deployment, null, 2));
 
     const ingress = generateNginxIngress('docsjs');

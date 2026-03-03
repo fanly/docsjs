@@ -288,7 +288,7 @@ export async function parseToAST(buffer: Buffer, format: InputFormat): Promise<D
     type: 'document',
     version: '1.0',
     children
-  } as DocumentNode;
+  } as any;
 }
 
 export { PDFParser, ODTParser, RTFParser };

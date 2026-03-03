@@ -103,6 +103,7 @@ export class PluginApprovalWorkflow {
       submittedAt: Date.now(),
       updatedAt: Date.now(),
       reviews: [],
+      reviewers: [],
       securityAudit: null,
       version: submission.config?.version as string || '1.0.0'
     };
@@ -266,7 +267,7 @@ export class PluginApprovalWorkflow {
     // Check for dangerous patterns in config
     const config = submission.config as Record<string, unknown> || {};
     
-    if (config.permissions?.network === true) {
+    if ((config as any).permissions?.network === true) {
       vulnerabilities.push({
         id: this.generateId(),
         severity: 'medium',

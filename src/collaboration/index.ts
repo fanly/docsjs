@@ -4,7 +4,8 @@
  * Provides real-time collaboration using Yjs CRDT.
  */
 
-import * as Y from 'yjs';
+// @ts-ignore
+import Y from 'yjs';
 
 export interface CollaborationUser {
   id: string;

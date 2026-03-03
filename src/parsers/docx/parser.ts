@@ -39,7 +39,7 @@ import type {
   CommentNode,
   PageSetup,
   ParagraphSemantics,
-} from "../ast/types";
+} from "../../ast/types";
 
 import {
   generateId,
