@@ -447,6 +447,22 @@ class DocsJSServer {
     };
   }
 
+  private async handleGetUsage(requestId: string): Promise<ApiResponse<any>> {
+    return {
+      success: true,
+      data: {
+        conversionsToday: this.usage.conversionsToday,
+        conversionsThisMonth: this.usage.conversionsThisMonth,
+        bytesProcessedToday: this.usage.bytesProcessedToday,
+        totalProcessingTimeMs: this.usage.totalProcessingTimeMs,
+        successfulConversions: this.usage.successfulConversions,
+        totalConversions: this.usage.totalConversions,
+        activeJobs: this.usage.activeJobs,
+        pendingJobs: this.usage.pendingJobs,
+      }
+    };
+  }
+
 
 
   private async handleCreateWebhook(requestId: string, body: string): Promise<ApiResponse<WebhookRegistration>> {
@@ -616,6 +632,7 @@ class DocsJSServer {
     return { status: overallStatus, timestamp: Date.now(), uptime: process.uptime(), checks: {
       memory: { status: memStatus as 'ok' | 'warning' | 'error', used: memUsedMB, total: memTotalMB },
       jobs: { status: jobStatus as 'ok' | 'warning' | 'error', active: this.usage.activeJobs, pending: this.usage.pendingJobs },
+      storage: { status: 'ok' as 'ok' | 'warning' | 'error' },
     }};
   }
 

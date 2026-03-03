@@ -172,7 +172,7 @@ export class ExamQuestionExtractor {
    */
   async importFromFile(file: string, format: 'qti' | 'csv' | 'json'): Promise<ExamQuestion[]> {
     switch (format) {
-      case ' return this.parseQqti':
+      case 'qti':
        TI(file);
       case 'csv':
         return this.parseCSV(file);
