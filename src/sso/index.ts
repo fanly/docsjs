@@ -18,13 +18,13 @@ export interface OAuthConfig {
   provider: "okta" | "azure-ad" | "auth0" | "generic-oauth";
   
   /** Client ID from OAuth provider */
-  clientId: string;
+  clientId?: string;
   
   /** Client secret (for confidential clients) */
   clientSecret?: string;
   
   /** OAuth discovery URL or manual config */
-  issuer: string;
+  issuer?: string;
   
   /** Authorization endpoint */
   authorizationEndpoint?: string;
@@ -39,7 +39,7 @@ export interface OAuthConfig {
   jwksUri?: string;
   
   /** Redirect URI after authentication */
-  redirectUri: string;
+  redirectUri?: string;
   
   /** Requested scopes */
   scopes: string[];
@@ -72,13 +72,13 @@ export interface SAMLConfig {
   provider: "okta" | "azure-ad" | "onelogin" | "generic-saml";
   
   /** Single Sign-On URL (SSO URL) */
-  ssoUrl: string;
+  ssoUrl?: string;
   
   /** Entity ID / Issuer */
   entityId: string;
   
   /** X.509 Certificate for signature verification */
-  certificate: string;
+  certificate?: string;
   
   /** Service Provider Entity ID (if different from issuer) */
   spEntityId?: string;

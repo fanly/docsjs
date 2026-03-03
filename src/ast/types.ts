@@ -39,7 +39,11 @@ export type InputFormat =
   | "gfm"
   | "json"
   | "clipboard"
-  | "unknown";
+  | "unknown"
+  | "tiptap"
+  | "slate"
+  | "prosemirror"
+  | "image";
 
 export type OutputFormat =
   | "html"
