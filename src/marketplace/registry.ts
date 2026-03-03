@@ -4,7 +4,7 @@
  * Core systems for managing community and commercial plugins.
  */
 
-import type { EnginePlugin, PluginPermissions, PluginMetadata, PluginManifest } from '../types/plugins';
+import type { EnginePlugin, PluginPermissions, PluginMetadata, PluginManifest, InstalledPlugin, PluginVerification } from '../types/plugins';
 
 export interface PluginRegistryConfig {
   /** Enable plugin installation/removal */
