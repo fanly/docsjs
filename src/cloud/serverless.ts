@@ -87,10 +87,6 @@ export class DocumentTransformationHandler {
       // Track performance
       this.performance.record({
         latencyMs: processingTime,
-        success: true,
-        timestamp: Date.now()
-      });
-        latencyMs: processingTime,
         success: true
       });
 
@@ -123,10 +119,6 @@ export class DocumentTransformationHandler {
       const processingTime = Date.now() - startTime;
       
       this.performance.record({
-        latencyMs: processingTime,
-        success: false,
-        timestamp: Date.now()
-      });
         latencyMs: processingTime,
         success: false
       });
@@ -193,11 +185,6 @@ export class DocumentTransformationHandler {
         body: {
           success: false,
           statusCode: 0,
-          responseTimeMs: 0,
-          error: error instanceof Error ? error.message : 'Network error'
-        }
-          success: false,
-          statusCode: 0,
           error: error instanceof Error ? error.message : 'Network error'
         }
       };
@@ -247,7 +234,7 @@ interface HealthCheckResult {
 interface WebhookTestResult {
   success: boolean;
   statusCode: number;
-  responseTimeMs: number;
+  responseTimeMs?: number;
   error?: string;
 }
 
@@ -305,7 +292,7 @@ class PerformanceTracker {
 interface PerformanceSample {
   latencyMs: number;
   success: boolean;
-  timestamp: number;
+  timestamp?: number;
 }
 
 /**
