@@ -11,6 +11,15 @@ export interface PluginManifest {
   main?: string;
   dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  // Additional properties
+  permissions?: PluginPermissions;
+  compatibility?: string[];
+  supportedHooks?: string[];
+  changelog?: string;
+  license?: string;
+  sizeMB?: number;
+  downloadUrl?: string;
+  signature?: string;
 }
 
 export interface PluginMetadata {
@@ -21,6 +30,10 @@ export interface PluginMetadata {
   repository?: string;
   keywords?: string[];
   license?: string;
+  // Additional properties
+  id?: string;
+  compatibility?: string;
+  permissions?: PluginPermissions;
 }
 
 export interface PluginPermissions {
@@ -43,6 +56,19 @@ export interface EnginePlugin {
   version: string;
   enabled?: boolean;
   permissions?: PluginPermissions;
+  author?: string;
+  description?: string;
 }
 
-export { InstalledPlugin, PluginVerification } from './modules';
+export interface InstalledPlugin {
+  name: string;
+  version: string;
+  path: string;
+  enabled: boolean;
+}
+
+export interface PluginVerification {
+  valid: boolean;
+  signature?: string;
+  checksum?: string;
+}

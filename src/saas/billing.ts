@@ -4,7 +4,7 @@
  * Handles subscription management, payments, invoicing, and usage-based billing.
  */
 
-import type { SubscriptionPlan, UsageRecord, Invoice, BillingInfo } from './organization';
+import type { SubscriptionPlan, Subscription, UsageRecord, Invoice, BillingInfo } from './organization';
 
 export type PaymentProvider = 'stripe' | 'paddle';
 
