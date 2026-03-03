@@ -75,7 +75,7 @@ export interface SAMLConfig {
   ssoUrl?: string;
   
   /** Entity ID / Issuer */
-  entityId: string;
+  entityId?: string;
   
   /** X.509 Certificate for signature verification */
   certificate?: string;
@@ -84,7 +84,7 @@ export interface SAMLConfig {
   spEntityId?: string;
   
   /** Assertion Consumer Service URL */
-  acsUrl: string;
+  acsUrl?: string;
   
   /** Single Logout URL */
   sloUrl?: string;

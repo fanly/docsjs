@@ -64,6 +64,12 @@ export interface TransformationProfile {
       tables: boolean;
       images: boolean;
       annotations: boolean;
+      citations?: boolean;
+      footnotes?: boolean;
+      headersFooters?: boolean;
+      codeBlocks?: boolean;
+      watermarks?: boolean;
+      syntaxHighlighting?: boolean;
     };
     performance: {
       chunkSize: number;
@@ -87,7 +93,7 @@ export interface TransformationProfile {
   // Security settings for this profile
   security: {
     allowedDomains: string[];
-    sanitizerProfile: 'fidelity-first' | 'strict' | 'none';
+    sanitizerProfile: 'fidelity-first' | 'strict' | 'none' | 'business' | 'balanced';
   };
 }
 

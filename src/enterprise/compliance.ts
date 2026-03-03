@@ -4,6 +4,11 @@
  * Compliance processing profiles for SOX, FERPA, HIPAA, and other regulations.
  */
 
+import type { TransformationProfile as Profile } from '../types/engine';
+
+/**
+ */
+
 
 
 /**
