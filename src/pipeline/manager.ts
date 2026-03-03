@@ -31,6 +31,7 @@ import type {
 import { HtmlParser } from '../parsers/html/parser';
 import type { HtmlRenderOptions, HtmlRenderResult } from '../renderers';
 import { MarkdownRenderer } from '../renderers/markdown/renderer';
+import { HtmlRenderer } from '../renderers/html/renderer';
 import { DocumentAST } from '../ast/types';
 
 export const DEFAULT_PIPELINE_CONTEXT: PipelineContext = {
@@ -219,7 +220,8 @@ export class PipelineManager {
       const htmlResult: HtmlParseResult = await htmlParser.parse(context.input);
       
       context.state.ast = htmlResult.ast;
-      context.metrics.processedBytes = htmlResult.report.processedBytes || 0;
+      context.metrics.processedBytes = (htmlResult.report as any).processedBytes || 0;
+      context.metrics.processedChars = (htmlResult.report as any).processedChars || 0;
       context.metrics.processedChars = htmlResult.report.processedChars || 0;
       
       // Process parser-generated diagnostics
@@ -244,7 +246,8 @@ export class PipelineManager {
       context.state.ast = result.ast;
       context.metrics.processedBytes = result.report.elapsedMs || 0;
       context.metrics.processedChars = result.report.elapsedMs || 0;
-      context.metrics.processedBytes = result.report.processedBytes || 0;
+      context.metrics.processedBytes = (result.report as any).processedBytes || 0;
+      context.metrics.processedChars = (result.report as any).processedChars || 0;
       context.metrics.processedChars = result.report.processedChars || 0;
       
       // Process parser-generated diagnostics
