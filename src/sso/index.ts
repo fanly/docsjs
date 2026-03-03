@@ -5,8 +5,6 @@
  * Supports Okta, Azure AD, OneLogin, Auth0, and generic SAML providers.
  */
 
-import type { User } from "../types";
-
 /**
  * SSO Provider types
  */
