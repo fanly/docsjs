@@ -310,12 +310,12 @@ export type {
   AccessControlRules,
   EncryptionRequirements
 } from './compliance';
-  ComplianceProfileConfig,
-  DataHandlingRules,
-  RetentionRequirements,
-  AccessControlRules,
-  EncryptionRequirements
-} from './compliance';
+
+
+
+
+
+
 
 // Deployment exports
 export { OnPremisesDeploymentManager } from './deployment';
