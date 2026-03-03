@@ -495,7 +495,7 @@ export class ComplianceManagerV2 {
         allowedDomains: this.config.dataHandling.dataResidency 
           ? [this.config.dataHandling.dataResidency] 
           : [],
-        sanitizerProfile: this.config.auditLevel === 'strict' ? 'strict' : 'standard'
+        sanitizerProfile: this.config.auditLevel === 'strict' ? 'strict' : 'fidelity-first'
       }
     };
   }

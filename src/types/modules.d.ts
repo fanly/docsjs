@@ -18,6 +18,27 @@ declare module 'yjs' {
     on(event: string, callback: Function): void;
   }
   export function createDoc(): Doc;
+  
+  const Y: {
+    Doc: typeof Doc;
+    Awareness: typeof Awareness;
+    createDoc: typeof createDoc;
+  };
+  export default Y;
+}
+declare module 'yjs' {
+  export class Doc {
+    constructor();
+    getMap(name?: string): any;
+    getArray(name?: string): any;
+    getText(name?: string): any;
+  }
+  export class Awareness {
+    setLocalState(state: any): void;
+    getLocalState(): any;
+    on(event: string, callback: Function): void;
+  }
+  export function createDoc(): Doc;
 }
 
 // Declaration for pdf-parse
