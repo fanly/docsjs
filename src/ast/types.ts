@@ -228,7 +228,9 @@ export type BlockNode =
   | BlockquoteNode
   | DividerNode
   | ThematicBreakNode
-  | CustomBlockNode;
+  | CustomBlockNode
+  | ImageNode;
+
 
 // ---- Paragraph ----
 
@@ -306,6 +308,7 @@ export interface ListNode {
   id: string;
   listType: "ordered" | "unordered" | "description";
   items: ListItemNode[];
+  children?: BlockNode[];
   
   /** List style reference */
   styleId?: string;
@@ -326,7 +329,7 @@ export interface ListItemNode {
   number?: number;
   
   /** Nesting level (0-based) */
-  level: number;
+  level?: number;
   
   /** For description lists */
   term?: InlineNode[];
