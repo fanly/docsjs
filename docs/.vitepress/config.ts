@@ -31,7 +31,7 @@ export default defineConfig({
           { text: "API", link: "/api/", activeMatch: "/api/" },
           { text: "Examples", link: "/examples/", activeMatch: "/examples/" },
           {
-            text: "v2.0.0",
+            text: "v1.0.0",
             items: [
               { text: "Changelog", link: "https://github.com/fanly/docsjs/releases" },
               {
@@ -115,7 +115,7 @@ export default defineConfig({
           { text: "API", link: "/zh/api/", activeMatch: "/zh/api/" },
           { text: "示例", link: "/zh/examples/", activeMatch: "/zh/examples/" },
           {
-            text: "v2.0.0",
+            text: "v1.0.0",
             items: [
               { text: "更新日志", link: "https://github.com/fanly/docsjs/releases" },
               {

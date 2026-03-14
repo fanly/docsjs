@@ -46,7 +46,7 @@ features:
     <div class="stat-label">Quality Gate Tests</div>
   </div>
   <div class="stat-item">
-    <div class="stat-value">v2.0.0</div>
+    <div class="stat-value">v1.0.0</div>
     <div class="stat-label">Latest Version</div>
   </div>
   <div class="stat-item">

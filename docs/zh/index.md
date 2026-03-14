@@ -46,7 +46,7 @@ features:
     <div class="stat-label">质量门测试</div>
   </div>
   <div class="stat-item">
-    <div class="stat-value">v2.0.0</div>
+    <div class="stat-value">v1.0.0</div>
     <div class="stat-label">当前版本</div>
   </div>
   <div class="stat-item">
