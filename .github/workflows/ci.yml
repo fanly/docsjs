@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - "codex/**"
+  tag:
+    - "v*"
 
 jobs:
   quality:
@@ -37,3 +39,31 @@ jobs:
 
       - name: Test
         run: vp test run
+
+  publish:
+    needs: quality
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install Vite+
+        run: npm install -g vite-plus
+
+      - name: Install dependencies
+        run: vp install
+
+      - name: Build
+        run: vp build
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
