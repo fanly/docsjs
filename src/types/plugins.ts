@@ -58,10 +58,11 @@ export interface PluginPermissions {
 export interface EnginePlugin {
   name: string;
   version: string;
-  enabled?: boolean;
-  permissions?: PluginPermissions;
   author?: string;
   description?: string;
+  enabled?: boolean;
+  permissions?: PluginPermissions;
+  [key: string]: unknown;
 }
 
 export interface InstalledPlugin {

@@ -18,7 +18,7 @@ export function createListStylePlugin(): TransformPlugin {
 
       const abstractNums = Array.from(
         context.numberingXml.querySelectorAll("w\\:abstractNum, abstractNum"),
-      );
+      ) as Element[];
       const listStyles: Record<string, { format: string; text: string }> = {};
 
       for (const abs of abstractNums) {

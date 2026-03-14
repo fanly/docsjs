@@ -136,7 +136,7 @@ export class SecurePluginRegistry {
 
       return {
         success: true,
-        plugin,
+        plugin: plugin as unknown as EnginePlugin,
         verification,
       };
     } catch (error) {
@@ -375,7 +375,10 @@ export class SecurePluginRegistry {
       name: path.split("/")[3] || "unknown",
       version: "1.0.0",
       path: path,
-      plugin: {} as EnginePlugin,
+      plugin: {
+        name: path.split("/")[3] || "unknown",
+        version: "1.0.0",
+      } as unknown as EnginePlugin,
       installed: true,
       enabled: true,
       verified: false,

@@ -16,10 +16,10 @@ export function createStyleInheritancePlugin(): TransformPlugin {
         return html;
       }
 
-      const styles = Array.from(context.stylesXml.querySelectorAll("w\\:style, style"));
+      const styles = context.stylesXml.querySelectorAll("w\\:style, style");
       const styleMap: Record<string, Record<string, string>> = {};
 
-      for (const style of styles) {
+      for (const style of Array.from(styles) as Element[]) {
         const type = style.getAttribute("w:type");
         const styleId = style.getAttribute("w:styleId");
         if (!styleId) {

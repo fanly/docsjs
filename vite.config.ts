@@ -22,6 +22,7 @@ export default defineConfig({
       "scripts/**",
       "bin/**",
       "run-tests.js",
+      "tests/**",
     ],
     rules: {
       "constructor-super": "error",
