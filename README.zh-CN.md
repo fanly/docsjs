@@ -24,6 +24,29 @@
 - GitHub: https://github.com/fanly/docsjs-markdown
 - 产品页: https://fanly.github.io/docsjs-markdown/
 
+## 🛠️ 基于 Vite+ 构建
+
+DocsJS 基于 [Vite+](https://viteplus.dev) 构建，新一代统一 JavaScript 工具链：
+
+```bash
+# 开发
+vp dev              # 启动 HMR 开发服务器
+vp test             # 使用 Vitest 4.1 运行测试
+vp check            # TypeScript + Oxlint + Oxfmt 检查
+
+# 构建与发布
+vp build            # 使用 Rolldown 生产构建
+vp pack             # 打包发布
+```
+
+### 为什么选择 Vite+?
+
+- **🚀 更快构建** - 基于 Rolldown 的bundler，优化生产输出
+- **🔒 类型安全** - 集成 Oxlint，支持类型感知的全面代码检查
+- **📦 更小包体积** - Tree-shaking 和代码分割优化
+- **🧪 更好测试** - Vitest 4.1 提升性能和可靠性
+- **🎯 统一工具链** - 单CLI搞定开发、测试、构建、代码检查
+
 ## 核心能力
 
 - Web Component 内核：`docs-word-editor`

@@ -5,6 +5,10 @@
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![License](https://img.shields.io/npm/l/@coding01/docsjs)](LICENSE)
 
+## 🚀 Documentation Website
+
+📚 **Explore our comprehensive documentation: [docsjs.coding01.cn](https://docsjs.coding01.cn)**
+
 ## 🚀 Key Features
 
 - 🔌 **Plugin Ecosystem** - 8 lifecycle hooks with security sandboxing ([Learn more](./PLUGINS.md))
@@ -13,6 +17,30 @@
 - ⚡ **High Fidelity** - Preserve Word document semantics and layout
 - 🌐 **Multi-Format** - DOCX / HTML / Markdown / JSON with AST core
 - 🏗️ **Platform-Grade** - Designed for extensibility and integrations
+- ⚡ **Built with Vite+** - Powered by the next-generation unified toolchain (Vite 8 + Rolldown + Oxlint)
+
+## 🛠️ Built with Vite+
+
+DocsJS is built and powered by [Vite+](https://viteplus.dev), the next-generation unified JavaScript toolchain:
+
+```bash
+# Development
+vp dev              # Start dev server with HMR
+vp test             # Run tests with Vitest 4.1
+vp check            # TypeScript + Oxlint + Oxfmt
+
+# Build & Release
+vp build            # Production build with Rolldown
+vp pack             # Package library for distribution
+```
+
+### Why Vite+?
+
+- **🚀 Faster Builds** - Rolldown-based bundling for optimal production output
+- **🔒 Type-Safe** - Integrated Oxlint for comprehensive linting with type awareness
+- **📦 Smaller Bundles** - Tree-shaking and code splitting optimized for production
+- **🧪 Better Testing** - Vitest 4.1 with improved performance and reliability
+- **🎯 Unified Toolchain** - Single CLI for dev, test, build, and lint workflows
 
 ## 🏗️ Core Architecture
 

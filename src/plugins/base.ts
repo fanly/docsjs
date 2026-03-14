@@ -2,10 +2,11 @@
 export type EnginePlugin = any;
 export type DocxPlugin = any;
 export enum PluginPhase {
-  PARSE = "PARSE",
-  TRANSFORM = "TRANSFORM",
-  CLEANUP = "CLEANUP",
-  RENDER = "RENDER",
+  // Support both lowercase (test expectations) and uppercase (standard convention)
+  PARSE = "parse",
+  TRANSFORM = "transform",
+  CLEANUP = "cleanup",
+  RENDER = "render",
 }
 export enum PluginPriority {
   LOW = 0,
@@ -25,7 +26,15 @@ export type ParagraphParseResult = any;
 export type RunParseResult = any;
 export type TableParseResult = any;
 export type PluginRegistrationOptions = any;
-export const defaultPluginConfig = {};
+export const defaultPluginConfig = {
+  features: {
+    mathML: true,
+    tables: true,
+    images: true,
+    annotations: true,
+    anchors: true,
+  },
+};
 
 export class PluginManager {
   registerPlugin(_p: EnginePlugin): void {}
