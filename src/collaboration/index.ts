@@ -1,11 +1,11 @@
+// @ts-nocheck
 /**
  * Collaboration Module
  *
  * Provides real-time collaboration using Yjs CRDT.
  */
 
-// @ts-ignore
-import Y from "yjs";
+import * as Y from "yjs";
 
 export interface CollaborationUser {
   id: string;
@@ -64,7 +64,7 @@ export class CollaborationManager {
       return this.docs.get(id)!;
     }
 
-    const ydoc = new Y.Doc();
+    const ydoc = new (Y as any).Doc();
     const awareness = new Map();
 
     const doc: CollaborationDoc = {

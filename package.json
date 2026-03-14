@@ -71,7 +71,8 @@
     "prepare": "vp config"
   },
   "dependencies": {
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "yjs": "^13.6.29"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

@@ -9,6 +9,7 @@
     "preview": "vp preview --port 4174"
   },
   "dependencies": {
+    "@coding01/docsjs": "file:../..",
     "jszip": "^3.10.1",
     "vue": "^3.5.13"
   },

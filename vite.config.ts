@@ -1385,14 +1385,43 @@ export default defineConfig({
     __DOCSJS_VERSION__: JSON.stringify("0.0.0"),
   },
   build: {
-    rollupOptions: {
-      input: {
+    lib: {
+      entry: {
         index: "src/index.ts",
         core: "src/core.ts",
         react: "src/react.ts",
         vue: "src/vue.ts",
       },
-      external: ["react", "react-dom", "vue", "jszip", "yjs"],
+      formats: ["es", "cjs"],
+    },
+    rollupOptions: {
+      external: [
+        "react",
+        "react-dom",
+        "vue",
+        "jszip",
+        "yjs",
+        "http",
+        "https",
+        "crypto",
+        "fs",
+        "path",
+        "os",
+      ],
+      output: [
+        {
+          format: "es",
+          entryFileNames: "[name].js",
+          chunkFileNames: "chunks/[name]-[hash].js",
+          assetFileNames: "assets/[name]-[hash][extname]",
+        },
+        {
+          format: "cjs",
+          entryFileNames: "[name].cjs",
+          chunkFileNames: "chunks/[name]-[hash].cjs",
+          assetFileNames: "assets/[name]-[hash][extname]",
+        },
+      ],
     },
   },
 });

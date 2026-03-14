@@ -9,9 +9,11 @@
     "preview": "vp preview --port 4173"
   },
   "dependencies": {
+    "@coding01/docsjs": "file:../..",
     "jszip": "^3.10.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yjs": "^13.6.29"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.0",
