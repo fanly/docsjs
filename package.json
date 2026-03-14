@@ -92,7 +92,8 @@
     "typescript": "^5.7.3",
     "vitest": "^3.2.4",
     "jsdom": "^26.0.0",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "vite": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "vue": {
