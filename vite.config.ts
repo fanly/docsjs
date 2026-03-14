@@ -101,7 +101,7 @@ export default defineConfig({
       "@typescript-eslint/prefer-namespace-keyword": "error",
       "@typescript-eslint/triple-slash-reference": "error",
     },
-    overrides: [
+  overrides: [
       {
         files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
         rules: {
@@ -1377,6 +1377,20 @@ export default defineConfig({
     options: {
       typeAware: true,
       typeCheck: true,
+    },
+  },
+  define: {
+    __DOCSJS_VERSION__: JSON.stringify("0.0.0"),
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        index: "src/index.ts",
+        core: "src/core.ts",
+        react: "src/react.ts",
+        vue: "src/vue.ts",
+      },
+      external: ["react", "react-dom", "vue", "jszip", "yjs"],
     },
   },
 });
