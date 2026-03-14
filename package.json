@@ -2,15 +2,38 @@
   "name": "@coding01/docsjs",
   "version": "2.0.0",
   "description": "Render-first Word fidelity component with Web Component core and React/Vue adapters",
+  "keywords": [
+    "docx",
+    "editor",
+    "fidelity",
+    "iframe",
+    "react",
+    "vue",
+    "web-component",
+    "word"
+  ],
+  "homepage": "https://github.com/fanly/docsjs#readme",
+  "bugs": {
+    "url": "https://github.com/fanly/docsjs/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fanly/docsjs.git"
+  },
+  "bin": {
+    "docsjs": "./bin/docsjs.js"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/*.cjs",
+    "dist/*.d.ts"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": {
-    "docsjs": "./bin/docsjs.js"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,15 +51,13 @@
       "require": "./dist/vue.cjs"
     }
   },
-  "files": [
-    "dist/*.js",
-    "dist/*.cjs",
-    "dist/*.d.ts"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "vp lint .",
     "build": "tsup",
-    "test": "vitest run",
+    "test": "vp test run",
     "typecheck": "tsc --noEmit",
     "sizecheck": "node scripts/check-dist-size.mjs",
     "sizecheck:pkg": "node scripts/check-package-size.mjs",
@@ -46,33 +67,8 @@
     "benchmark:fidelity": "node scripts/fidelity-benchmark.mjs",
     "docs:sync": "node scripts/sync-doc-content.mjs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run sizecheck && npm run sizecheck:pkg",
-    "prepublishOnly": "npm run verify"
-  },
-  "keywords": [
-    "word",
-    "docx",
-    "editor",
-    "fidelity",
-    "iframe",
-    "react",
-    "vue",
-    "web-component"
-  ],
-  "homepage": "https://github.com/fanly/docsjs#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fanly/docsjs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/fanly/docsjs/issues"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
-    "vue": ">=3.4.0"
+    "prepublishOnly": "npm run verify",
+    "prepare": "vp config"
   },
   "dependencies": {
     "jszip": "^3.10.1"
@@ -82,22 +78,32 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "eslint": "^9.18.0",
     "globals": "^15.14.0",
+    "jsdom": "^26.0.0",
     "pixelmatch": "^6.0.0",
     "playwright": "^1.51.1",
     "pngjs": "^7.0.0",
     "tsup": "^8.3.5",
-    "typescript-eslint": "^8.20.0",
     "typescript": "^5.7.3",
-    "vitest": "^4.1.0",
-    "jsdom": "^26.0.0",
-    "vue": "^3.5.13",
-    "vite": "^8.0.0"
+    "typescript-eslint": "^8.20.0",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+    "vue": "^3.5.13"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vue": ">=3.4.0"
   },
   "peerDependenciesMeta": {
     "vue": {
       "optional": true
     }
-  }
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.11.1"
 }
