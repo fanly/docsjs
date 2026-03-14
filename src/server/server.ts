@@ -1,5 +1,19 @@
 import * as http from "http";
-import { randomUUID } from "crypto";
+
+function generateUUID(): string {
+  if (
+    typeof globalThis !== "undefined" &&
+    globalThis.crypto &&
+    typeof globalThis.crypto.randomUUID === "function"
+  ) {
+    return globalThis.crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 import {
   type ServerConfig,
   type ApiResponse,
@@ -76,7 +90,7 @@ class DocsJSServer {
   async start(): Promise<void> {
     return new Promise((resolve) => {
       this.server = http.createServer(async (req, res) => {
-        const requestId = randomUUID();
+        const requestId = generateUUID();
         const startTime = Date.now();
 
         res.setHeader("Content-Type", "application/json");
@@ -372,7 +386,7 @@ class DocsJSServer {
 
   private async processBatch(req: BatchConvertRequest): Promise<BatchConvertResultData> {
     const results: BatchConvertResultData = {
-      jobId: randomUUID(),
+      jobId: generateUUID(),
       total: req.files.length,
       completed: 0,
       failed: 0,
@@ -423,7 +437,7 @@ class DocsJSServer {
     callbackUrl?: string,
   ): Promise<Job> {
     const job: Job = {
-      id: randomUUID(),
+      id: generateUUID(),
       type,
       status: "pending",
       progress: 0,
@@ -543,7 +557,7 @@ class DocsJSServer {
     }
 
     const webhook: WebhookRegistration = {
-      id: randomUUID(),
+      id: generateUUID(),
       url: req.url,
       events: req.events,
       secret: req.secret,
@@ -613,7 +627,7 @@ class DocsJSServer {
     const payload = {
       event,
       timestamp: Date.now(),
-      requestId: randomUUID(),
+      requestId: generateUUID(),
       data,
     };
 
