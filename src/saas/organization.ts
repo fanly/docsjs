@@ -1,6 +1,6 @@
 /**
  * SaaS Platform Module
- * 
+ *
  * Administration, organization management, and billing for DocsJS cloud platform.
  */
 
@@ -50,7 +50,7 @@ export interface OrganizationSettings {
   ssoProvider?: string;
 }
 
-export type OrganizationRole = 'owner' | 'admin' | 'member' | 'viewer';
+export type OrganizationRole = "owner" | "admin" | "member" | "viewer";
 
 export interface OrganizationMember {
   id: string;
@@ -77,13 +77,13 @@ export interface OrganizationInvitation {
 // Subscription & Billing
 // ============================================================================
 
-export type SubscriptionPlan = 'free' | 'starter' | 'professional' | 'enterprise';
+export type SubscriptionPlan = "free" | "starter" | "professional" | "enterprise";
 
 export interface Subscription {
   id: string;
   organizationId: string;
   plan: SubscriptionPlan;
-  status: 'active' | 'canceled' | 'past_due' | 'trialing';
+  status: "active" | "canceled" | "past_due" | "trialing";
   currentPeriodStart: number;
   currentPeriodEnd: number;
   cancelAtPeriodEnd: boolean;
@@ -92,7 +92,7 @@ export interface Subscription {
 }
 
 export interface UsageRecord {
-  metric: 'api_calls' | 'storage_gb' | 'transformations' | 'seats';
+  metric: "api_calls" | "storage_gb" | "transformations" | "seats";
   used: number;
   limit: number;
   unitPrice: number;
@@ -116,7 +116,7 @@ export interface BillingInfo {
   };
   /** Payment method */
   paymentMethod?: {
-    type: 'card' | 'bank';
+    type: "card" | "bank";
     last4: string;
     brand?: string;
     expiryMonth?: number;
@@ -129,7 +129,7 @@ export interface Invoice {
   organizationId: string;
   amount: number;
   currency: string;
-  status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible';
+  status: "draft" | "open" | "paid" | "void" | "uncollectible";
   periodStart: number;
   periodEnd: number;
   paidAt?: number;
@@ -149,68 +149,62 @@ export interface InvoiceLineItem {
 // Plan Pricing
 // ============================================================================
 
-export const PLAN_PRICING: Record<SubscriptionPlan, {
-  name: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
-  features: string[];
-  limits: {
-    apiCalls: number;
-    storageGB: number;
-    transformations: number;
-    seats: number;
-  };
-}> = {
+export const PLAN_PRICING: Record<
+  SubscriptionPlan,
+  {
+    name: string;
+    monthlyPrice: number;
+    yearlyPrice: number;
+    features: string[];
+    limits: {
+      apiCalls: number;
+      storageGB: number;
+      transformations: number;
+      seats: number;
+    };
+  }
+> = {
   free: {
-    name: 'Free',
+    name: "Free",
     monthlyPrice: 0,
     yearlyPrice: 0,
-    features: [
-      'Up to 100 transformations/month',
-      '1 GB storage',
-      'Community support',
-    ],
+    features: ["Up to 100 transformations/month", "1 GB storage", "Community support"],
     limits: { apiCalls: 100, storageGB: 1, transformations: 100, seats: 1 },
   },
   starter: {
-    name: 'Starter',
+    name: "Starter",
     monthlyPrice: 29,
     yearlyPrice: 290,
-    features: [
-      '5,000 transformations/month',
-      '10 GB storage',
-      'Basic analytics',
-      'Email support',
-    ],
+    features: ["5,000 transformations/month", "10 GB storage", "Basic analytics", "Email support"],
     limits: { apiCalls: 5000, storageGB: 10, transformations: 5000, seats: 3 },
   },
   professional: {
-    name: 'Professional',
+    name: "Professional",
     monthlyPrice: 99,
     yearlyPrice: 990,
     features: [
-      '50,000 transformations/month',
-      '100 GB storage',
-      'Advanced analytics',
-      'Priority support',
-      'Custom branding',
-      'API access',
+      "50,000 transformations/month",
+      "100 GB storage",
+      "Advanced analytics",
+      "Priority support",
+      "Custom branding",
+      "API access",
     ],
     limits: { apiCalls: 50000, storageGB: 100, transformations: 50000, seats: 10 },
   },
   enterprise: {
-    name: 'Enterprise',
+    name: "Enterprise",
     monthlyPrice: 499,
     yearlyPrice: 4990,
     features: [
-      'Unlimited transformations',
-      '1 TB storage',
-      'Enterprise analytics',
-      'Dedicated support',
-      'Custom contracts',
-      'SSO/SAML',
-      'Audit logs',
-      'SLA guarantee',
+      "Unlimited transformations",
+      "1 TB storage",
+      "Enterprise analytics",
+      "Dedicated support",
+      "Custom contracts",
+      "SSO/SAML",
+      "Audit logs",
+      "SLA guarantee",
     ],
     limits: { apiCalls: -1, storageGB: 1000, transformations: -1, seats: -1 },
   },
@@ -235,34 +229,34 @@ export class OrganizationManager {
     plan?: SubscriptionPlan;
   }): Promise<Organization> {
     const org: Organization = {
-      id: 'org_' + this.generateId(),
+      id: "org_" + this.generateId(),
       name: data.name,
       slug: data.slug,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      plan: data.plan || 'free',
+      plan: data.plan || "free",
       settings: {
         allowInvitations: true,
         require2FA: false,
-        defaultRole: 'member',
+        defaultRole: "member",
         ssoEnabled: false,
       },
       billing: {
-        billingEmail: '',
+        billingEmail: "",
       },
       ownerId: data.ownerId,
       memberIds: [data.ownerId],
-      timezone: 'UTC',
+      timezone: "UTC",
     };
 
     this.organizations.set(org.id, org);
 
     // Add owner as member
     const member: OrganizationMember = {
-      id: 'mem_' + this.generateId(),
+      id: "mem_" + this.generateId(),
       userId: data.ownerId,
       organizationId: org.id,
-      role: 'owner',
+      role: "owner",
       joinedAt: Date.now(),
     };
     this.members.set(member.id, member);
@@ -281,15 +275,20 @@ export class OrganizationManager {
    * Get organization by slug
    */
   getOrganizationBySlug(slug: string): Organization | undefined {
-    return Array.from(this.organizations.values()).find(o => o.slug === slug);
+    return Array.from(this.organizations.values()).find((o) => o.slug === slug);
   }
 
   /**
    * Update organization
    */
-  async updateOrganization(id: string, updates: Partial<Organization>): Promise<Organization | null> {
+  async updateOrganization(
+    id: string,
+    updates: Partial<Organization>,
+  ): Promise<Organization | null> {
     const org = this.organizations.get(id);
-    if (!org) {return null;}
+    if (!org) {
+      return null;
+    }
 
     const updated = { ...org, ...updates, updatedAt: Date.now() };
     this.organizations.set(id, updated);
@@ -300,18 +299,24 @@ export class OrganizationManager {
    * Get organization members
    */
   getMembers(organizationId: string): OrganizationMember[] {
-    return Array.from(this.members.values()).filter(m => m.organizationId === organizationId);
+    return Array.from(this.members.values()).filter((m) => m.organizationId === organizationId);
   }
 
   /**
    * Add member to organization
    */
-  async addMember(organizationId: string, userId: string, role: OrganizationRole = 'member'): Promise<OrganizationMember> {
+  async addMember(
+    organizationId: string,
+    userId: string,
+    role: OrganizationRole = "member",
+  ): Promise<OrganizationMember> {
     const org = this.organizations.get(organizationId);
-    if (!org) {throw new Error('Organization not found');}
+    if (!org) {
+      throw new Error("Organization not found");
+    }
 
     const member: OrganizationMember = {
-      id: 'mem_' + this.generateId(),
+      id: "mem_" + this.generateId(),
       userId,
       organizationId,
       role,
@@ -330,15 +335,17 @@ export class OrganizationManager {
    */
   async removeMember(organizationId: string, userId: string): Promise<boolean> {
     const org = this.organizations.get(organizationId);
-    if (!org) {return false;}
+    if (!org) {
+      return false;
+    }
 
     const member = Array.from(this.members.values()).find(
-      m => m.organizationId === organizationId && m.userId === userId
+      (m) => m.organizationId === organizationId && m.userId === userId,
     );
 
     if (member) {
       this.members.delete(member.id);
-      org.memberIds = org.memberIds.filter(id => id !== userId);
+      org.memberIds = org.memberIds.filter((id) => id !== userId);
       org.updatedAt = Date.now();
       return true;
     }
@@ -348,9 +355,13 @@ export class OrganizationManager {
   /**
    * Update member role
    */
-  async updateMemberRole(organizationId: string, userId: string, role: OrganizationRole): Promise<boolean> {
+  async updateMemberRole(
+    organizationId: string,
+    userId: string,
+    role: OrganizationRole,
+  ): Promise<boolean> {
     const member = Array.from(this.members.values()).find(
-      m => m.organizationId === organizationId && m.userId === userId
+      (m) => m.organizationId === organizationId && m.userId === userId,
     );
 
     if (member) {
@@ -368,15 +379,15 @@ export class OrganizationManager {
     organizationId: string,
     email: string,
     role: OrganizationRole,
-    invitedBy: string
+    invitedBy: string,
   ): Promise<OrganizationInvitation> {
     const invitation: OrganizationInvitation = {
-      id: 'inv_' + this.generateId(),
+      id: "inv_" + this.generateId(),
       email,
       organizationId,
       role,
       invitedBy,
-      expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
     this.invitations.set(invitation.id, invitation);
@@ -388,7 +399,9 @@ export class OrganizationManager {
    */
   async acceptInvitation(invitationId: string, userId: string): Promise<OrganizationMember | null> {
     const invitation = this.invitations.get(invitationId);
-    if (!invitation || invitation.expiresAt < Date.now()) {return null;}
+    if (!invitation || invitation.expiresAt < Date.now()) {
+      return null;
+    }
 
     // Add member
     const member = await this.addMember(invitation.organizationId, userId, invitation.role);
@@ -405,15 +418,17 @@ export class OrganizationManager {
    */
   getUsage(organizationId: string): UsageRecord[] {
     const org = this.organizations.get(organizationId);
-    if (!org) {return [];}
+    if (!org) {
+      return [];
+    }
 
     const plan = PLAN_PRICING[org.plan];
     // Mock usage data - real impl would query actual metrics
     return [
-      { metric: 'api_calls', used: 0, limit: plan.limits.apiCalls, unitPrice: 0 },
-      { metric: 'storage_gb', used: 0, limit: plan.limits.storageGB, unitPrice: 0.1 },
-      { metric: 'transformations', used: 0, limit: plan.limits.transformations, unitPrice: 0 },
-      { metric: 'seats', used: org.memberIds.length, limit: plan.limits.seats, unitPrice: 0 },
+      { metric: "api_calls", used: 0, limit: plan.limits.apiCalls, unitPrice: 0 },
+      { metric: "storage_gb", used: 0, limit: plan.limits.storageGB, unitPrice: 0.1 },
+      { metric: "transformations", used: 0, limit: plan.limits.transformations, unitPrice: 0 },
+      { metric: "seats", used: org.memberIds.length, limit: plan.limits.seats, unitPrice: 0 },
     ];
   }
 
@@ -479,12 +494,12 @@ export interface AdminAuditLog {
 }
 
 export interface SystemHealth {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   services: {
-    api: { status: 'ok' | 'degraded' | 'down'; latencyMs: number };
-    database: { status: 'ok' | 'degraded' | 'down'; connections: number };
-    cache: { status: 'ok' | 'degraded' | 'down'; hitRate: number };
-    queue: { status: 'ok' | 'degraded' | 'down'; pending: number };
+    api: { status: "ok" | "degraded" | "down"; latencyMs: number };
+    database: { status: "ok" | "degraded" | "down"; connections: number };
+    cache: { status: "ok" | "degraded" | "down"; hitRate: number };
+    queue: { status: "ok" | "degraded" | "down"; pending: number };
   };
 }
 
@@ -522,7 +537,7 @@ export class AdminManager {
     ipAddress?: string;
   }): Promise<AdminAuditLog> {
     const log: AdminAuditLog = {
-      id: 'log_' + this.generateId(),
+      id: "log_" + this.generateId(),
       organizationId: data.organizationId,
       userId: data.userId,
       action: data.action,
@@ -549,19 +564,19 @@ export class AdminManager {
     let logs = Array.from(this.auditLogs.values());
 
     if (filters?.organizationId) {
-      logs = logs.filter(l => l.organizationId === filters.organizationId);
+      logs = logs.filter((l) => l.organizationId === filters.organizationId);
     }
     if (filters?.userId) {
-      logs = logs.filter(l => l.userId === filters.userId);
+      logs = logs.filter((l) => l.userId === filters.userId);
     }
     if (filters?.action) {
-      logs = logs.filter(l => l.action === filters.action);
+      logs = logs.filter((l) => l.action === filters.action);
     }
     if (filters?.from) {
-      logs = logs.filter(l => l.timestamp >= filters.from!);
+      logs = logs.filter((l) => l.timestamp >= filters.from!);
     }
     if (filters?.to) {
-      logs = logs.filter(l => l.timestamp <= filters.to!);
+      logs = logs.filter((l) => l.timestamp <= filters.to!);
     }
 
     logs.sort((a, b) => b.timestamp - a.timestamp);
@@ -578,12 +593,12 @@ export class AdminManager {
    */
   async getSystemHealth(): Promise<SystemHealth> {
     return {
-      status: 'healthy',
+      status: "healthy",
       services: {
-        api: { status: 'ok', latencyMs: 50 },
-        database: { status: 'ok', connections: 10 },
-        cache: { status: 'ok', hitRate: 0.95 },
-        queue: { status: 'ok', pending: 0 },
+        api: { status: "ok", latencyMs: 50 },
+        database: { status: "ok", connections: 10 },
+        cache: { status: "ok", hitRate: 0.95 },
+        queue: { status: "ok", pending: 0 },
       },
     };
   }

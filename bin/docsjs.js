@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-
 /**
  * DocsJS CLI
- * 
+ *
  * Command-line interface for document transformation.
- * 
+ *
  * Usage:
  *   docsjs <input> [options]
  *   docsjs convert <input> -o <output> --profile <profile>
@@ -19,15 +18,16 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-interface CLIOptions {
-  output?: string;
-  profile?: string;
-  format?: string;
-  watch?: boolean;
-  port?: string;
-  help?: boolean;
-  verbose?: boolean;
-}
+/**
+ * @typedef {Object} CLIOptions
+ * @property {string} [output]
+ * @property {string} [profile]
+ * @property {string} [format]
+ * @property {boolean} [watch]
+ * @property {string} [port]
+ * @property {boolean} [help]
+ * @property {boolean} [verbose]
+ */
 
 const HELP_TEXT = `
 DocsJS - Document Transformation Platform
@@ -58,20 +58,24 @@ EXAMPLES:
 
 PROFILES:
   default           - General purpose conversion
-  knowledge-base    - High-fidelity for documentation
-  exam-paper        - Academic papers and exams
-  enterprise        - Security and compliance focused
+  knowledge-base   - High-fidelity for documentation
+  exam-paper       - Academic papers and exams
+  enterprise       - Security and compliance focused
 `;
 
 // Simple argument parser
-function parseArgs(args: string[]): { command: string; input?: string; options: CLIOptions } {
-  const options: CLIOptions = {};
+/**
+ * @param {string[]} args
+ * @returns {{ command: string; input?: string; options: CLIOptions }}
+ */
+function parseArgs(args) {
+  const options = {};
   let command = "";
   let input = "";
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     if (arg === "-o" || arg === "--output") {
       options.output = args[++i];
     } else if (arg === "-f" || arg === "--format") {
@@ -94,7 +98,7 @@ function parseArgs(args: string[]): { command: string; input?: string; options: 
       }
     }
   }
-  
+
   return { command, input, options };
 }
 
@@ -135,7 +139,11 @@ async function main() {
   }
 }
 
-async function handleConvert(input: string | undefined, options: CLIOptions) {
+/**
+ * @param {string | undefined} input
+ * @param {CLIOptions} options
+ */
+async function handleConvert(input, options) {
   if (!input) {
     console.error("Error: Input file required");
     process.exit(1);
@@ -160,8 +168,7 @@ async function handleConvert(input: string | undefined, options: CLIOptions) {
 
   try {
     // Dynamic import to avoid loading engine in CLI help mode
-    const { CoreEngine } = await import("./dist/index.js");
-    const { SYSTEM_PROFILES } = await import("./dist/index.js");
+    const { CoreEngine, SYSTEM_PROFILES } = await import("../dist/index.js");
 
     // Initialize engine
     const engine = new CoreEngine({ debug: verbose });
@@ -187,7 +194,7 @@ async function handleConvert(input: string | undefined, options: CLIOptions) {
     }
 
     // Transform
-    const result = await engine.transformDocument(file as unknown as File, profileName);
+    const result = await engine.transformDocument(file, profileName);
 
     // Output
     if (output) {
@@ -210,46 +217,47 @@ async function handleConvert(input: string | undefined, options: CLIOptions) {
         console.log(`  Time: ${result.diagnostics.stats.total_time_ms}ms`);
       }
     }
-
   } catch (error) {
     console.error(`Error: ${error instanceof Error ? error.message : error}`);
     process.exit(1);
   }
 }
 
-async function handleServe(options: CLIOptions) {
+/**
+ * @param {CLIOptions} options
+ */
+async function handleServe(options) {
   const port = parseInt(options.port || "3000");
   const verbose = options.verbose || false;
 
   console.log(`Starting DocsJS server on port ${port}...`);
 
   try {
-    const { DocsJSServer } = await import("./dist/index.js");
-    const { CoreEngine, SYSTEM_PROFILES } = await import("./dist/index.js");
+    const { DocsJSServer, CoreEngine, SYSTEM_PROFILES } = await import("../dist/index.js");
 
     const server = new DocsJSServer({ port, logging: verbose });
-    
+
     server.setRequestHandler(async (req) => {
       const engine = new CoreEngine({ debug: verbose });
       for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
         engine.registerProfile(profile);
       }
-      engine.applyProfile(req.profile || 'default');
+      engine.applyProfile(req.profile || "default");
 
       if (!req.file) {
-        throw new Error('No file provided');
+        throw new Error("No file provided");
       }
 
-      const buffer = Buffer.from(req.file, 'base64');
-      const file = new Blob([buffer], { type: 'application/octet-stream' });
-      Object.defineProperty(file, 'name', { value: 'input.docx' });
+      const buffer = Buffer.from(req.file, "base64");
+      const file = new Blob([buffer], { type: "application/octet-stream" });
+      Object.defineProperty(file, "name", { value: "input.docx" });
 
-      const result = await engine.transformDocument(file as unknown as File, req.profile || 'default');
-      
+      const result = await engine.transformDocument(file, req.profile || "default");
+
       return {
         output: result.output,
         outputFormat: req.outputFormat,
-        profile: req.profile || 'default',
+        profile: req.profile || "default",
         metrics: result.diagnostics?.stats,
         diagnostics: result.diagnostics?.errors?.concat(result.diagnostics?.warnings || []),
       };
@@ -260,15 +268,6 @@ async function handleServe(options: CLIOptions) {
     console.error(`Failed to start server: ${error instanceof Error ? error.message : error}`);
     process.exit(1);
   }
-}
-  const port = parseInt(options.port || "3000");
-  const verbose = options.verbose || false;
-
-  console.log(`Starting DocsJS server on port ${port}...`);
-  console.log("(Server implementation placeholder - needs HTTP server setup)");
-
-  // This would start an HTTP server with the transformation API
-  // For now, just a placeholder
 }
 
 function handleProfiles() {

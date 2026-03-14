@@ -1,11 +1,11 @@
 /**
  * Embedded Services Module
- * 
+ *
  * SDK for embedding DocsJS in 3rd party products, white-label packaging,
  * and OEM licensing.
  */
 
-import type { SubscriptionPlan } from '../saas/organization';
+import type { SubscriptionPlan } from "../saas/organization";
 
 // ============================================================================
 // SDK Configuration
@@ -66,8 +66,8 @@ export interface SDKFeatures {
 // Embed Types
 // ============================================================================
 
-export type EmbedPosition = 'inline' | 'floating' | 'modal';
-export type EmbedTheme = 'light' | 'dark' | 'auto' | 'custom';
+export type EmbedPosition = "inline" | "floating" | "modal";
+export type EmbedTheme = "light" | "dark" | "auto" | "custom";
 
 export interface EmbedOptions {
   /** Container element ID */
@@ -108,7 +108,7 @@ export interface EmbedInstance {
   /** Set theme */
   setTheme(theme: EmbedTheme): void;
   /** Export to format */
-  exportTo(format: 'html' | 'markdown' | 'json' | 'pdf'): Promise<Blob>;
+  exportTo(format: "html" | "markdown" | "json" | "pdf"): Promise<Blob>;
 }
 
 // ============================================================================
@@ -117,9 +117,9 @@ export interface EmbedInstance {
 
 export interface WidgetConfig {
   /** Widget type */
-  type: 'converter' | 'editor' | 'viewer' | 'comparison';
+  type: "converter" | "editor" | "viewer" | "comparison";
   /** Position */
-  position?: 'left' | 'right' | 'bottom';
+  position?: "left" | "right" | "bottom";
   /** Trigger text */
   triggerText?: string;
   /** Show on pages */
@@ -142,7 +142,7 @@ export interface WidgetInstance {
 // ============================================================================
 
 export interface APIRequest {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
   body?: unknown;
   headers?: Record<string, string>;
@@ -172,11 +172,13 @@ export class DocsJSEmbeddedClient {
    * Initialize SDK
    */
   async initialize(): Promise<void> {
-    if (this.initialized) {return;}
-    
+    if (this.initialized) {
+      return;
+    }
+
     // Validate API key
     await this.validateApiKey();
-    
+
     this.initialized = true;
   }
 
@@ -203,13 +205,13 @@ export class DocsJSEmbeddedClient {
     outputFormat: string;
   }): Promise<{ output: string; metrics?: unknown }> {
     const response = await this.request<APIResponse<{ output: string }>>({
-      method: 'POST',
-      path: '/v1/convert',
+      method: "POST",
+      path: "/v1/convert",
       body: data,
     });
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Conversion failed');
+      throw new Error(response.error?.message || "Conversion failed");
     }
 
     return { output: response.data.output };
@@ -223,13 +225,13 @@ export class DocsJSEmbeddedClient {
     outputFormat: string;
   }): Promise<{ jobId: string }> {
     const response = await this.request<APIResponse<{ jobId: string }>>({
-      method: 'POST',
-      path: '/v1/convert/batch',
+      method: "POST",
+      path: "/v1/convert/batch",
       body: data,
     });
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Batch conversion failed');
+      throw new Error(response.error?.message || "Batch conversion failed");
     }
 
     return response.data;
@@ -244,11 +246,17 @@ export class DocsJSEmbeddedClient {
     transformations: { used: number; limit: number };
   }> {
     const response = await this.request<APIResponse<any>>({
-      method: 'GET',
-      path: '/v1/usage',
+      method: "GET",
+      path: "/v1/usage",
     });
 
-    return response.data || { apiCalls: { used: 0, limit: 0 }, storage: { used: 0, limit: 0 }, transformations: { used: 0, limit: 0 } };
+    return (
+      response.data || {
+        apiCalls: { used: 0, limit: 0 },
+        storage: { used: 0, limit: 0 },
+        transformations: { used: 0, limit: 0 },
+      }
+    );
   }
 
   /**
@@ -256,36 +264,36 @@ export class DocsJSEmbeddedClient {
    */
   async getPlan(): Promise<{ plan: SubscriptionPlan; features: string[] }> {
     const response = await this.request<APIResponse<any>>({
-      method: 'GET',
-      path: '/v1/plan',
+      method: "GET",
+      path: "/v1/plan",
     });
 
-    return response.data || { plan: 'free', features: [] };
+    return response.data || { plan: "free", features: [] };
   }
 
   private async validateApiKey(): Promise<void> {
     const response = await this.request<APIResponse<{ valid: boolean }>>({
-      method: 'POST',
-      path: '/v1/auth/validate',
+      method: "POST",
+      path: "/v1/auth/validate",
     });
 
     if (!response.success || !response.data?.valid) {
-      throw new Error('Invalid API key');
+      throw new Error("Invalid API key");
     }
   }
 
   private async request<T>(req: APIRequest): Promise<T> {
     const url = `${this.config.apiUrl}${req.path}`;
-    
+
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-API-Key': this.config.apiKey,
-      'X-SDK-Version': this.config.version,
+      "Content-Type": "application/json",
+      "X-API-Key": this.config.apiKey,
+      "X-SDK-Version": this.config.version,
       ...req.headers,
     };
 
     if (this.config.organizationId) {
-      headers['X-Organization-Id'] = this.config.organizationId;
+      headers["X-Organization-Id"] = this.config.organizationId;
     }
 
     const response = await fetch(url, {
@@ -311,7 +319,7 @@ class EmbedInstanceImpl implements EmbedInstance {
   constructor(config: EmbeddedSDKConfig, options: EmbedOptions) {
     this.config = config;
     this.options = options;
-    this.init();
+    void this.init();
   }
 
   private async init(): Promise<void> {
@@ -328,33 +336,41 @@ class EmbedInstanceImpl implements EmbedInstance {
   }
 
   private applyStyles(): void {
-    if (!this.container) {return;}
+    if (!this.container) {
+      return;
+    }
 
-    const theme = this.options.theme || 'light';
-    const primaryColor = this.config.whiteLabel?.primaryColor || '#0066cc';
+    const theme = this.options.theme || "light";
+    const primaryColor = this.config.whiteLabel?.primaryColor || "#0066cc";
 
-    this.container.style.setProperty('--docsjs-primary', primaryColor);
+    this.container.style.setProperty("--docsjs-primary", primaryColor);
     this.container.classList.add(`docsjs-embed-${theme}`);
 
     if (this.config.whiteLabel?.customCSS) {
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.textContent = this.config.whiteLabel.customCSS;
       this.container.appendChild(style);
     }
   }
 
   async loadDocument(content: string, format?: string): Promise<void> {
-    if (!this.initialized) {throw new Error('Embed not initialized');}
+    if (!this.initialized) {
+      throw new Error("Embed not initialized");
+    }
     // Load document logic
   }
 
   async getContent(format?: string): Promise<string> {
-    if (!this.initialized) {throw new Error('Embed not initialized');}
-    return '';
+    if (!this.initialized) {
+      throw new Error("Embed not initialized");
+    }
+    return "";
   }
 
   async save(): Promise<void> {
-    if (!this.initialized) {throw new Error('Embed not initialized');}
+    if (!this.initialized) {
+      throw new Error("Embed not initialized");
+    }
     const content = await this.getContent();
     this.options.onSave?.(content);
   }
@@ -369,9 +385,9 @@ class EmbedInstanceImpl implements EmbedInstance {
     this.applyStyles();
   }
 
-  async exportTo(format: 'html' | 'markdown' | 'json' | 'pdf'): Promise<Blob> {
+  async exportTo(format: "html" | "markdown" | "json" | "pdf"): Promise<Blob> {
     const content = await this.getContent(format);
-    return new Blob([content], { type: 'text/html' });
+    return new Blob([content], { type: "text/html" });
   }
 }
 
@@ -391,18 +407,18 @@ class WidgetInstanceImpl implements WidgetInstance {
   }
 
   private init(): void {
-    this.element = document.createElement('div');
+    this.element = document.createElement("div");
     this.element.className = `docsjs-widget docsjs-widget-${this.widgetConfig.type}`;
-    this.element.style.display = 'none';
+    this.element.style.display = "none";
     document.body.appendChild(this.element);
   }
 
   show(): void {
-    this.element!.style.display = 'block';
+    this.element!.style.display = "block";
   }
 
   hide(): void {
-    this.element!.style.display = 'none';
+    this.element!.style.display = "none";
   }
 
   destroy(): void {
@@ -427,8 +443,8 @@ export function createEmbeddedClient(config: EmbeddedSDKConfig): DocsJSEmbeddedC
  */
 export function createEmbed(elementId: string, apiKey: string): EmbedInstance {
   return new DocsJSEmbeddedClient({
-    version: '2.0.0',
-    apiUrl: 'https://api.docsjs.com',
+    version: "2.0.0",
+    apiUrl: "https://api.docsjs.com",
     apiKey,
   }).createEmbed({
     containerId: elementId,
@@ -466,25 +482,25 @@ export class OEMLicenseManager {
    */
   validate(licenseKey: string, domain: string, ip?: string): LicenseValidation {
     const license = this.licenses.get(licenseKey);
-    
+
     if (!license) {
-      return { valid: false, error: 'License not found' };
+      return { valid: false, error: "License not found" };
     }
 
     if (license.expiresAt && license.expiresAt < Date.now()) {
-      return { valid: false, error: 'License expired' };
+      return { valid: false, error: "License expired" };
     }
 
     if (!license.allowedDomains.includes(domain)) {
-      return { valid: false, error: 'Domain not authorized' };
+      return { valid: false, error: "Domain not authorized" };
     }
 
     if (license.allowedIPs?.length && ip && !license.allowedIPs.includes(ip)) {
-      return { valid: false, error: 'IP not authorized' };
+      return { valid: false, error: "IP not authorized" };
     }
 
     if (license.currentSeats >= license.maxSeats) {
-      return { valid: false, error: 'Seat limit exceeded' };
+      return { valid: false, error: "Seat limit exceeded" };
     }
 
     return { valid: true, license };
@@ -502,8 +518,10 @@ export class OEMLicenseManager {
    */
   useSeat(licenseKey: string): boolean {
     const license = this.licenses.get(licenseKey);
-    if (!license) {return false;}
-    
+    if (!license) {
+      return false;
+    }
+
     if (license.currentSeats < license.maxSeats) {
       license.currentSeats++;
       return true;
@@ -516,8 +534,10 @@ export class OEMLicenseManager {
    */
   releaseSeat(licenseKey: string): boolean {
     const license = this.licenses.get(licenseKey);
-    if (!license) {return false;}
-    
+    if (!license) {
+      return false;
+    }
+
     if (license.currentSeats > 0) {
       license.currentSeats--;
       return true;

@@ -1,10 +1,10 @@
 /**
  * Exam Question Extraction
- * 
+ *
  * Extracts questions from academic documents for question banks and assessments.
  */
 
-import type { DocumentNode } from '../ast/types';
+import type { DocumentNode } from "../ast/types";
 
 /**
  * Extracted question
@@ -25,19 +25,19 @@ export interface ExamQuestion {
 /**
  * Question types
  */
-export type QuestionType = 
-  | 'multiple-choice'
-  | 'true-false'
-  | 'short-answer'
-  | 'essay'
-  | 'fill-blank'
-  | 'matching'
-  | 'ordering';
+export type QuestionType =
+  | "multiple-choice"
+  | "true-false"
+  | "short-answer"
+  | "essay"
+  | "fill-blank"
+  | "matching"
+  | "ordering";
 
 /**
  * Difficulty levels
  */
-export type DifficultyLevel = 'easy' | 'medium' | 'hard';
+export type DifficultyLevel = "easy" | "medium" | "hard";
 
 /**
  * Question option
@@ -107,7 +107,7 @@ export class ExamQuestionExtractor {
       minConfidence: 0.5,
       includeExplanation: true,
       autoDifficulty: true,
-      ...config
+      ...config,
     };
   }
 
@@ -116,21 +116,24 @@ export class ExamQuestionExtractor {
    */
   extract(node: DocumentNode | string, options: ExtractionOptions = {}): ExtractionResult {
     const startTime = Date.now();
-    
-    if (typeof node === 'string') {
+
+    if (typeof node === "string") {
       node = this.parseToAST(node);
     }
 
     const questions = this.findQuestions(node);
-    const filtered = this.filterByConfidence(questions, options.minConfidence ?? this.config.minConfidence);
-    
+    const filtered = this.filterByConfidence(
+      questions,
+      options.minConfidence ?? this.config.minConfidence,
+    );
+
     const questionBank = this.createQuestionBank(filtered, options);
     const statistics = this.calculateStatistics(filtered, startTime);
 
     return {
       questions: filtered,
       questionBank,
-      statistics
+      statistics,
     };
   }
 
@@ -138,85 +141,87 @@ export class ExamQuestionExtractor {
    * Sync questions to LMS
    */
   async syncToLMS(questions: ExamQuestion[], lmsConfig: LMSConfig): Promise<SyncResult> {
-    const results: SyncResult['results'] = [];
+    const results: SyncResult["results"] = [];
 
     for (const question of questions) {
       try {
         const lmsQuestion = this.convertToLMSFormat(question, lmsConfig.type);
         const response = await this.pushToLMS(lmsConfig, lmsQuestion);
-        
+
         results.push({
           questionId: question.id,
           success: true,
-          lmsId: response.id
+          lmsId: response.id,
         });
       } catch (error) {
         results.push({
           questionId: question.id,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     }
 
     return {
-      success: results.every(r => r.success),
-      synced: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
-      results
+      success: results.every((r) => r.success),
+      synced: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
+      results,
     };
   }
 
   /**
    * Import from question bank file
    */
-  async importFromFile(file: string, format: 'qti' | 'csv' | 'json'): Promise<ExamQuestion[]> {
+  async importFromFile(file: string, format: "qti" | "csv" | "json"): Promise<ExamQuestion[]> {
     switch (format) {
-      case 'qti':
+      case "qti":
         // TODO: Implement QTI import
-        throw new Error('QTI import not yet implemented');
-      case 'csv':
+        throw new Error("QTI import not yet implemented");
+      case "csv":
         return this.parseCSV(file);
-      case 'json':
+      case "json":
         return this.parseJSON(file);
       default:
-        throw new Error(`Unsupported format: ${format}`);
+        throw new Error(`Unsupported format: ${String(format)}`);
     }
   }
 
   /**
    * Export to question bank file
    */
-  async exportToFile(questions: ExamQuestion[], format: 'qti' | 'csv' | 'json'): Promise<string> {
+  async exportToFile(questions: ExamQuestion[], format: "qti" | "csv" | "json"): Promise<string> {
     switch (format) {
-      case 'qti':
+      case "qti":
         // TODO: Implement QTI import
-        throw new Error('QTI import not yet implemented');
+        throw new Error("QTI import not yet implemented");
         return this.toQTI(questions);
-      case 'csv':
+      case "csv":
         return this.toCSV(questions);
-      case 'json':
+      case "json":
         return this.toJSON(questions);
       default:
-        throw new Error(`Unsupported format: ${format}`);
+        throw new Error(`Unsupported format: ${String(format)}`);
     }
   }
 
   private parseToAST(content: string): DocumentNode {
     // Simplified - would use actual parser
     return {
-      type: 'document',
+      type: "document",
       id: `doc-${Date.now()}`,
-      metadata: { version: '1.0', generator: 'docsjs' },
-      children: [{
-        type: 'section',
-        id: `section-1`,
-        children: content.split('\n').map((line, i) => ({
-          type: 'paragraph',
-          id: `p-${i}`,
-          children: [{ type: 'text', content: line }]
-        }))
-      }]
+      metadata: { version: "1.0", generator: "docsjs" },
+      children: [
+        {
+          type: "section",
+          id: `section-1`,
+          children: content.split("\n").map((line, i) => ({
+            type: "paragraph",
+            id: `p-${i}`,
+            children: [{ type: "text", content: line }],
+          })),
+        },
+      ],
     } as unknown as DocumentNode;
   }
 
@@ -228,7 +233,7 @@ export class ExamQuestionExtractor {
     const questionPatterns = [
       /^(?:Q(?:uestion)?\.?\s*)(\d+)[.)]\s*(.+)/gim,
       /^(?:A(?:nswer)?\.?\s*)(\d+)[.)]\s*(.+)/gim,
-      /^(?:\d+)[.)\]]\s*(?:What|Who|Where|When|Why|How|Define|Explain)/gim
+      /^(?:\d+)[.)\]]\s*(?:What|Who|Where|When|Why|How|Define|Explain)/gim,
     ];
 
     for (const pattern of questionPatterns) {
@@ -252,53 +257,55 @@ export class ExamQuestionExtractor {
 
   private parseQuestion(text: string, index: number): ExamQuestion | null {
     // Basic parsing - would be more sophisticated in production
-    if (text.length < 10) {return null;}
+    if (text.length < 10) {
+      return null;
+    }
 
     return {
       id: `q_${Date.now()}_${index}`,
       type: this.detectQuestionType(text),
       text: text.trim(),
-      difficulty: this.config.autoDifficulty ? this.estimateDifficulty(text) : 'medium',
+      difficulty: this.config.autoDifficulty ? this.estimateDifficulty(text) : "medium",
       tags: this.extractTags(text),
       points: 1,
       metadata: {
         extractedAt: Date.now(),
-        confidence: 0.7
-      }
+        confidence: 0.7,
+      },
     };
   }
 
   private findMultipleChoice(content: string): ExamQuestion[] {
     const questions: ExamQuestion[] = [];
     const pattern = /(?:Q\.?\s*)?(\d+)[.)]\s*([^\n]+)(?:\n\s*([A-D])[.)]\s*([^\n]+))+/g;
-    
+
     let match;
     while ((match = pattern.exec(content)) !== null) {
       const options: QuestionOption[] = [];
       const optionPattern = /([A-D])[.)]\s*([^\n]+)/g;
       let optMatch;
-      
+
       while ((optMatch = optionPattern.exec(match[0])) !== null) {
         options.push({
           id: optMatch[1],
           text: optMatch[2].trim(),
-          isCorrect: false // Would need marking
+          isCorrect: false, // Would need marking
         });
       }
 
       if (options.length >= 2) {
         questions.push({
           id: `mc_${Date.now()}_${questions.length}`,
-          type: 'multiple-choice',
+          type: "multiple-choice",
           text: match[2].trim(),
           options,
-          difficulty: 'medium',
+          difficulty: "medium",
           tags: [],
           points: 1,
           metadata: {
             extractedAt: Date.now(),
-            confidence: 0.8
-          }
+            confidence: 0.8,
+          },
         });
       }
     }
@@ -309,21 +316,21 @@ export class ExamQuestionExtractor {
   private findTrueFalse(content: string): ExamQuestion[] {
     const questions: ExamQuestion[] = [];
     const pattern = /(?:Q\.?\s*)?(\d+)[.)]\s*([^\n?]+)\??\s*(True|False|T|F)/gi;
-    
+
     let match;
     while ((match = pattern.exec(content)) !== null) {
       questions.push({
         id: `tf_${Date.now()}_${questions.length}`,
-        type: 'true-false',
+        type: "true-false",
         text: match[2].trim(),
-        correctAnswer: match[3].toLowerCase().startsWith('t') ? 'True' : 'False',
-        difficulty: 'easy',
+        correctAnswer: match[3].toLowerCase().startsWith("t") ? "True" : "False",
+        difficulty: "easy",
         tags: [],
         points: 1,
         metadata: {
           extractedAt: Date.now(),
-          confidence: 0.9
-        }
+          confidence: 0.9,
+        },
       });
     }
 
@@ -332,73 +339,92 @@ export class ExamQuestionExtractor {
 
   private detectQuestionType(text: string): QuestionType {
     const lower = text.toLowerCase();
-    
-    if (lower.includes('which of the following') || lower.includes('options:')) {
-      return 'multiple-choice';
+
+    if (lower.includes("which of the following") || lower.includes("options:")) {
+      return "multiple-choice";
     }
-    if (lower.includes('true') || lower.includes('false')) {
-      return 'true-false';
+    if (lower.includes("true") || lower.includes("false")) {
+      return "true-false";
     }
-    if (lower.includes('explain') || lower.includes('describe')) {
-      return 'essay';
+    if (lower.includes("explain") || lower.includes("describe")) {
+      return "essay";
     }
-    if (lower.includes('fill in') || lower.includes('blank')) {
-      return 'fill-blank';
+    if (lower.includes("fill in") || lower.includes("blank")) {
+      return "fill-blank";
     }
-    
-    return 'short-answer';
+
+    return "short-answer";
   }
 
   private estimateDifficulty(text: string): DifficultyLevel {
     const words = text.split(/\s+/).length;
     const hasComplexWords = /\b(analyze|evaluate|synthesize|compare|contrast)\b/i.test(text);
-    
-    if (words > 50 || hasComplexWords) {return 'hard';}
-    if (words > 20) {return 'medium';}
-    return 'easy';
+
+    if (words > 50 || hasComplexWords) {
+      return "hard";
+    }
+    if (words > 20) {
+      return "medium";
+    }
+    return "easy";
   }
 
   private extractTags(text: string): string[] {
     const tags: string[] = [];
-    
+
     // Subject detection
-    const subjects = ['math', 'science', 'history', 'literature', 'physics', 'chemistry', 'biology'];
+    const subjects = [
+      "math",
+      "science",
+      "history",
+      "literature",
+      "physics",
+      "chemistry",
+      "biology",
+    ];
     for (const subject of subjects) {
       if (text.toLowerCase().includes(subject)) {
         tags.push(subject);
       }
     }
-    
+
     return tags;
   }
 
   private filterByConfidence(questions: ExamQuestion[], minConfidence: number): ExamQuestion[] {
-    return questions.filter(q => q.metadata.confidence >= minConfidence);
+    return questions.filter((q) => q.metadata.confidence >= minConfidence);
   }
 
   private createQuestionBank(questions: ExamQuestion[], options: ExtractionOptions): QuestionBank {
     return {
       id: `qb_${Date.now()}`,
-      name: options.name || 'Extracted Question Bank',
+      name: options.name || "Extracted Question Bank",
       description: options.description,
       courseId: options.courseId,
       questions,
       metadata: {
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        author: options.author || 'System',
-        totalPoints: questions.reduce((sum, q) => sum + q.points, 0)
-      }
+        author: options.author || "System",
+        totalPoints: questions.reduce((sum, q) => sum + q.points, 0),
+      },
     };
   }
 
   private calculateStatistics(questions: ExamQuestion[], startTime: number): ExtractionStatistics {
     const byType: Record<QuestionType, number> = {
-      'multiple-choice': 0, 'true-false': 0, 'short-answer': 0,
-      'essay': 0, 'fill-blank': 0, 'matching': 0, 'ordering': 0
+      "multiple-choice": 0,
+      "true-false": 0,
+      "short-answer": 0,
+      essay: 0,
+      "fill-blank": 0,
+      matching: 0,
+      ordering: 0,
     };
     const byDifficulty: Record<DifficultyLevel, number> = {
-      'easy': 0, 'medium': 0, 'hard': 0
+      easy: 0,
+      medium: 0,
+      hard: 0,
     };
 
     let totalConfidence = 0;
@@ -414,7 +440,7 @@ export class ExamQuestionExtractor {
       byType,
       byDifficulty,
       averageConfidence: questions.length > 0 ? totalConfidence / questions.length : 0,
-      processingTimeMs: Date.now() - startTime
+      processingTimeMs: Date.now() - startTime,
     };
   }
 
@@ -422,7 +448,7 @@ export class ExamQuestionExtractor {
     // Convert to LMS-specific format
     return {
       ...question,
-      lmsType
+      lmsType,
     };
   }
 
@@ -432,10 +458,12 @@ export class ExamQuestionExtractor {
   }
 
   private extractText(node: DocumentNode): string {
-    let text = '';
+    let text = "";
     const traverse = (n: any) => {
-      text += n.content || '';
-      if (n.children) {n.children.forEach(traverse);}
+      text += n.content || "";
+      if (n.children) {
+        n.children.forEach(traverse);
+      }
     };
     traverse(node);
     return text;
@@ -447,15 +475,15 @@ export class ExamQuestionExtractor {
   }
 
   private parseCSV(file: string): ExamQuestion[] {
-    const lines = file.split('\n');
+    const lines = file.split("\n");
     return lines.slice(1).map((line, i) => ({
       id: `csv_${i}`,
-      type: 'multiple-choice' as QuestionType,
-      text: line.split(',')[0] || '',
-      difficulty: 'medium' as DifficultyLevel,
+      type: "multiple-choice" as QuestionType,
+      text: line.split(",")[0] || "",
+      difficulty: "medium" as DifficultyLevel,
       tags: [],
       points: 1,
-      metadata: { extractedAt: Date.now(), confidence: 0.8 }
+      metadata: { extractedAt: Date.now(), confidence: 0.8 },
     }));
   }
 
@@ -472,8 +500,10 @@ export class ExamQuestionExtractor {
   }
 
   private toCSV(questions: ExamQuestion[]): string {
-    return 'text,type,difficulty\n' + 
-      questions.map(q => `"${q.text}",${q.type},${q.difficulty}`).join('\n');
+    return (
+      "text,type,difficulty\n" +
+      questions.map((q) => `"${q.text}",${q.type},${q.difficulty}`).join("\n")
+    );
   }
 
   private toJSON(questions: ExamQuestion[]): string {
@@ -496,7 +526,7 @@ export interface ExtractionOptions {
  * LMS configuration
  */
 export interface LMSConfig {
-  type: 'moodle' | 'blackboard' | 'canvas' | 'migrate';
+  type: "moodle" | "blackboard" | "canvas" | "migrate";
   baseUrl: string;
   apiKey: string;
   courseId: string;
@@ -523,7 +553,6 @@ interface ExtractorConfig {
   autoDifficulty: boolean;
 }
 
-
 // Re-export from gradebook
 export {
   GradeBookManager,
@@ -531,5 +560,5 @@ export {
   type GradeEntry,
   type GradeStatistics,
   type StudentPerformance,
-  type AcademicAnalytics
-} from './gradebook';
+  type AcademicAnalytics,
+} from "./gradebook";

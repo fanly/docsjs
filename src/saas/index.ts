@@ -2,9 +2,10 @@
  * SaaS Module Index
  */
 
-export { 
-  OrganizationManager,
-  AdminManager,
+export { OrganizationManager, AdminManager } from "./organization";
+
+// Type-only exports from organization
+export type {
   Organization,
   OrganizationSettings,
   OrganizationMember,
@@ -16,18 +17,15 @@ export {
   BillingInfo,
   Invoice,
   InvoiceLineItem,
-  PLAN_PRICING,
   AdminStats,
   AdminAuditLog,
-  SystemHealth
-} from './organization';
+  SystemHealth,
+} from "./organization";
 
-export {
-  BillingManager,
-  UsageBillingManager,
-  PaymentConfig,
-  PaymentProvider,
-  PaymentIntent,
-  CheckoutSession,
-  SubscriptionUpdate
-} from './billing';
+// Value exports that are not type-only
+export { PLAN_PRICING } from "./organization";
+
+export { BillingManager, UsageBillingManager } from "./billing";
+export type { CheckoutSession, PaymentConfig, PaymentProvider, PaymentIntent } from "./billing";
+
+export type { SubscriptionUpdate } from "./billing";

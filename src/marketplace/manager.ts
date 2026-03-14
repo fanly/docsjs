@@ -1,13 +1,18 @@
 /**
  * Plugin Manager
- * 
+ *
  * Handles plugin lifecycle management, versioning, compatibility checking,
  * and performance metrics.
  */
 
-import type { EnginePlugin, PluginManifest, PluginMetadata, PluginPermissions } from '../types/plugins';
+import type {
+  EnginePlugin,
+  PluginManifest,
+  PluginMetadata,
+  PluginPermissions,
+} from "../types/plugins";
 
-export interface PluginVersion {
+export type PluginVersion = {
   version: string;
   releaseDate: string;
   downloadUrl: string;
@@ -17,9 +22,9 @@ export interface PluginVersion {
     minEngineVersion: string;
     maxEngineVersion: string;
   };
-}
+};
 
-export interface PluginMetrics {
+export type PluginMetrics = {
   pluginId: string;
   installs: number;
   activeUsers: number;
@@ -28,17 +33,17 @@ export interface PluginMetrics {
   crashRate: number;
   averageLoadTimeMs: number;
   lastUpdated: number;
-}
+};
 
-export interface PluginCompatibilityResult {
+export type PluginCompatibilityResult = {
   compatible: boolean;
   issues: string[];
   warnings: string[];
   requiredPermissions: string[];
   missingCapabilities: string[];
-}
+};
 
-export interface PluginSearchQuery {
+export type PluginSearchQuery = {
   query?: string;
   tags?: string[];
   author?: string;
@@ -46,21 +51,21 @@ export interface PluginSearchQuery {
   maxPrice?: number;
   verifiedOnly?: boolean;
   compatibility?: string;
-  sortBy?: 'downloads' | 'rating' | 'updated' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "downloads" | "rating" | "updated" | "name";
+  sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
-}
+};
 
-export interface PluginSearchResult {
+export type PluginSearchResult = {
   plugins: MarketplacePluginBrief[];
   total: number;
   page: number;
   limit: number;
   hasMore: boolean;
-}
+};
 
-export interface MarketplacePluginBrief {
+export type MarketplacePluginBrief = {
   id: string;
   name: string;
   description: string;
@@ -72,9 +77,9 @@ export interface MarketplacePluginBrief {
   verified: boolean;
   premium: boolean;
   price?: number;
-}
+};
 
-export interface PluginSubmissionRequest {
+export type PluginSubmissionRequest = {
   name: string;
   description: string;
   packageUrl: string;
@@ -88,16 +93,16 @@ export interface PluginSubmissionRequest {
     email: string;
     website?: string;
   };
-}
+};
 
-export interface PluginApprovalStatus {
+export type PluginApprovalStatus = {
   pluginId: string;
-  status: 'pending' | 'approved' | 'rejected' | 'needs-review';
+  status: "pending" | "approved" | "rejected" | "needs-review";
   reviewer?: string;
   feedback?: string;
   submittedAt: number;
   reviewedAt?: number;
-}
+};
 
 export class PluginManager {
   private plugins: Map<string, PluginMetadata> = new Map();
@@ -105,13 +110,13 @@ export class PluginManager {
   private metrics: Map<string, PluginMetrics> = new Map();
   private submissions: Map<string, PluginSubmissionRequest> = new Map();
   private approvalStatus: Map<string, PluginApprovalStatus> = new Map();
-  
+
   private currentEngineVersion: string;
-  
-  constructor(engineVersion: string = '2.0.0') {
+
+  constructor(engineVersion: string = "2.0.0") {
     this.currentEngineVersion = engineVersion;
   }
-  
+
   /**
    * Register a plugin
    */
@@ -120,19 +125,19 @@ export class PluginManager {
       id: plugin.name,
       name: plugin.name,
       version: manifest.version,
-      author: plugin.author || 'Unknown',
-      description: plugin.description || '',
+      author: plugin.author || "Unknown",
+      description: plugin.description || "",
       installed: true,
       enabled: true,
       permissions: plugin.permissions,
-      compatibility: (manifest.compatibility || []).join(','),
+      compatibility: (manifest.compatibility || []).join(","),
       metrics: { installs: 0, errors: 0 },
     };
-    
+
     this.plugins.set(plugin.name, metadata);
     this.initializeMetrics(plugin.name);
   }
-  
+
   /**
    * Unregister a plugin
    */
@@ -140,21 +145,21 @@ export class PluginManager {
     this.plugins.delete(pluginId);
     return true;
   }
-  
+
   /**
    * Get plugin metadata
    */
   getPlugin(pluginId: string): PluginMetadata | undefined {
     return this.plugins.get(pluginId);
   }
-  
+
   /**
    * List all registered plugins
    */
   listPlugins(): PluginMetadata[] {
     return Array.from(this.plugins.values());
   }
-  
+
   /**
    * Check plugin compatibility
    */
@@ -163,44 +168,48 @@ export class PluginManager {
     if (!plugin) {
       return {
         compatible: false,
-        issues: ['Plugin not found'],
+        issues: ["Plugin not found"],
         warnings: [],
         requiredPermissions: [],
         missingCapabilities: [],
       };
     }
-    
+
     const issues: string[] = [];
     const warnings: string[] = [];
     const requiredPermissions: string[] = [];
     const missingCapabilities: string[] = [];
-    
+
     // Check version compatibility
     const compatibility = (plugin as any).compatibility || {};
     if (compatibility) {
       const minVersion = compatibility.minEngineVersion;
       const maxVersion = compatibility.maxEngineVersion;
-      
+
       if (this.compareVersions(this.currentEngineVersion, minVersion) < 0) {
-        issues.push(`Requires engine version ${minVersion}, current is ${this.currentEngineVersion}`);
+        issues.push(
+          `Requires engine version ${minVersion}, current is ${this.currentEngineVersion}`,
+        );
       }
-      
+
       if (this.compareVersions(this.currentEngineVersion, maxVersion) > 0) {
-        issues.push(`Maximum supported version is ${maxVersion}, current is ${this.currentEngineVersion}`);
+        issues.push(
+          `Maximum supported version is ${maxVersion}, current is ${this.currentEngineVersion}`,
+        );
       }
     }
-    
+
     // Check required permissions
     const permissions = plugin.permissions;
     if (permissions) {
       if (permissions.compute?.maxMemoryMB > 100) {
-        warnings.push('Plugin requests high memory allocation');
+        warnings.push("Plugin requests high memory allocation");
       }
       if (permissions.network) {
-        requiredPermissions.push('network');
+        requiredPermissions.push("network");
       }
     }
-    
+
     return {
       compatible: issues.length === 0,
       issues,
@@ -209,7 +218,7 @@ export class PluginManager {
       missingCapabilities,
     };
   }
-  
+
   /**
    * Add a plugin version
    */
@@ -219,14 +228,14 @@ export class PluginManager {
     existing.sort((a, b) => this.compareVersions(b.version, a.version));
     this.versions.set(pluginId, existing);
   }
-  
+
   /**
    * Get plugin versions
    */
   getVersions(pluginId: string): PluginVersion[] {
     return this.versions.get(pluginId) || [];
   }
-  
+
   /**
    * Get latest version
    */
@@ -234,16 +243,19 @@ export class PluginManager {
     const versions = this.versions.get(pluginId);
     return versions?.[0];
   }
-  
+
   /**
    * Check if update available
    */
-  checkForUpdate(pluginId: string, currentVersion: string): { available: boolean; newVersion?: string; breaking: boolean } {
+  checkForUpdate(
+    pluginId: string,
+    currentVersion: string,
+  ): { available: boolean; newVersion?: string; breaking: boolean } {
     const latest = this.getLatestVersion(pluginId);
     if (!latest) {
       return { available: false, breaking: false };
     }
-    
+
     const comparison = this.compareVersions(latest.version, currentVersion);
     return {
       available: comparison > 0,
@@ -251,68 +263,72 @@ export class PluginManager {
       breaking: latest.breaking,
     };
   }
-  
+
   /**
    * Submit plugin for review
    */
   submitPlugin(request: PluginSubmissionRequest): string {
-    const submissionId = 'sub_' + Math.random().toString(36).substr(2, 9);
+    const submissionId = "sub_" + Math.random().toString(36).substr(2, 9);
     this.submissions.set(submissionId, request);
-    
+
     const status: PluginApprovalStatus = {
       pluginId: submissionId,
-      status: 'pending',
+      status: "pending",
       submittedAt: Date.now(),
     };
     this.approvalStatus.set(submissionId, status);
-    
+
     return submissionId;
   }
-  
+
   /**
    * Get submission status
    */
   getSubmissionStatus(submissionId: string): PluginApprovalStatus | undefined {
     return this.approvalStatus.get(submissionId);
   }
-  
+
   /**
    * Approve plugin submission
    */
   approvePlugin(submissionId: string, reviewer: string, feedback?: string): boolean {
     const status = this.approvalStatus.get(submissionId);
-    if (!status) {return false;}
-    
-    status.status = 'approved';
+    if (!status) {
+      return false;
+    }
+
+    status.status = "approved";
     status.reviewer = reviewer;
     status.feedback = feedback;
     status.reviewedAt = Date.now();
-    
+
     return true;
   }
-  
+
   /**
    * Reject plugin submission
    */
   rejectPlugin(submissionId: string, reviewer: string, feedback: string): boolean {
     const status = this.approvalStatus.get(submissionId);
-    if (!status) {return false;}
-    
-    status.status = 'rejected';
+    if (!status) {
+      return false;
+    }
+
+    status.status = "rejected";
     status.reviewer = reviewer;
     status.feedback = feedback;
     status.reviewedAt = Date.now();
-    
+
     return true;
   }
-  
+
   /**
    * Get plugin metrics
    */
   getMetrics(pluginId: string): PluginMetrics | undefined {
     return this.metrics.get(pluginId);
   }
-  
+
   /**
    * Update plugin metrics
    */
@@ -322,7 +338,7 @@ export class PluginManager {
       Object.assign(metrics, updates);
     }
   }
-  
+
   /**
    * Record plugin install
    */
@@ -332,7 +348,7 @@ export class PluginManager {
       metrics.installs++;
     }
   }
-  
+
   /**
    * Record plugin error
    */
@@ -340,10 +356,10 @@ export class PluginManager {
     const metrics = this.metrics.get(pluginId);
     if (metrics) {
       const totalRuns = metrics.installs || 1;
-      metrics.crashRate = ((metrics.crashRate * totalRuns) + 1) / totalRuns;
+      metrics.crashRate = (metrics.crashRate * totalRuns + 1) / totalRuns;
     }
   }
-  
+
   /**
    * Search marketplace (mock implementation)
    */
@@ -352,71 +368,68 @@ export class PluginManager {
     // Mock result for now
     const mockPlugins: MarketplacePluginBrief[] = [
       {
-        id: 'math-enhancer',
-        name: 'MathML Enhancer',
-        description: 'Advanced MathML layout preservation',
-        author: '@community',
-        version: '1.2.0',
+        id: "math-enhancer",
+        name: "MathML Enhancer",
+        description: "Advanced MathML layout preservation",
+        author: "@community",
+        version: "1.2.0",
         rating: 4.8,
         downloads: 12500,
-        tags: ['math', 'fidelity'],
+        tags: ["math", "fidelity"],
         verified: true,
         premium: false,
       },
       {
-        id: 'table-optimizer',
-        name: 'Table Layout Optimizer',
-        description: 'Preserves table structure and formatting',
-        author: '@community',
-        version: '2.1.0',
+        id: "table-optimizer",
+        name: "Table Layout Optimizer",
+        description: "Preserves table structure and formatting",
+        author: "@community",
+        version: "2.1.0",
         rating: 4.6,
         downloads: 8500,
-        tags: ['tables', 'layout'],
+        tags: ["tables", "layout"],
         verified: true,
         premium: false,
       },
     ];
-    
+
     let results = mockPlugins;
-    
+
     // Apply filters
     if (query.query) {
       const q = query.query.toLowerCase();
-      results = results.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.description.toLowerCase().includes(q)
+      results = results.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q),
       );
     }
-    
+
     if (query.tags?.length) {
-      results = results.filter(p => 
-        query.tags!.some(t => p.tags.includes(t))
-      );
+      results = results.filter((p) => query.tags!.some((t) => p.tags.includes(t)));
     }
-    
+
     if (query.verifiedOnly) {
-      results = results.filter(p => p.verified);
+      results = results.filter((p) => p.verified);
     }
-    
+
     if (query.minRating) {
-      results = results.filter(p => p.rating >= query.minRating!);
+      results = results.filter((p) => p.rating >= query.minRating!);
     }
-    
+
     // Sort
-    const sortKey = query.sortBy || 'downloads';
-    const sortOrder = query.sortOrder || 'desc';
+    const sortKey = query.sortBy || "downloads";
+    const sortOrder = query.sortOrder || "desc";
     results.sort((a, b) => {
       const aVal = a[sortKey] as number;
       const bVal = b[sortKey] as number;
-      return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+      return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
     });
-    
+
     // Paginate
     const page = query.page || 1;
     const limit = query.limit || 20;
     const start = (page - 1) * limit;
     const paginatedResults = results.slice(start, start + limit);
-    
+
     return {
       plugins: paginatedResults,
       total: results.length,
@@ -425,7 +438,7 @@ export class PluginManager {
       hasMore: start + limit < results.length,
     };
   }
-  
+
   private initializeMetrics(pluginId: string): void {
     this.metrics.set(pluginId, {
       pluginId,
@@ -438,16 +451,20 @@ export class PluginManager {
       lastUpdated: Date.now(),
     });
   }
-  
+
   private compareVersions(a: string, b: string): number {
-    const partsA = a.split('.').map(Number);
-    const partsB = b.split('.').map(Number);
-    
+    const partsA = a.split(".").map(Number);
+    const partsB = b.split(".").map(Number);
+
     for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
       const partA = partsA[i] || 0;
       const partB = partsB[i] || 0;
-      if (partA > partB) {return 1;}
-      if (partA < partB) {return -1;}
+      if (partA > partB) {
+        return 1;
+      }
+      if (partA < partB) {
+        return -1;
+      }
     }
     return 0;
   }
@@ -481,7 +498,7 @@ ${renderPermissions(manifest.permissions)}
 
 ## Supported Hooks
 
-${manifest.supportedHooks?.join(', ') || 'None'}
+${manifest.supportedHooks?.join(", ") || "None"}
 
 ## Usage
 
@@ -495,31 +512,35 @@ engine.registerPlugin(plugin);
 
 ## Changelog
 
-${manifest.changelog || 'No changelog available.'}
+${manifest.changelog || "No changelog available."}
 
 ## License
 
-${manifest.license || 'MIT'}
+${manifest.license || "MIT"}
 `;
 }
 
 function renderPermissions(permissions?: PluginPermissions): string {
-  if (!permissions) {return 'None required';}
-  
+  if (!permissions) {
+    return "None required";
+  }
+
   const lines: string[] = [];
-  
+
   if (permissions.read?.length) {
-    lines.push(`- **Read**: ${permissions.read.join(', ')}`);
+    lines.push(`- **Read**: ${permissions.read.join(", ")}`);
   }
   if (permissions.write?.length) {
-    lines.push(`- **Write**: ${permissions.write.join(', ')}`);
+    lines.push(`- **Write**: ${permissions.write.join(", ")}`);
   }
   if (permissions.network !== undefined) {
-    lines.push(`- **Network**: ${permissions.network ? 'Allowed' : 'Not allowed'}`);
+    lines.push(`- **Network**: ${permissions.network ? "Allowed" : "Not allowed"}`);
   }
   if (permissions.compute) {
-    lines.push(`- **Compute**: Max ${permissions.compute.maxMemoryMB}MB memory, ${permissions.compute.maxCpuSecs}s CPU`);
+    lines.push(
+      `- **Compute**: Max ${permissions.compute.maxMemoryMB}MB memory, ${permissions.compute.maxCpuSecs}s CPU`,
+    );
   }
-  
-  return lines.length > 0 ? lines.join('\n') : 'None required';
+
+  return lines.length > 0 ? lines.join("\n") : "None required";
 }

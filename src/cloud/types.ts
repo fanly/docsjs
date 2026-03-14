@@ -1,6 +1,6 @@
 /**
  * Cloud Infrastructure Types
- * 
+ *
  * Type definitions for serverless, queues, CDN, and cloud deployment.
  */
 
@@ -51,9 +51,9 @@ export interface BatchJob {
   /** Job ID */
   id: string;
   /** Job type */
-  type: 'convert' | 'transform' | 'render' | 'export';
+  type: "convert" | "transform" | "render" | "export";
   /** Job status */
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
   /** Input files */
   inputFiles: string[];
   /** Output format */
@@ -79,14 +79,14 @@ export interface BatchJob {
 /**
  * Webhook event
  */
-export type WebhookEventType = 
-  | 'conversion.completed'
-  | 'conversion.failed'
-  | 'conversion.started'
-  | 'batch.completed'
-  | 'batch.failed'
-  | 'batch.progress'
-  | 'webhook.test';
+export type WebhookEventType =
+  | "conversion.completed"
+  | "conversion.failed"
+  | "conversion.started"
+  | "batch.completed"
+  | "batch.failed"
+  | "batch.progress"
+  | "webhook.test";
 
 export interface WebhookEvent {
   id: string;
@@ -101,7 +101,7 @@ export interface WebhookEvent {
  */
 export interface CDNConfig {
   /** CDN provider */
-  provider: 'cloudfront' | 'cloudflare' | 'akamai' | 'custom';
+  provider: "cloudfront" | "cloudflare" | "akamai" | "custom";
   /** Distribution domain */
   domain: string;
   /** Cache rules */
@@ -131,7 +131,7 @@ export interface CacheRule {
  */
 export interface GeoRestriction {
   /** Restriction type */
-  type: 'none' | 'whitelist' | 'blacklist';
+  type: "none" | "whitelist" | "blacklist";
   /** Countries */
   countries: string[];
 }

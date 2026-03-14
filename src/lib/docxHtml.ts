@@ -98,7 +98,7 @@ function createEmptyFeatureCounts(): DocxParseFeatureCounts {
     oleCount: 0,
     watermarkCount: 0,
     headerCount: 0,
-    footerCount: 0
+    footerCount: 0,
   };
 }
 
@@ -116,7 +116,9 @@ function parseXml(xmlText: string): Document {
 }
 
 function rootChildrenAsElements(root: ParentNode): Element[] {
-  return Array.from((root as ParentNode & { children?: HTMLCollection }).children ?? []) as Element[];
+  return Array.from(
+    (root as ParentNode & { children?: HTMLCollection }).children ?? [],
+  ) as Element[];
 }
 
 function queryAllByLocalName(root: ParentNode, localName: string): Element[] {
@@ -124,7 +126,9 @@ function queryAllByLocalName(root: ParentNode, localName: string): Element[] {
   const stack = rootChildrenAsElements(root).reverse();
   while (stack.length > 0) {
     const node = stack.pop() as Element;
-    if (node.localName === localName) {result.push(node);}
+    if (node.localName === localName) {
+      result.push(node);
+    }
     const children = node.children;
     for (let i = children.length - 1; i >= 0; i -= 1) {
       stack.push(children[i] as Element);
@@ -137,7 +141,9 @@ function queryByLocalName(root: ParentNode, localName: string): Element | null {
   const stack = rootChildrenAsElements(root).reverse();
   while (stack.length > 0) {
     const node = stack.pop() as Element;
-    if (node.localName === localName) {return node;}
+    if (node.localName === localName) {
+      return node;
+    }
     const children = node.children;
     for (let i = children.length - 1; i >= 0; i -= 1) {
       stack.push(children[i] as Element);
@@ -151,7 +157,9 @@ function directChildrenByLocalName(node: Element, localName: string): Element[] 
 }
 
 function getAttr(node: Element | null, name: string): string | null {
-  if (!node) {return null;}
+  if (!node) {
+    return null;
+  }
   return node.getAttribute(name);
 }
 
@@ -185,12 +193,20 @@ function parseDrawingSizePx(drawing: Element): DrawingSizePx {
 
 function imageDimensionAttributes(sizePx: DrawingSizePx): string {
   const attrs: string[] = [];
-  if (sizePx.widthPx !== null) {attrs.push(`width="${Math.round(sizePx.widthPx)}"`);}
-  if (sizePx.heightPx !== null) {attrs.push(`height="${Math.round(sizePx.heightPx)}"`);}
+  if (sizePx.widthPx !== null) {
+    attrs.push(`width="${Math.round(sizePx.widthPx)}"`);
+  }
+  if (sizePx.heightPx !== null) {
+    attrs.push(`height="${Math.round(sizePx.heightPx)}"`);
+  }
   if (sizePx.widthPx !== null || sizePx.heightPx !== null) {
     const style: string[] = ["max-width:100%"];
-    if (sizePx.widthPx !== null) {style.push(`width:${sizePx.widthPx.toFixed(2)}px`);}
-    if (sizePx.heightPx !== null) {style.push(`height:${sizePx.heightPx.toFixed(2)}px`);}
+    if (sizePx.widthPx !== null) {
+      style.push(`width:${sizePx.widthPx.toFixed(2)}px`);
+    }
+    if (sizePx.heightPx !== null) {
+      style.push(`height:${sizePx.heightPx.toFixed(2)}px`);
+    }
     attrs.push(`style="${style.join(";")}"`);
   }
   return attrs.length > 0 ? ` ${attrs.join(" ")}` : "";
@@ -224,30 +240,44 @@ function parseAnchorPositionPx(anchor: Element): AnchorPositionPx {
 
   const positionH = directChildrenByLocalName(anchor, "positionH")[0] ?? null;
   const positionV = directChildrenByLocalName(anchor, "positionV")[0] ?? null;
-  const posH = positionH ? directChildrenByLocalName(positionH, "posOffset")[0] ?? null : null;
-  const posV = positionV ? directChildrenByLocalName(positionV, "posOffset")[0] ?? null : null;
+  const posH = positionH ? (directChildrenByLocalName(positionH, "posOffset")[0] ?? null) : null;
+  const posV = positionV ? (directChildrenByLocalName(positionV, "posOffset")[0] ?? null) : null;
 
   const rawLeft = posH?.textContent?.trim() ?? "";
   const rawTop = posV?.textContent?.trim() ?? "";
   const left = rawLeft ? Number.parseFloat(rawLeft) : Number.NaN;
   const top = rawTop ? Number.parseFloat(rawTop) : Number.NaN;
 
-  if (Number.isFinite(left)) {leftPx = emuToPx(left);}
-  if (Number.isFinite(top)) {topPx = emuToPx(top);}
+  if (Number.isFinite(left)) {
+    leftPx = emuToPx(left);
+  }
+  if (Number.isFinite(top)) {
+    topPx = emuToPx(top);
+  }
   return { leftPx, topPx };
 }
 
 function parseAnchorWrapMode(anchor: Element): AnchorWrapMode {
-  if (directChildrenByLocalName(anchor, "wrapSquare")[0]) {return "square";}
-  if (directChildrenByLocalName(anchor, "wrapTight")[0]) {return "tight";}
-  if (directChildrenByLocalName(anchor, "wrapTopAndBottom")[0]) {return "topAndBottom";}
-  if (directChildrenByLocalName(anchor, "wrapNone")[0]) {return "none";}
+  if (directChildrenByLocalName(anchor, "wrapSquare")[0]) {
+    return "square";
+  }
+  if (directChildrenByLocalName(anchor, "wrapTight")[0]) {
+    return "tight";
+  }
+  if (directChildrenByLocalName(anchor, "wrapTopAndBottom")[0]) {
+    return "topAndBottom";
+  }
+  if (directChildrenByLocalName(anchor, "wrapNone")[0]) {
+    return "none";
+  }
   return null;
 }
 
 function parseAnchorMeta(drawing: Element): AnchorMeta | null {
   const anchor = directChildrenByLocalName(drawing, "anchor")[0] ?? null;
-  if (!anchor) {return null;}
+  if (!anchor) {
+    return null;
+  }
 
   const positionH = directChildrenByLocalName(anchor, "positionH")[0] ?? null;
   const positionV = directChildrenByLocalName(anchor, "positionV")[0] ?? null;
@@ -265,8 +295,12 @@ function parseAnchorMeta(drawing: Element): AnchorMeta | null {
 
   const boolAttr = (name: string, fallback: boolean): boolean => {
     const raw = (getAttr(anchor, name) ?? "").toLowerCase();
-    if (raw === "1" || raw === "true" || raw === "on") {return true;}
-    if (raw === "0" || raw === "false" || raw === "off") {return false;}
+    if (raw === "1" || raw === "true" || raw === "on") {
+      return true;
+    }
+    if (raw === "0" || raw === "false" || raw === "off") {
+      return false;
+    }
     return fallback;
   };
 
@@ -282,23 +316,27 @@ function parseAnchorMeta(drawing: Element): AnchorMeta | null {
     behindDoc: boolAttr("behindDoc", false),
     allowOverlap: boolAttr("allowOverlap", true),
     layoutInCell: boolAttr("layoutInCell", true),
-    relativeHeight: Number.isFinite(parsedHeight) ? parsedHeight : null
+    relativeHeight: Number.isFinite(parsedHeight) ? parsedHeight : null,
   };
 }
 
 function mergeImageStyle(baseAttrs: string, anchorMeta: AnchorMeta | null): string {
-  if (!anchorMeta) {return baseAttrs;}
+  if (!anchorMeta) {
+    return baseAttrs;
+  }
   const { position, wrapMode } = anchorMeta;
-  if (position.leftPx === null && position.topPx === null) {return baseAttrs;}
+  if (position.leftPx === null && position.topPx === null) {
+    return baseAttrs;
+  }
   const styleParts = [
     "position:absolute",
     position.leftPx !== null ? `left:${position.leftPx.toFixed(2)}px` : "",
     position.topPx !== null ? `top:${position.topPx.toFixed(2)}px` : "",
-    `z-index:${anchorMeta.behindDoc ? 0 : anchorMeta.relativeHeight ?? 3}`,
+    `z-index:${anchorMeta.behindDoc ? 0 : (anchorMeta.relativeHeight ?? 3)}`,
     anchorMeta.distTPx !== null ? `margin-top:${anchorMeta.distTPx.toFixed(2)}px` : "",
     anchorMeta.distBPx !== null ? `margin-bottom:${anchorMeta.distBPx.toFixed(2)}px` : "",
     anchorMeta.distLPx !== null ? `margin-left:${anchorMeta.distLPx.toFixed(2)}px` : "",
-    anchorMeta.distRPx !== null ? `margin-right:${anchorMeta.distRPx.toFixed(2)}px` : ""
+    anchorMeta.distRPx !== null ? `margin-right:${anchorMeta.distRPx.toFixed(2)}px` : "",
   ].filter((x) => x.length > 0);
 
   if (wrapMode === "topAndBottom") {
@@ -308,11 +346,17 @@ function mergeImageStyle(baseAttrs: string, anchorMeta: AnchorMeta | null): stri
   const anchorAttrs = [
     `data-word-anchor="1"`,
     wrapMode ? `data-word-wrap="${wrapMode}"` : "",
-    anchorMeta.relativeFromH ? `data-word-anchor-relh="${escapeHtml(anchorMeta.relativeFromH)}"` : "",
-    anchorMeta.relativeFromV ? `data-word-anchor-relv="${escapeHtml(anchorMeta.relativeFromV)}"` : "",
+    anchorMeta.relativeFromH
+      ? `data-word-anchor-relh="${escapeHtml(anchorMeta.relativeFromH)}"`
+      : "",
+    anchorMeta.relativeFromV
+      ? `data-word-anchor-relv="${escapeHtml(anchorMeta.relativeFromV)}"`
+      : "",
     anchorMeta.behindDoc ? `data-word-anchor-behind="1"` : `data-word-anchor-behind="0"`,
     anchorMeta.allowOverlap ? `data-word-anchor-overlap="1"` : `data-word-anchor-overlap="0"`,
-    anchorMeta.layoutInCell ? `data-word-anchor-layout-cell="1"` : `data-word-anchor-layout-cell="0"`
+    anchorMeta.layoutInCell
+      ? `data-word-anchor-layout-cell="1"`
+      : `data-word-anchor-layout-cell="0"`,
   ]
     .filter((x) => x.length > 0)
     .join(" ");
@@ -328,14 +372,18 @@ function mergeImageStyle(baseAttrs: string, anchorMeta: AnchorMeta | null): stri
 }
 
 function parseDocRelsMap(relsXmlText: string | null): RelMap {
-  if (!relsXmlText) {return {};}
+  if (!relsXmlText) {
+    return {};
+  }
   const rels = parseXml(relsXmlText);
   const relationNodes = queryAllByLocalName(rels, "Relationship");
   const map: RelMap = {};
   for (const rel of relationNodes) {
     const id = getAttr(rel, "Id");
     const target = getAttr(rel, "Target");
-    if (!id || !target) {continue;}
+    if (!id || !target) {
+      continue;
+    }
     map[id] = target;
   }
   return map;
@@ -343,29 +391,57 @@ function parseDocRelsMap(relsXmlText: string | null): RelMap {
 
 function extToMime(ext: string): string {
   const lower = ext.toLowerCase();
-  if (lower === "png") {return "image/png";}
-  if (lower === "jpg" || lower === "jpeg") {return "image/jpeg";}
-  if (lower === "gif") {return "image/gif";}
-  if (lower === "webp") {return "image/webp";}
-  if (lower === "bmp") {return "image/bmp";}
-  if (lower === "svg") {return "image/svg+xml";}
+  if (lower === "png") {
+    return "image/png";
+  }
+  if (lower === "jpg" || lower === "jpeg") {
+    return "image/jpeg";
+  }
+  if (lower === "gif") {
+    return "image/gif";
+  }
+  if (lower === "webp") {
+    return "image/webp";
+  }
+  if (lower === "bmp") {
+    return "image/bmp";
+  }
+  if (lower === "svg") {
+    return "image/svg+xml";
+  }
   return "application/octet-stream";
 }
 
 function normalizeWordPath(relTarget: string): string {
   const normalized = relTarget.replace(/\\/g, "/").replace(/^\/+/, "");
-  if (normalized.startsWith("word/")) {return normalized;}
-  if (normalized.startsWith("../")) {return `word/${normalized.replace(/^(\.\.\/)+/, "")}`;}
+  if (normalized.startsWith("word/")) {
+    return normalized;
+  }
+  if (normalized.startsWith("../")) {
+    return `word/${normalized.replace(/^(\.\.\/)+/, "")}`;
+  }
   return `word/${normalized}`;
 }
 
-function resolveHyperlinkHref(relMap: RelMap, rid: string | null, anchor: string | null): string | null {
-  if (anchor && anchor.trim()) {return `#${encodeURIComponent(anchor.trim())}`;}
-  if (!rid) {return null;}
+function resolveHyperlinkHref(
+  relMap: RelMap,
+  rid: string | null,
+  anchor: string | null,
+): string | null {
+  if (anchor && anchor.trim()) {
+    return `#${encodeURIComponent(anchor.trim())}`;
+  }
+  if (!rid) {
+    return null;
+  }
   const relTarget = relMap[rid];
-  if (!relTarget) {return null;}
+  if (!relTarget) {
+    return null;
+  }
   const trimmed = relTarget.trim();
-  if (!trimmed) {return null;}
+  if (!trimmed) {
+    return null;
+  }
   const lower = trimmed.toLowerCase();
   if (
     lower.startsWith("http://") ||
@@ -380,10 +456,14 @@ function resolveHyperlinkHref(relMap: RelMap, rid: string | null, anchor: string
 
 async function imageRidToDataUrl(zip: JSZip, relMap: RelMap, rid: string): Promise<string | null> {
   const relTarget = relMap[rid];
-  if (!relTarget) {return null;}
+  if (!relTarget) {
+    return null;
+  }
   const path = normalizeWordPath(relTarget);
   const file = zip.file(path);
-  if (!file) {return null;}
+  if (!file) {
+    return null;
+  }
   const base64 = await file.async("base64");
   const ext = path.split(".").pop() ?? "bin";
   const mime = extToMime(ext);
@@ -392,25 +472,43 @@ async function imageRidToDataUrl(zip: JSZip, relMap: RelMap, rid: string): Promi
 
 async function readXmlByRid(zip: JSZip, relMap: RelMap, rid: string): Promise<string | null> {
   const relTarget = relMap[rid];
-  if (!relTarget) {return null;}
+  if (!relTarget) {
+    return null;
+  }
   const path = normalizeWordPath(relTarget);
   const file = zip.file(path);
   return file ? file.async("string") : null;
 }
 
 function parseChartType(chartDoc: Document): string {
-  const known = ["barChart", "lineChart", "pieChart", "areaChart", "scatterChart", "radarChart", "doughnutChart"];
+  const known = [
+    "barChart",
+    "lineChart",
+    "pieChart",
+    "areaChart",
+    "scatterChart",
+    "radarChart",
+    "doughnutChart",
+  ];
   for (const type of known) {
-    if (queryByLocalName(chartDoc, type)) {return type.replace(/Chart$/, "");}
+    if (queryByLocalName(chartDoc, type)) {
+      return type.replace(/Chart$/, "");
+    }
   }
   return "unknown";
 }
 
-function parseChartSummary(chartXmlText: string): { title: string; type: string; seriesCount: number; pointCount: number } {
+function parseChartSummary(chartXmlText: string): {
+  title: string;
+  type: string;
+  seriesCount: number;
+  pointCount: number;
+} {
   const chartDoc = parseXml(chartXmlText);
-  const title = queryAllByLocalName(chartDoc, "t")
-    .map((n) => (n.textContent ?? "").trim())
-    .find((v) => v.length > 0) ?? "Chart";
+  const title =
+    queryAllByLocalName(chartDoc, "t")
+      .map((n) => (n.textContent ?? "").trim())
+      .find((v) => v.length > 0) ?? "Chart";
   const seriesCount = queryAllByLocalName(chartDoc, "ser").length;
   const pointCount = queryAllByLocalName(chartDoc, "pt").length;
   const type = parseChartType(chartDoc);
@@ -426,7 +524,9 @@ function extractSmartArtText(diagramXmlText: string): string[] {
 }
 
 function ommlNodeToText(node: Element): string {
-  if (node.localName === "t") {return node.textContent ?? "";}
+  if (node.localName === "t") {
+    return node.textContent ?? "";
+  }
   if (node.localName === "f") {
     const num = queryByLocalName(node, "num");
     const den = queryByLocalName(node, "den");
@@ -452,26 +552,48 @@ function ommlNodeToText(node: Element): string {
 }
 
 function runStyleToCss(rPr: Element | null): string {
-  if (!rPr) {return "";}
+  if (!rPr) {
+    return "";
+  }
   const declarations: string[] = [];
 
-  if (queryByLocalName(rPr, "b")) {declarations.push("font-weight:700");}
-  if (queryByLocalName(rPr, "i")) {declarations.push("font-style:italic");}
-  if (queryByLocalName(rPr, "u")) {declarations.push("text-decoration:underline");}
-  if (queryByLocalName(rPr, "strike")) {declarations.push("text-decoration:line-through");}
+  if (queryByLocalName(rPr, "b")) {
+    declarations.push("font-weight:700");
+  }
+  if (queryByLocalName(rPr, "i")) {
+    declarations.push("font-style:italic");
+  }
+  if (queryByLocalName(rPr, "u")) {
+    declarations.push("text-decoration:underline");
+  }
+  if (queryByLocalName(rPr, "strike")) {
+    declarations.push("text-decoration:line-through");
+  }
 
   const color = queryByLocalName(rPr, "color");
   const colorVal = getAttr(color, "w:val") ?? getAttr(color, "val");
-  if (colorVal && colorVal.toLowerCase() !== "auto") {declarations.push(`color:#${colorVal}`);}
+  if (colorVal && colorVal.toLowerCase() !== "auto") {
+    declarations.push(`color:#${colorVal}`);
+  }
 
   const highlight = queryByLocalName(rPr, "highlight");
-  const highlightVal = (getAttr(highlight, "w:val") ?? getAttr(highlight, "val") ?? "").toLowerCase();
-  if (highlightVal === "yellow") {declarations.push("background-color:#fff200");}
+  const highlightVal = (
+    getAttr(highlight, "w:val") ??
+    getAttr(highlight, "val") ??
+    ""
+  ).toLowerCase();
+  if (highlightVal === "yellow") {
+    declarations.push("background-color:#fff200");
+  }
 
   const vertAlign = queryByLocalName(rPr, "vertAlign");
   const vertVal = (getAttr(vertAlign, "w:val") ?? getAttr(vertAlign, "val") ?? "").toLowerCase();
-  if (vertVal === "superscript") {declarations.push("vertical-align:super;font-size:0.83em");}
-  if (vertVal === "subscript") {declarations.push("vertical-align:sub;font-size:0.83em");}
+  if (vertVal === "superscript") {
+    declarations.push("vertical-align:super;font-size:0.83em");
+  }
+  if (vertVal === "subscript") {
+    declarations.push("vertical-align:sub;font-size:0.83em");
+  }
 
   return declarations.join(";");
 }
@@ -480,9 +602,15 @@ function paragraphTag(paragraph: Element): "p" | "h1" | "h2" | "h3" {
   const pPr = queryByLocalName(paragraph, "pPr");
   const pStyle = pPr ? queryByLocalName(pPr, "pStyle") : null;
   const val = (getAttr(pStyle, "w:val") ?? getAttr(pStyle, "val") ?? "").toLowerCase();
-  if (val.includes("heading1") || val === "1" || val === "heading 1") {return "h1";}
-  if (val.includes("heading2") || val === "2" || val === "heading 2") {return "h2";}
-  if (val.includes("heading3") || val === "3" || val === "heading 3") {return "h3";}
+  if (val.includes("heading1") || val === "1" || val === "heading 1") {
+    return "h1";
+  }
+  if (val.includes("heading2") || val === "2" || val === "heading 2") {
+    return "h2";
+  }
+  if (val.includes("heading3") || val === "3" || val === "heading 3") {
+    return "h3";
+  }
   return "p";
 }
 
@@ -502,27 +630,38 @@ function paragraphDataAttr(paragraphIndex: number | null): string {
 
 function extractNodeParagraphText(node: Element): string {
   const paragraphs = queryAllByLocalName(node, "p");
-  return paragraphs.map((p) => paragraphText(p)).join("<br/>").trim();
+  return paragraphs
+    .map((p) => paragraphText(p))
+    .join("<br/>")
+    .trim();
 }
 
 function parseIndexedParagraphMap(
   xmlText: string | null,
   itemTagName: string,
-  options: { requirePositiveNumericId: boolean }
+  options: { requirePositiveNumericId: boolean },
 ): FootnoteMap {
-  if (!xmlText) {return {};}
+  if (!xmlText) {
+    return {};
+  }
   const doc = parseXml(xmlText);
   const map: FootnoteMap = {};
   const items = queryAllByLocalName(doc, itemTagName);
   for (const item of items) {
     const idRaw = getAttr(item, "w:id") ?? getAttr(item, "id");
-    if (!idRaw) {continue;}
+    if (!idRaw) {
+      continue;
+    }
     if (options.requirePositiveNumericId) {
       const idNum = Number.parseInt(idRaw, 10);
-      if (!Number.isFinite(idNum) || idNum <= 0) {continue;}
+      if (!Number.isFinite(idNum) || idNum <= 0) {
+        continue;
+      }
     }
     const text = extractNodeParagraphText(item);
-    if (!text) {continue;}
+    if (!text) {
+      continue;
+    }
     map[idRaw] = text;
   }
   return map;
@@ -533,19 +672,25 @@ function parseFootnotesMap(footnotesXmlText: string | null): FootnoteMap {
 }
 
 function parseCommentsMap(commentsXmlText: string | null): CommentMap {
-  if (!commentsXmlText) {return {};}
+  if (!commentsXmlText) {
+    return {};
+  }
   const commentsDoc = parseXml(commentsXmlText);
   const map: CommentMap = {};
   const comments = queryAllByLocalName(commentsDoc, "comment");
   for (const comment of comments) {
     const idRaw = getAttr(comment, "w:id") ?? getAttr(comment, "id");
-    if (!idRaw) {continue;}
+    if (!idRaw) {
+      continue;
+    }
     const text = extractNodeParagraphText(comment);
-    if (!text) {continue;}
+    if (!text) {
+      continue;
+    }
     map[idRaw] = {
       author: getAttr(comment, "w:author") ?? getAttr(comment, "author"),
       date: getAttr(comment, "w:date") ?? getAttr(comment, "date"),
-      text
+      text,
     };
   }
   return map;
@@ -557,16 +702,22 @@ function parseEndnotesMap(endnotesXmlText: string | null): FootnoteMap {
 
 function renderFootnotesSection(usedIds: string[], footnotesMap: FootnoteMap): string {
   const uniq = [...new Set(usedIds)].filter((id) => footnotesMap[id]);
-  if (uniq.length === 0) {return "";}
+  if (uniq.length === 0) {
+    return "";
+  }
   const items = uniq
-    .map((id) => `<li id="word-footnote-${id}" data-word-footnote-id="${id}">${footnotesMap[id]}</li>`)
+    .map(
+      (id) => `<li id="word-footnote-${id}" data-word-footnote-id="${id}">${footnotesMap[id]}</li>`,
+    )
     .join("");
   return `<section data-word-footnotes="1"><hr/><ol>${items}</ol></section>`;
 }
 
 function renderCommentsSection(usedIds: string[], commentsMap: CommentMap): string {
   const uniq = [...new Set(usedIds)].filter((id) => commentsMap[id]);
-  if (uniq.length === 0) {return "";}
+  if (uniq.length === 0) {
+    return "";
+  }
   const items = uniq
     .map((id) => {
       const item = commentsMap[id];
@@ -580,7 +731,9 @@ function renderCommentsSection(usedIds: string[], commentsMap: CommentMap): stri
 
 function renderEndnotesSection(usedIds: string[], endnotesMap: FootnoteMap): string {
   const uniq = [...new Set(usedIds)].filter((id) => endnotesMap[id]);
-  if (uniq.length === 0) {return "";}
+  if (uniq.length === 0) {
+    return "";
+  }
   const items = uniq
     .map((id) => `<li id="word-endnote-${id}" data-word-endnote-id="${id}">${endnotesMap[id]}</li>`)
     .join("");
@@ -592,7 +745,7 @@ function collectRunTextParts(run: Element): RunTextParts {
     text: "",
     delText: "",
     lineBreakCount: 0,
-    pageBreakCount: 0
+    pageBreakCount: 0,
   };
   const stack = [run];
   while (stack.length > 0) {
@@ -629,7 +782,7 @@ async function paragraphToHtml(
   endnotesMap: FootnoteMap,
   usedEndnoteIds: string[],
   commentsMap: CommentMap,
-  usedCommentIds: string[]
+  usedCommentIds: string[],
 ): Promise<string> {
   const tag = paragraphTag(paragraph);
   const alignStyle = paragraphAlignStyle(paragraph);
@@ -647,7 +800,9 @@ async function paragraphToHtml(
   if (context.pluginPipeline && context.pluginContext) {
     for (const plugin of context.pluginPipeline.getParagraphPlugins()) {
       const parsed = plugin.parseParagraph(paragraph, context.pluginContext);
-      if (!parsed.handled) {continue;}
+      if (!parsed.handled) {
+        continue;
+      }
       if (parsed.metadata) {
         Object.assign(context.pluginContext.metadata, parsed.metadata);
       }
@@ -662,17 +817,25 @@ async function paragraphToHtml(
       type,
       id: getAttr(node, "w:id") ?? getAttr(node, "id"),
       author: getAttr(node, "w:author") ?? getAttr(node, "author"),
-      date: getAttr(node, "w:date") ?? getAttr(node, "date")
+      date: getAttr(node, "w:date") ?? getAttr(node, "date"),
     };
   }
 
   function inferRevisionMeta(run: Element, fallback: RevisionMeta | null): RevisionMeta | null {
-    if (fallback) {return fallback;}
+    if (fallback) {
+      return fallback;
+    }
     let cursor: Element | null = run;
     while (cursor) {
-      if (cursor.localName === "ins") {return parseRevisionMeta(cursor, "ins");}
-      if (cursor.localName === "del") {return parseRevisionMeta(cursor, "del");}
-      if (cursor.localName === "p") {break;}
+      if (cursor.localName === "ins") {
+        return parseRevisionMeta(cursor, "ins");
+      }
+      if (cursor.localName === "del") {
+        return parseRevisionMeta(cursor, "del");
+      }
+      if (cursor.localName === "p") {
+        break;
+      }
       cursor = cursor.parentElement;
     }
     return null;
@@ -680,9 +843,15 @@ async function paragraphToHtml(
 
   function revisionMetaAttrs(meta: RevisionMeta): string {
     const attrs: string[] = [`data-word-revision="${meta.type}"`];
-    if (meta.id) {attrs.push(`data-word-revision-id="${escapeHtml(meta.id)}"`);}
-    if (meta.author) {attrs.push(`data-word-revision-author="${escapeHtml(meta.author)}"`);}
-    if (meta.date) {attrs.push(`data-word-revision-date="${escapeHtml(meta.date)}"`);}
+    if (meta.id) {
+      attrs.push(`data-word-revision-id="${escapeHtml(meta.id)}"`);
+    }
+    if (meta.author) {
+      attrs.push(`data-word-revision-author="${escapeHtml(meta.author)}"`);
+    }
+    if (meta.date) {
+      attrs.push(`data-word-revision-date="${escapeHtml(meta.date)}"`);
+    }
     return attrs.join(" ");
   }
 
@@ -691,8 +860,12 @@ async function paragraphToHtml(
     if (context.pluginPipeline && context.pluginContext) {
       for (const plugin of context.pluginPipeline.getRunPlugins()) {
         const parsed = plugin.parseRun(run, context.pluginContext);
-        if (!parsed.handled) {continue;}
-        if (parsed.html) {result.push(parsed.html);}
+        if (!parsed.handled) {
+          continue;
+        }
+        if (parsed.html) {
+          result.push(parsed.html);
+        }
         return result;
       }
     }
@@ -705,7 +878,7 @@ async function paragraphToHtml(
       context.features.footnoteRefCount += 1;
       usedFootnoteIds.push(footnoteId);
       result.push(
-        `<sup data-word-footnote-ref="${footnoteId}"><a href="#word-footnote-${footnoteId}">[${footnoteId}]</a></sup>`
+        `<sup data-word-footnote-ref="${footnoteId}"><a href="#word-footnote-${footnoteId}">[${footnoteId}]</a></sup>`,
       );
       return result;
     }
@@ -716,7 +889,7 @@ async function paragraphToHtml(
       context.features.endnoteRefCount += 1;
       usedEndnoteIds.push(endnoteId);
       result.push(
-        `<sup data-word-endnote-ref="${endnoteId}"><a href="#word-endnote-${endnoteId}">[${endnoteId}]</a></sup>`
+        `<sup data-word-endnote-ref="${endnoteId}"><a href="#word-endnote-${endnoteId}">[${endnoteId}]</a></sup>`,
       );
       return result;
     }
@@ -727,7 +900,7 @@ async function paragraphToHtml(
       context.features.commentRefCount += 1;
       usedCommentIds.push(commentId);
       result.push(
-        `<sup data-word-comment-ref="${commentId}"><a href="#word-comment-${commentId}">[c${commentId}]</a></sup>`
+        `<sup data-word-comment-ref="${commentId}"><a href="#word-comment-${commentId}">[c${commentId}]</a></sup>`,
       );
       return result;
     }
@@ -743,7 +916,9 @@ async function paragraphToHtml(
           const dimensionAttrs = imageDimensionAttributes(imageSize);
           const anchorMeta = parseAnchorMeta(drawing);
           const attrs = mergeImageStyle(dimensionAttrs, anchorMeta);
-          if (anchorMeta) {context.features.anchorImageCount += 1;}
+          if (anchorMeta) {
+            context.features.anchorImageCount += 1;
+          }
           result.push(`<img src="${src}" alt="word-image"${attrs}/>`);
           return result;
         }
@@ -760,7 +935,7 @@ async function paragraphToHtml(
             `<figure data-word-chart="1" data-word-chart-type="${summary.type}" data-word-chart-series="${summary.seriesCount}" data-word-chart-points="${summary.pointCount}">` +
               `<figcaption>${escapeHtml(summary.title)}</figcaption>` +
               `<div>Chart(${escapeHtml(summary.type)}): series=${summary.seriesCount}, points=${summary.pointCount}</div>` +
-              `</figure>`
+              `</figure>`,
           );
           return result;
         }
@@ -776,7 +951,7 @@ async function paragraphToHtml(
         result.push(
           `<figure data-word-smartart="1" data-word-smartart-items="${textItems.length}">` +
             `<figcaption>SmartArt fallback${preview}</figcaption>` +
-            `</figure>`
+            `</figure>`,
         );
         return result;
       }
@@ -811,7 +986,10 @@ async function paragraphToHtml(
     return result;
   }
 
-  async function nodeToHtml(node: Element, revisionFallback: RevisionMeta | null): Promise<string[]> {
+  async function nodeToHtml(
+    node: Element,
+    revisionFallback: RevisionMeta | null,
+  ): Promise<string[]> {
     if (node.localName === "commentRangeStart") {
       const id = getAttr(node, "w:id") ?? getAttr(node, "id");
       return id ? [`<span data-word-comment-range-start="${id}"></span>`] : [];
@@ -832,15 +1010,19 @@ async function paragraphToHtml(
         nested.push(...(await nodeToHtml(child, revisionFallback)));
       }
       const content = nested.join("") || escapeHtml(node.textContent ?? "");
-      if (!href) {return content ? [content] : [];}
+      if (!href) {
+        return content ? [content] : [];
+      }
       context.features.hyperlinkCount += 1;
       return [
-        `<a data-word-hyperlink="1" href="${escapeHtml(href)}" rel="noreferrer noopener" target="_blank">${content}</a>`
+        `<a data-word-hyperlink="1" href="${escapeHtml(href)}" rel="noreferrer noopener" target="_blank">${content}</a>`,
       ];
     }
     if (node.localName === "oMath" || node.localName === "oMathPara") {
       const linear = ommlNodeToText(node).trim();
-      if (!linear) {return [];}
+      if (!linear) {
+        return [];
+      }
       context.features.ommlCount += 1;
       return [`<span data-word-omml="1">${escapeHtml(linear)}</span>`];
     }
@@ -887,7 +1069,7 @@ function paragraphText(paragraph: Element): string {
 
 function parseTcGridSpan(tc: Element): number {
   const tcPr = directChildrenByLocalName(tc, "tcPr")[0] ?? null;
-  const gridSpan = tcPr ? directChildrenByLocalName(tcPr, "gridSpan")[0] ?? null : null;
+  const gridSpan = tcPr ? (directChildrenByLocalName(tcPr, "gridSpan")[0] ?? null) : null;
   const rawVal = getAttr(gridSpan, "w:val") ?? getAttr(gridSpan, "val");
   const parsed = rawVal ? Number.parseInt(rawVal, 10) : Number.NaN;
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
@@ -895,15 +1077,19 @@ function parseTcGridSpan(tc: Element): number {
 
 function parseTcVMerge(tc: Element): "none" | "restart" | "continue" {
   const tcPr = directChildrenByLocalName(tc, "tcPr")[0] ?? null;
-  const vMerge = tcPr ? directChildrenByLocalName(tcPr, "vMerge")[0] ?? null : null;
-  if (!vMerge) {return "none";}
+  const vMerge = tcPr ? (directChildrenByLocalName(tcPr, "vMerge")[0] ?? null) : null;
+  if (!vMerge) {
+    return "none";
+  }
   const rawVal = (getAttr(vMerge, "w:val") ?? getAttr(vMerge, "val") ?? "continue").toLowerCase();
   return rawVal === "restart" ? "restart" : "continue";
 }
 
 function parseTblGridWidthsPx(table: Element): number[] {
   const grid = directChildrenByLocalName(table, "tblGrid")[0] ?? null;
-  if (!grid) {return [];}
+  if (!grid) {
+    return [];
+  }
   return directChildrenByLocalName(grid, "gridCol")
     .map((col) => {
       const raw = getAttr(col, "w:w") ?? getAttr(col, "w");
@@ -918,10 +1104,18 @@ function borderSizeToPx(size: number): number {
 }
 
 function parseBorderCss(borderNode: Element | null): string | null {
-  if (!borderNode) {return null;}
+  if (!borderNode) {
+    return null;
+  }
   const val = (getAttr(borderNode, "w:val") ?? getAttr(borderNode, "val") ?? "").toLowerCase();
-  if (!val || val === "nil" || val === "none") {return "none";}
-  const color = (getAttr(borderNode, "w:color") ?? getAttr(borderNode, "color") ?? "222222").replace(/^#/, "");
+  if (!val || val === "nil" || val === "none") {
+    return "none";
+  }
+  const color = (
+    getAttr(borderNode, "w:color") ??
+    getAttr(borderNode, "color") ??
+    "222222"
+  ).replace(/^#/, "");
   const rawSize = getAttr(borderNode, "w:sz") ?? getAttr(borderNode, "sz");
   const size = rawSize ? Number.parseInt(rawSize, 10) : Number.NaN;
   const px = Number.isFinite(size) && size > 0 ? borderSizeToPx(size) : 1;
@@ -940,23 +1134,44 @@ interface TableStyleProfile {
 
 function parseTableStyleProfile(table: Element): TableStyleProfile {
   const tblPr = directChildrenByLocalName(table, "tblPr")[0] ?? null;
-  const tblBorders = tblPr ? directChildrenByLocalName(tblPr, "tblBorders")[0] ?? null : null;
-  const layout = tblPr ? directChildrenByLocalName(tblPr, "tblLayout")[0] ?? null : null;
-  const spacing = tblPr ? directChildrenByLocalName(tblPr, "tblCellSpacing")[0] ?? null : null;
-  const spacingType = (getAttr(spacing, "w:type") ?? getAttr(spacing, "type") ?? "dxa").toLowerCase();
+  const tblBorders = tblPr ? (directChildrenByLocalName(tblPr, "tblBorders")[0] ?? null) : null;
+  const layout = tblPr ? (directChildrenByLocalName(tblPr, "tblLayout")[0] ?? null) : null;
+  const spacing = tblPr ? (directChildrenByLocalName(tblPr, "tblCellSpacing")[0] ?? null) : null;
+  const spacingType = (
+    getAttr(spacing, "w:type") ??
+    getAttr(spacing, "type") ??
+    "dxa"
+  ).toLowerCase();
   const spacingRaw = getAttr(spacing, "w:w") ?? getAttr(spacing, "w");
   const spacingVal = spacingRaw ? Number.parseFloat(spacingRaw) : Number.NaN;
   const borderSpacingPx =
-    spacingType === "dxa" && Number.isFinite(spacingVal) && spacingVal > 0 ? twipToPx(spacingVal) : 0;
+    spacingType === "dxa" && Number.isFinite(spacingVal) && spacingVal > 0
+      ? twipToPx(spacingVal)
+      : 0;
   const borderCollapse = borderSpacingPx > 0 ? "separate" : "collapse";
-  const tableLayout = (getAttr(layout, "w:type") ?? getAttr(layout, "type") ?? "").toLowerCase() === "autofit" ? "auto" : "fixed";
+  const tableLayout =
+    (getAttr(layout, "w:type") ?? getAttr(layout, "type") ?? "").toLowerCase() === "autofit"
+      ? "auto"
+      : "fixed";
 
-  const top = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "top")[0] ?? null : null);
-  const bottom = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "bottom")[0] ?? null : null);
-  const left = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "left")[0] ?? null : null);
-  const right = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "right")[0] ?? null : null);
-  const insideH = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "insideH")[0] ?? null : null);
-  const insideV = parseBorderCss(tblBorders ? directChildrenByLocalName(tblBorders, "insideV")[0] ?? null : null);
+  const top = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "top")[0] ?? null) : null,
+  );
+  const bottom = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "bottom")[0] ?? null) : null,
+  );
+  const left = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "left")[0] ?? null) : null,
+  );
+  const right = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "right")[0] ?? null) : null,
+  );
+  const insideH = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "insideH")[0] ?? null) : null,
+  );
+  const insideV = parseBorderCss(
+    tblBorders ? (directChildrenByLocalName(tblBorders, "insideV")[0] ?? null) : null,
+  );
   const borderCss = top ?? right ?? bottom ?? left ?? "1px solid #222";
 
   return {
@@ -965,13 +1180,13 @@ function parseTableStyleProfile(table: Element): TableStyleProfile {
     borderSpacingPx,
     borderCss,
     insideHCss: insideH,
-    insideVCss: insideV
+    insideVCss: insideV,
   };
 }
 
 function parseTableWidthStyle(table: Element, gridWidthsPx: number[]): string {
   const tblPr = directChildrenByLocalName(table, "tblPr")[0] ?? null;
-  const tblW = tblPr ? directChildrenByLocalName(tblPr, "tblW")[0] ?? null : null;
+  const tblW = tblPr ? (directChildrenByLocalName(tblPr, "tblW")[0] ?? null) : null;
   const type = (getAttr(tblW, "w:type") ?? getAttr(tblW, "type") ?? "").toLowerCase();
   const rawVal = getAttr(tblW, "w:w") ?? getAttr(tblW, "w");
   const numericVal = rawVal ? Number.parseFloat(rawVal) : Number.NaN;
@@ -982,13 +1197,20 @@ function parseTableWidthStyle(table: Element, gridWidthsPx: number[]): string {
     return `width:${(numericVal / 50).toFixed(2)}%`;
   }
   const gridTotal = gridWidthsPx.reduce((sum, item) => sum + item, 0);
-  if (gridTotal > 0) {return `width:${gridTotal.toFixed(2)}px;max-width:100%`;}
+  if (gridTotal > 0) {
+    return `width:${gridTotal.toFixed(2)}px;max-width:100%`;
+  }
   return "width:100%";
 }
 
-function parseCellWidthStyle(cell: Element, colCursor: number, colSpan: number, gridWidthsPx: number[]): string {
+function parseCellWidthStyle(
+  cell: Element,
+  colCursor: number,
+  colSpan: number,
+  gridWidthsPx: number[],
+): string {
   const tcPr = directChildrenByLocalName(cell, "tcPr")[0] ?? null;
-  const tcW = tcPr ? directChildrenByLocalName(tcPr, "tcW")[0] ?? null : null;
+  const tcW = tcPr ? (directChildrenByLocalName(tcPr, "tcW")[0] ?? null) : null;
   const type = (getAttr(tcW, "w:type") ?? getAttr(tcW, "type") ?? "").toLowerCase();
   const rawVal = getAttr(tcW, "w:w") ?? getAttr(tcW, "w");
   const numericVal = rawVal ? Number.parseFloat(rawVal) : Number.NaN;
@@ -999,29 +1221,51 @@ function parseCellWidthStyle(cell: Element, colCursor: number, colSpan: number, 
   if (type === "pct" && Number.isFinite(numericVal) && numericVal > 0) {
     return `width:${(numericVal / 50).toFixed(2)}%`;
   }
-  const width = gridWidthsPx.slice(colCursor, colCursor + colSpan).reduce((sum, item) => sum + item, 0);
-  if (width > 0) {return `width:${width.toFixed(2)}px`;}
+  const width = gridWidthsPx
+    .slice(colCursor, colCursor + colSpan)
+    .reduce((sum, item) => sum + item, 0);
+  if (width > 0) {
+    return `width:${width.toFixed(2)}px`;
+  }
   return "";
 }
 
 function parseCellBorderStyle(cell: Element, tableStyle: TableStyleProfile): string {
   const tcPr = directChildrenByLocalName(cell, "tcPr")[0] ?? null;
-  const tcBorders = tcPr ? directChildrenByLocalName(tcPr, "tcBorders")[0] ?? null : null;
+  const tcBorders = tcPr ? (directChildrenByLocalName(tcPr, "tcBorders")[0] ?? null) : null;
   if (!tcBorders) {
     const fallback = tableStyle.insideHCss ?? tableStyle.insideVCss ?? tableStyle.borderCss;
     return `border:${fallback}`;
   }
-  const top = parseBorderCss(directChildrenByLocalName(tcBorders, "top")[0] ?? null) ?? tableStyle.insideHCss ?? tableStyle.borderCss;
-  const right = parseBorderCss(directChildrenByLocalName(tcBorders, "right")[0] ?? null) ?? tableStyle.insideVCss ?? tableStyle.borderCss;
-  const bottom = parseBorderCss(directChildrenByLocalName(tcBorders, "bottom")[0] ?? null) ?? tableStyle.insideHCss ?? tableStyle.borderCss;
-  const left = parseBorderCss(directChildrenByLocalName(tcBorders, "left")[0] ?? null) ?? tableStyle.insideVCss ?? tableStyle.borderCss;
+  const top =
+    parseBorderCss(directChildrenByLocalName(tcBorders, "top")[0] ?? null) ??
+    tableStyle.insideHCss ??
+    tableStyle.borderCss;
+  const right =
+    parseBorderCss(directChildrenByLocalName(tcBorders, "right")[0] ?? null) ??
+    tableStyle.insideVCss ??
+    tableStyle.borderCss;
+  const bottom =
+    parseBorderCss(directChildrenByLocalName(tcBorders, "bottom")[0] ?? null) ??
+    tableStyle.insideHCss ??
+    tableStyle.borderCss;
+  const left =
+    parseBorderCss(directChildrenByLocalName(tcBorders, "left")[0] ?? null) ??
+    tableStyle.insideVCss ??
+    tableStyle.borderCss;
   return `border-top:${top};border-right:${right};border-bottom:${bottom};border-left:${left}`;
 }
 
-function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>, context: ParseContext): string {
+function tableCellHtml(
+  cell: Element,
+  paragraphIndexMap: Map<Element, number>,
+  context: ParseContext,
+): string {
   const blocks: string[] = [];
   for (const child of Array.from(cell.children)) {
-    if (child.localName === "tcPr") {continue;}
+    if (child.localName === "tcPr") {
+      continue;
+    }
     if (child.localName === "p") {
       const paragraphIndex = paragraphIndexMap.get(child) ?? null;
       blocks.push(`<p${paragraphDataAttr(paragraphIndex)}>${paragraphText(child)}</p>`);
@@ -1033,12 +1277,21 @@ function tableCellHtml(cell: Element, paragraphIndexMap: Map<Element, number>, c
     }
   }
 
-  if (blocks.length > 0) {return blocks.join("");}
-  const text = queryAllByLocalName(cell, "t").map((t) => t.textContent ?? "").join("").trim();
+  if (blocks.length > 0) {
+    return blocks.join("");
+  }
+  const text = queryAllByLocalName(cell, "t")
+    .map((t) => t.textContent ?? "")
+    .join("")
+    .trim();
   return escapeHtml(text) || "<br/>";
 }
 
-function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, context: ParseContext): string {
+function tableToHtml(
+  table: Element,
+  paragraphIndexMap: Map<Element, number>,
+  context: ParseContext,
+): string {
   if (context.pluginPipeline && context.pluginContext) {
     for (const plugin of context.pluginPipeline.getTablePlugins()) {
       const parsed = plugin.parseTable(table, context.pluginContext);
@@ -1080,9 +1333,7 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
           .filter((origin) => !continued.has(origin))
           .sort((a, b) => a.startCol - b.startCol);
         const origin =
-          activeOrigins.find((item) => item.startCol >= colCursor) ??
-          activeOrigins[0] ??
-          null;
+          activeOrigins.find((item) => item.startCol >= colCursor) ?? activeOrigins[0] ?? null;
         if (origin) {
           origin.rowSpan += 1;
           continued.add(origin);
@@ -1105,7 +1356,7 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
           startCol: colCursor,
           colSpan,
           rowSpan: 1,
-          startedRow: rowIndex
+          startedRow: rowIndex,
         };
         nextOriginId += 1;
         allOrigins.push(origin);
@@ -1115,9 +1366,11 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
         attrs.push(`data-word-merge-id="${origin.id}"`);
       }
 
-      if (colSpan > 1) {attrs.push(`colspan="${colSpan}"`);}
+      if (colSpan > 1) {
+        attrs.push(`colspan="${colSpan}"`);
+      }
       emittedCells.push(
-        `<td${attrs.length > 0 ? ` ${attrs.join(" ")}` : ""} style="${borderStyle};vertical-align:top;${widthStyle}">${html}</td>`
+        `<td${attrs.length > 0 ? ` ${attrs.join(" ")}` : ""} style="${borderStyle};vertical-align:top;${widthStyle}">${html}</td>`,
       );
       colCursor += colSpan;
     }
@@ -1141,27 +1394,38 @@ function tableToHtml(table: Element, paragraphIndexMap: Map<Element, number>, co
   }
 
   const tableWidthStyle = parseTableWidthStyle(table, gridWidthsPx);
-  const spacing = tableStyle.borderSpacingPx > 0 ? `border-spacing:${tableStyle.borderSpacingPx.toFixed(2)}px;` : "";
+  const spacing =
+    tableStyle.borderSpacingPx > 0
+      ? `border-spacing:${tableStyle.borderSpacingPx.toFixed(2)}px;`
+      : "";
   return `<table style="border-collapse:${tableStyle.borderCollapse};${spacing}table-layout:${tableStyle.tableLayout};${tableWidthStyle};border:${tableStyle.borderCss};">${merged}</table>`;
 }
 
 function applySanitization(html: string, profile: SanitizationProfile): string {
-  if (profile === "fidelity-first") {return html;}
-  
+  if (profile === "fidelity-first") {
+    return html;
+  }
+
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  
+
   doc.querySelectorAll("[style]").forEach((el) => {
     const style = el.getAttribute("style") || "";
     const cleaned: string[] = [];
     const parts = style.split(";").filter((s) => s.trim());
     for (const part of parts) {
       const [prop, value] = part.split(":").map((s) => s.trim());
-      if (!prop || !value) {continue;}
-      if (prop === "position" && value === "absolute") {continue;}
+      if (!prop || !value) {
+        continue;
+      }
+      if (prop === "position" && value === "absolute") {
+        continue;
+      }
       if (prop.startsWith("margin") || prop.startsWith("padding")) {
         const num = parseFloat(value);
-        if (num > 100) {continue;}
+        if (num > 100) {
+          continue;
+        }
       }
       cleaned.push(`${prop}:${value}`);
     }
@@ -1171,23 +1435,30 @@ function applySanitization(html: string, profile: SanitizationProfile): string {
       el.removeAttribute("style");
     }
   });
-  
+
   return doc.documentElement.outerHTML;
 }
 
 export async function parseDocxToHtmlSnapshotWithReport(
   file: File,
-  options?: { enablePlugins?: boolean; sanitizationProfile?: SanitizationProfile }
+  options?: { enablePlugins?: boolean; sanitizationProfile?: SanitizationProfile },
 ): Promise<{ htmlSnapshot: string; report: DocxParseReport }> {
   const startedAt = Date.now();
   const enablePlugins = options?.enablePlugins ?? true;
   const sanitizationProfile = options?.sanitizationProfile ?? "fidelity-first";
-  
+
   const pluginPipeline = enablePlugins ? createPipeline() : null;
-  const context: ParseContext = { features: createEmptyFeatureCounts(), pluginPipeline: pluginPipeline ?? undefined, sanitizationProfile };
-  
-  const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
-  const buffer = maybeArrayBuffer ? await maybeArrayBuffer.call(file) : await new Response(file).arrayBuffer();
+  const context: ParseContext = {
+    features: createEmptyFeatureCounts(),
+    pluginPipeline: pluginPipeline ?? undefined,
+    sanitizationProfile,
+  };
+
+  const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> })
+    .arrayBuffer;
+  const buffer = maybeArrayBuffer
+    ? await maybeArrayBuffer.call(file)
+    : await new Response(file).arrayBuffer();
   const zip = await JSZip.loadAsync(buffer);
 
   const documentXmlText = await zip.file("word/document.xml")?.async("string");
@@ -1200,14 +1471,14 @@ export async function parseDocxToHtmlSnapshotWithReport(
   const commentsText = await zip.file("word/comments.xml")?.async("string");
   const stylesText = await zip.file("word/styles.xml")?.async("string");
   const numberingText = await zip.file("word/numbering.xml")?.async("string");
-  
+
   const relMap = parseDocRelsMap(relsText ?? null);
   const footnotesMap = parseFootnotesMap(footnotesText ?? null);
   const endnotesMap = parseEndnotesMap(endnotesText ?? null);
   const commentsMap = parseCommentsMap(commentsText ?? null);
   const stylesXml = stylesText ? parseXml(stylesText) : null;
   const numberingXml = numberingText ? parseXml(numberingText) : null;
-  
+
   const usedFootnoteIds: string[] = [];
   const usedEndnoteIds: string[] = [];
   const usedCommentIds: string[] = [];
@@ -1226,7 +1497,7 @@ export async function parseDocxToHtmlSnapshotWithReport(
       numberingXml,
       relsMap: relMap,
       metadata: {},
-      config: pluginPipeline.getConfig()
+      config: pluginPipeline.getConfig(),
     };
   }
 
@@ -1237,7 +1508,9 @@ export async function parseDocxToHtmlSnapshotWithReport(
 
   const blockHtml: string[] = [];
   for (const child of Array.from(body.children)) {
-    if (child.localName === "sectPr") {continue;}
+    if (child.localName === "sectPr") {
+      continue;
+    }
     if (child.localName === "p") {
       const paragraphIndex = paragraphIndexMap.get(child) ?? null;
       blockHtml.push(
@@ -1252,8 +1525,8 @@ export async function parseDocxToHtmlSnapshotWithReport(
           endnotesMap,
           usedEndnoteIds,
           commentsMap,
-          usedCommentIds
-        )
+          usedCommentIds,
+        ),
       );
       continue;
     }
@@ -1266,22 +1539,22 @@ export async function parseDocxToHtmlSnapshotWithReport(
   blockHtml.push(renderFootnotesSection(usedFootnoteIds, footnotesMap));
   blockHtml.push(renderEndnotesSection(usedEndnoteIds, endnotesMap));
   blockHtml.push(renderCommentsSection(usedCommentIds, commentsMap));
-  
+
   let htmlResult = buildHtmlSnapshot(blockHtml.join("\n"));
-  
+
   if (pluginPipeline) {
     htmlResult = await pluginPipeline.executeTransformPhase(htmlResult);
     htmlResult = await pluginPipeline.executeCleanupPhase(htmlResult);
   }
-  
+
   htmlResult = applySanitization(htmlResult, sanitizationProfile);
-  
+
   return {
     htmlSnapshot: htmlResult,
     report: {
       elapsedMs: Date.now() - startedAt,
-      features: context.features
-    }
+      features: context.features,
+    },
   };
 }
 

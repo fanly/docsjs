@@ -23,7 +23,7 @@ import {
   createStyleInheritancePlugin,
   createListStylePlugin,
   createMathMlPlugin,
-  createAnchorCollisionPlugin
+  createAnchorCollisionPlugin,
 } from "../plugins";
 
 export interface DocxPluginPipelineConfig extends PluginConfig {
@@ -36,14 +36,14 @@ const defaultPipelineConfig: DocxPluginPipelineConfig = {
   cleanup: {
     googleDocs: true,
     wps: true,
-    word: true
+    word: true,
   },
   features: {
     mathML: true,
     shapes: true,
     oleObjects: true,
-    anchors: true
-  }
+    anchors: true,
+  },
 };
 
 export class DocxPluginPipeline {
@@ -98,9 +98,11 @@ export class DocxPluginPipeline {
     documentXml: Document,
     stylesXml: Document | null,
     numberingXml: Document | null,
-    relsMap: Record<string, string>
+    relsMap: Record<string, string>,
   ): Promise<void> {
-    if (this.initialized || !this.config.enabled) {return;}
+    if (this.initialized || !this.config.enabled) {
+      return;
+    }
 
     this.registerAllPlugins();
 
@@ -111,7 +113,7 @@ export class DocxPluginPipeline {
       numberingXml,
       relsMap,
       metadata: {},
-      config: this.config
+      config: this.config,
     };
 
     await this.registry.initialize(context);
@@ -119,7 +121,9 @@ export class DocxPluginPipeline {
   }
 
   async executeTransformPhase(html: string): Promise<string> {
-    if (!this.config.enabled) {return html;}
+    if (!this.config.enabled) {
+      return html;
+    }
 
     const context: PluginContext = {
       zip: null as unknown as JSZip,
@@ -128,14 +132,16 @@ export class DocxPluginPipeline {
       numberingXml: null,
       relsMap: {},
       metadata: {},
-      config: this.config
+      config: this.config,
     };
 
     return this.registry.transform(html, context);
   }
 
   async executeCleanupPhase(html: string): Promise<string> {
-    if (!this.config.enabled) {return html;}
+    if (!this.config.enabled) {
+      return html;
+    }
 
     if (!this.initialized) {
       this.registerAllPlugins();
@@ -149,7 +155,7 @@ export class DocxPluginPipeline {
       numberingXml: null,
       relsMap: {},
       metadata: {},
-      config: this.config
+      config: this.config,
     };
 
     return this.registry.cleanup(html, context);
@@ -160,7 +166,7 @@ export class DocxPluginPipeline {
       .list()
       .filter(
         (plugin): plugin is ParagraphPlugin =>
-          "parseParagraph" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+          "parseParagraph" in plugin && plugin.phases.includes(PluginPhase.PARSE),
       )
       .sort((a, b) => b.priority - a.priority);
   }
@@ -170,7 +176,7 @@ export class DocxPluginPipeline {
       .list()
       .filter(
         (plugin): plugin is RunPlugin =>
-          "parseRun" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+          "parseRun" in plugin && plugin.phases.includes(PluginPhase.PARSE),
       )
       .sort((a, b) => b.priority - a.priority);
   }
@@ -180,7 +186,7 @@ export class DocxPluginPipeline {
       .list()
       .filter(
         (plugin): plugin is TablePlugin =>
-          "parseTable" in plugin && plugin.phases.includes(PluginPhase.PARSE)
+          "parseTable" in plugin && plugin.phases.includes(PluginPhase.PARSE),
       )
       .sort((a, b) => b.priority - a.priority);
   }

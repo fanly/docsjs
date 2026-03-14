@@ -1,11 +1,11 @@
 /**
  * Ghost CMS Adapter
- * 
+ *
  * Integration with Ghost CMS for blog posts and newsletters.
  */
 
-import type { CMSAdapter, CMSImportOptions, CMSContent } from './adapters';
-import type { ConvertResultData } from '../server/types';
+import type { CMSAdapter, CMSImportOptions, CMSContent } from "./adapters";
+import type { ConvertResultData } from "../server/types";
 
 export interface GhostOptions extends CMSImportOptions {
   /** Ghost API URL */
@@ -15,7 +15,7 @@ export interface GhostOptions extends CMSImportOptions {
   /** Content API key (for reading) */
   contentApiKey?: string;
   /** Default post status */
-  defaultStatus?: 'draft' | 'published' | 'scheduled';
+  defaultStatus?: "draft" | "published" | "scheduled";
   /** Newsletter to publish to */
   newsletter?: string;
 }
@@ -41,8 +41,8 @@ export interface GhostPost {
 }
 
 export class GhostAdapter implements CMSAdapter {
-  name = 'ghost';
-  version = '1.0.0';
+  name = "ghost";
+  version = "1.0.0";
   private options: GhostOptions;
 
   constructor(options: GhostOptions) {
@@ -51,53 +51,54 @@ export class GhostAdapter implements CMSAdapter {
 
   async convert(content: unknown): Promise<ConvertResultData> {
     const post = content as GhostPost;
-    
+
     return {
-      output: this.htmlToDocsJS(post.html || ''),
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      output: this.htmlToDocsJS(post.html || ""),
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const mergedOptions = { ...this.options, ...options };
     const extracted = this.extractContent(content);
-    
+
     // Post to Ghost if API keys provided
     if (mergedOptions.apiUrl && mergedOptions.adminApiKey) {
       await this.postToGhost(extracted, mergedOptions);
     }
-    
+
     return extracted;
   }
 
   /**
    * Fetch posts from Ghost
    */
-  async fetchPosts(options?: { limit?: number; page?: number; status?: string }): Promise<GhostPost[]> {
+  async fetchPosts(options?: {
+    limit?: number;
+    page?: number;
+    status?: string;
+  }): Promise<GhostPost[]> {
     if (!this.options.contentApiKey) {
-      throw new Error('Content API key required');
+      throw new Error("Content API key required");
     }
 
     const params = new URLSearchParams({
       limit: String(options?.limit || 10),
       page: String(options?.page || 1),
-      include: 'tags,authors',
+      include: "tags,authors",
     });
 
     if (options?.status) {
-      params.set('filter', `status:${options.status}`);
+      params.set("filter", `status:${options.status}`);
     }
 
-    const response = await fetch(
-      `${this.options.apiUrl}/ghost/api/content/posts/?${params}`,
-      {
-        headers: {
-          'Authorization': `Ghost ${this.options.contentApiKey}`,
-        },
-      }
-    );
+    const response = await fetch(`${this.options.apiUrl}/ghost/api/content/posts/?${params}`, {
+      headers: {
+        Authorization: `Ghost ${this.options.contentApiKey}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Ghost API error: ${response.statusText}`);
@@ -112,16 +113,16 @@ export class GhostAdapter implements CMSAdapter {
    */
   async getPost(slug: string): Promise<GhostPost | null> {
     const posts = await this.fetchPosts({ limit: 1 });
-    return posts.find(p => p.slug === slug) || null;
+    return posts.find((p) => p.slug === slug) || null;
   }
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     const imgMatch = body.match(/<img[^>]+src="([^"]+)"/i);
@@ -141,29 +142,28 @@ export class GhostAdapter implements CMSAdapter {
   private async postToGhost(content: CMSContent, options: GhostOptions): Promise<GhostPost> {
     const posts = [
       {
-        posts: [{
-          title: content.title,
-          html: content.body,
-          status: options.defaultStatus || 'draft',
-          feature_image: content.featuredImage,
-          excerpt: content.excerpt,
-          tags: content.tags?.map(t => ({ name: t })),
-          authors: content.author ? [{ name: content.author }] : undefined,
-        }],
+        posts: [
+          {
+            title: content.title,
+            html: content.body,
+            status: options.defaultStatus || "draft",
+            feature_image: content.featuredImage,
+            excerpt: content.excerpt,
+            tags: content.tags?.map((t) => ({ name: t })),
+            authors: content.author ? [{ name: content.author }] : undefined,
+          },
+        ],
       },
     ];
 
-    const response = await fetch(
-      `${options.apiUrl}/ghost/api/admin/posts/`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Ghost ${options.adminApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(posts),
-      }
-    );
+    const response = await fetch(`${options.apiUrl}/ghost/api/admin/posts/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Ghost ${options.adminApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(posts),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to post to Ghost: ${response.statusText}`);

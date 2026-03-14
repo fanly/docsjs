@@ -1,11 +1,11 @@
 /**
  * AI-Powered Document Parsing
- * 
+ *
  * Provides AI-enhanced parsing for contracts and resumes using LLM.
  */
 
 export interface ContractParsingOptions {
-  provider: 'openai' | 'anthropic' | 'custom';
+  provider: "openai" | "anthropic" | "custom";
   apiKey?: string;
   model?: string;
   extractClauses?: boolean;
@@ -16,18 +16,18 @@ export interface ContractParsingOptions {
 
 export interface ContractParsingResult {
   success: boolean;
-  documentType: 'contract' | 'agreement' | 'nda' | 'other';
+  documentType: "contract" | "agreement" | "nda" | "other";
   parties: Array<{ name: string; role: string; address?: string }>;
   effectiveDate?: string;
   expirationDate?: string;
   amounts: ArrayOf<{ amount: string; currency: string; description: string }>;
-  clauses: ArrayOf<{ title: string; content: string; importance: 'high' | 'medium' | 'low' }>;
+  clauses: ArrayOf<{ title: string; content: string; importance: "high" | "medium" | "low" }>;
   risks: string[];
   summary: string;
 }
 
 export interface ResumeParsingOptions {
-  provider: 'openai' | 'anthropic' | 'custom';
+  provider: "openai" | "anthropic" | "custom";
   apiKey?: string;
   model?: string;
   extractSkills?: boolean;
@@ -62,7 +62,7 @@ export interface ResumeParsingResult {
 type ArrayOf<T> = T[];
 
 export interface AIProviderConfig {
-  type: 'openai' | 'anthropic' | 'custom';
+  type: "openai" | "anthropic" | "custom";
   apiKey: string;
   baseUrl?: string;
   model?: string;
@@ -79,32 +79,34 @@ class BaseAIParser {
 
   protected async callAPI(prompt: string): Promise<string> {
     const { type, apiKey, baseUrl, model, maxTokens, temperature } = this.config;
-    
+
     const body = {
-      model: model || (type === 'openai' ? 'gpt-4' : 'claude-3-opus-20240229'),
-      messages: [{ role: 'user', content: prompt }],
+      model: model || (type === "openai" ? "gpt-4" : "claude-3-opus-20240229"),
+      messages: [{ role: "user", content: prompt }],
       max_tokens: maxTokens || 2000,
-      temperature: temperature || 0.3
+      temperature: temperature || 0.3,
     };
 
-    const url = baseUrl || (type === 'openai' 
-      ? 'https://api.openai.com/v1/chat/completions'
-      : 'https://api.anthropic.com/v1/messages');
+    const url =
+      baseUrl ||
+      (type === "openai"
+        ? "https://api.openai.com/v1/chat/completions"
+        : "https://api.anthropic.com/v1/messages");
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
 
-    if (type === 'openai') {
-      headers['Authorization'] = `Bearer ${apiKey}`;
+    if (type === "openai") {
+      headers["Authorization"] = `Bearer ${apiKey}`;
     } else {
-      headers['x-api-key'] = apiKey;
+      headers["x-api-key"] = apiKey;
     }
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -112,11 +114,11 @@ class BaseAIParser {
     }
 
     const data = await response.json();
-    
-    if (type === 'openai') {
-      return data.choices?.[0]?.message?.content || '';
+
+    if (type === "openai") {
+      return data.choices?.[0]?.message?.content || "";
     } else {
-      return data.content?.[0]?.text || '';
+      return data.content?.[0]?.text || "";
     }
   }
 }
@@ -126,30 +128,33 @@ export class ContractParser extends BaseAIParser {
     super(config);
   }
 
-  async parse(content: string, options?: Partial<ContractParsingOptions>): Promise<ContractParsingResult> {
+  async parse(
+    content: string,
+    options?: Partial<ContractParsingOptions>,
+  ): Promise<ContractParsingResult> {
     const prompt = this.buildPrompt(content, options);
-    
+
     try {
       const response = await this.callAPI(prompt);
       const result = this.parseResponse(response);
-      return { 
-        success: true, 
-        documentType: result.documentType || 'other',
+      return {
+        success: true,
+        documentType: result.documentType || "other",
         parties: result.parties || [],
         amounts: result.amounts || [],
         clauses: result.clauses || [],
         risks: result.risks || [],
-        summary: result.summary || ''
+        summary: result.summary || "",
       };
     } catch (error) {
       return {
         success: false,
-        documentType: 'other',
+        documentType: "other",
         parties: [],
         amounts: [],
         clauses: [],
         risks: [],
-        summary: error instanceof Error ? error.message : 'Parsing failed'
+        summary: error instanceof Error ? error.message : "Parsing failed",
       };
     }
   }
@@ -191,7 +196,14 @@ Return the result as JSON with these fields:
     } catch {
       // Fallback to default
     }
-    return { documentType: 'other', parties: [], amounts: [], clauses: [], risks: [], summary: response };
+    return {
+      documentType: "other",
+      parties: [],
+      amounts: [],
+      clauses: [],
+      risks: [],
+      summary: response,
+    };
   }
 }
 
@@ -200,27 +212,30 @@ export class ResumeParser extends BaseAIParser {
     super(config);
   }
 
-  async parse(content: string, options?: Partial<ResumeParsingOptions>): Promise<ResumeParsingResult> {
+  async parse(
+    content: string,
+    options?: Partial<ResumeParsingOptions>,
+  ): Promise<ResumeParsingResult> {
     const prompt = this.buildPrompt(content, options);
-    
+
     try {
       const response = await this.callAPI(prompt);
       const result = this.parseResponse(response);
-      return { 
-        success: true, 
+      return {
+        success: true,
         skills: result.skills || [],
         experience: result.experience || [],
         education: result.education || [],
         certifications: result.certifications || [],
         languages: result.languages || [],
-        ...result
+        ...result,
       };
     } catch (error) {
       return {
         success: false,
         skills: [],
         experience: [],
-        education: []
+        education: [],
       };
     }
   }

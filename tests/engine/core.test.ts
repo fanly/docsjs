@@ -1,14 +1,14 @@
 /**
  * Core Engine v2 Tests
- * 
+ *
  * Tests the new engine architecture and its main functionalities.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { CoreEngine } from '../../src/engine/core';
-import { SYSTEM_PROFILES } from '../../src/profiles/profile-manager';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vite-plus/test";
+import { CoreEngine } from "../../src/engine/core";
+import { SYSTEM_PROFILES } from "../../src/profiles/profile-manager";
 
-describe('CoreEngine', () => {
+describe("CoreEngine", () => {
   let engine: CoreEngine;
 
   beforeEach(() => {
@@ -21,9 +21,9 @@ describe('CoreEngine', () => {
     }
   });
 
-  it('should initialize with default configuration', () => {
+  it("should initialize with default configuration", () => {
     const config = engine.getConfig();
-    
+
     expect(config).toBeDefined();
     expect(config.debug).toBe(false);
     expect(config.performance.maxMemoryMB).toBe(512);
@@ -31,10 +31,10 @@ describe('CoreEngine', () => {
     expect(config.security.enableSandboxes).toBe(true);
   });
 
-  it('should update configuration properly', () => {
+  it("should update configuration properly", () => {
     engine.configure({
       debug: true,
-      performance: { maxMemoryMB: 1024, maxWorkers: 2, operationTimeoutMS: 30000 }
+      performance: { maxMemoryMB: 1024, maxWorkers: 2, operationTimeoutMS: 30000 },
     });
 
     const config = engine.getConfig();
@@ -43,82 +43,82 @@ describe('CoreEngine', () => {
     expect(config.performance.maxWorkers).toBe(2);
   });
 
-  it('should manage profiles correctly', async () => {
+  it("should manage profiles correctly", async () => {
     // Initialize engine first to load profiles
     await engine.initialize();
-    
+
     // Should have system profiles
     const initialProfiles = engine.listProfiles();
     expect(initialProfiles.length).toBeGreaterThan(0);
     expect(initialProfiles.length).toBeGreaterThan(0);
 
     // Should be able to get a specific profile
-    const defaultProfile = engine.getProfile('default');
+    const defaultProfile = engine.getProfile("default");
     expect(defaultProfile).toBeDefined();
-    expect(defaultProfile!.id).toBe('default');
+    expect(defaultProfile!.id).toBe("default");
   });
 
-  it('should apply and get current profile', async () => {
+  it("should apply and get current profile", async () => {
     await engine.initialize();
-    
-    engine.applyProfile('knowledge-base');
-    engine.applyProfile('knowledge-base');
 
-    const currentProfile = engine.getProfile('knowledge-base');
+    engine.applyProfile("knowledge-base");
+    engine.applyProfile("knowledge-base");
+
+    const currentProfile = engine.getProfile("knowledge-base");
     expect(currentProfile).toBeDefined();
-    expect(currentProfile!.name).toBe('Knowledge Base Profile');
+    expect(currentProfile!.name).toBe("Knowledge Base Profile");
   });
 
-  it('should register and manage plugins', () => {
+  it("should register and manage plugins", () => {
     const mockPlugin = {
-      name: 'test-plugin',
-      version: '1.0.0',
-      author: 'Author',
-      description: 'Test plugin',
-      availableHooks: ['beforeParse'] as const,
-      supportedFormats: ['docx'],
+      name: "test-plugin",
+      version: "1.0.0",
+      author: "Author",
+      description: "Test plugin",
+      availableHooks: ["beforeParse"] as const,
+      supportedFormats: ["docx"],
       permissions: {
-        read: ['.'],
-        write: ['.'],
+        read: ["."],
+        write: ["."],
         network: false,
         compute: { maxThreads: 1, maxMemoryMB: 10, maxCpuSecs: 5 },
         ast: { canModifySemantics: true, canAccessOriginal: true, canExportRawAst: false },
         export: { canGenerateFiles: false, canUpload: false },
-        misc: { allowUnsafeCode: false }
+        misc: { allowUnsafeCode: false },
       },
-      priority: 'normal' as const,
+      priority: "normal" as const,
       dependencies: [],
-      beforeParse: (ctx: any) => ctx
+      beforeParse: (ctx: any) => ctx,
     };
 
     engine.registerPlugin(mockPlugin);
 
-    expect(engine.listPlugins()).toContain('test-plugin');
-    expect(engine.getPlugin('test-plugin')).toBeDefined();
-    expect(engine.getPlugin('test-plugin')!.name).toBe('test-plugin');
+    expect(engine.listPlugins()).toContain("test-plugin");
+    expect(engine.getPlugin("test-plugin")).toBeDefined();
+    expect(engine.getPlugin("test-plugin")!.name).toBe("test-plugin");
   });
 
-  it('should handle plugin lifecycle (init/destroy)', async () => {
+  it("should handle plugin lifecycle (init/destroy)", async () => {
     const initSpy = vi.fn();
     const destroySpy = vi.fn();
 
     const mockPlugin = {
-      name: 'lifecycle-test-plugin',
-      version: '1.0.0',
-      author: 'Author', 
-      description: 'Test plugin with lifecycle',
+      name: "lifecycle-test-plugin",
+      version: "1.0.0",
+      author: "Author",
+      description: "Test plugin with lifecycle",
       availableHooks: [] as const,
-      supportedFormats: ['test'],
+      supportedFormats: ["test"],
       permissions: {
-        read: ['.'],
-        write: ['.'], 
+        read: ["."],
+        write: ["."],
         network: false,
         compute: { maxThreads: 1, maxMemoryMB: 10, maxCpuSecs: 5 },
         ast: { canModifySemantics: false, canAccessOriginal: false, canExportRawAst: false },
         export: { canGenerateFiles: false, canUpload: false },
-        misc: { allowUnsafeCode: false }
+        misc: { allowUnsafeCode: false },
       },
-      priority: 'normal' as const,
+      priority: "normal" as const,
       dependencies: [],
       init: () => {
         initSpy();
@@ -127,7 +127,7 @@ describe('CoreEngine', () => {
       destroy: () => {
         destroySpy();
         return Promise.resolve();
-      }
+      },
     };
 
     engine.registerPlugin(mockPlugin);
@@ -140,14 +140,14 @@ describe('CoreEngine', () => {
     expect(destroySpy).toHaveBeenCalled();
   });
 
-  it('should maintain performance metrics', () => {
+  it("should maintain performance metrics", () => {
     const metrics = engine.getPerformanceMetrics();
     expect(metrics).toBeDefined();
-    expect(typeof metrics.totalOperations).toBe('number');
-    expect(typeof metrics.averageElapsedTimeMs).toBe('number');
+    expect(typeof metrics.totalOperations).toBe("number");
+    expect(typeof metrics.averageElapsedTimeMs).toBe("number");
   });
 
-  it('should reset performance metrics', () => {
+  it("should reset performance metrics", () => {
     const initialMetrics = engine.getPerformanceMetrics();
     expect(initialMetrics.totalOperations).toBe(0);
 
@@ -157,18 +157,18 @@ describe('CoreEngine', () => {
     expect(resetMetrics.totalOperations).toBe(0);
   });
 
-  it('should have default profile registered initially', () => {
-    const defaultProfile = engine.getProfile('default');
+  it("should have default profile registered initially", () => {
+    const defaultProfile = engine.getProfile("default");
     expect(defaultProfile).toBeDefined();
-    expect(defaultProfile!.id).toBe('default');
-    expect(defaultProfile!.name).toBe('Default Profile');
+    expect(defaultProfile!.id).toBe("default");
+    expect(defaultProfile!.name).toBe("Default Profile");
   });
 
-  it('should validate a simple profile correctly', () => {
+  it("should validate a simple profile correctly", () => {
     const testProfile = {
-      id: 'test-profile',
-      name: 'Test Profile',
-      description: 'A test profile',
+      id: "test-profile",
+      name: "Test Profile",
+      description: "A test profile",
       parse: {
         enablePlugins: true,
         features: { mathML: true, tables: true, images: true, annotations: false },
@@ -176,22 +176,22 @@ describe('CoreEngine', () => {
       },
       transform: {
         enablePlugins: true,
-        operations: ['normalize'],
+        operations: ["normalize"],
       },
       render: {
-        outputFormat: 'html',
-        theme: 'default',
+        outputFormat: "html",
+        theme: "default",
       },
       security: {
         allowedDomains: [],
-        sanitizerProfile: 'fidelity-first',
+        sanitizerProfile: "fidelity-first",
       },
     } as const;
 
     engine.registerProfile(testProfile);
-    
-    const retrievedProfile = engine.getProfile('test-profile');
+
+    const retrievedProfile = engine.getProfile("test-profile");
     expect(retrievedProfile).toBeDefined();
-    expect(retrievedProfile!.id).toBe('test-profile');
+    expect(retrievedProfile!.id).toBe("test-profile");
   });
 });

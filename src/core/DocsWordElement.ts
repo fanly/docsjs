@@ -13,22 +13,25 @@ let sequenceCounter = 0;
 type Locale = "zh" | "en";
 type ChangeSource = "paste" | "upload" | "api" | "clear";
 
-const MESSAGES: Record<Locale, {
-  readClipboard: string;
-  uploadWord: string;
-  clear: string;
-  pastePlaceholder: string;
-  waitImport: string;
-  loadedHtml: string;
-  cleared: string;
-  loadedWord: (name: string) => string;
-  importedClipboard: string;
-  noContent: string;
-  noClipboardRead: string;
-  parseFailed: string;
-  clipboardReadFailed: string;
-  errorPrefix: string;
-}> = {
+const MESSAGES: Record<
+  Locale,
+  {
+    readClipboard: string;
+    uploadWord: string;
+    clear: string;
+    pastePlaceholder: string;
+    waitImport: string;
+    loadedHtml: string;
+    cleared: string;
+    loadedWord: (name: string) => string;
+    importedClipboard: string;
+    noContent: string;
+    noClipboardRead: string;
+    parseFailed: string;
+    clipboardReadFailed: string;
+    errorPrefix: string;
+  }
+> = {
   zh: {
     readClipboard: "从系统剪贴板读取",
     uploadWord: "上传 Word",
@@ -43,7 +46,7 @@ const MESSAGES: Record<Locale, {
     noClipboardRead: "当前浏览器不支持 clipboard.read",
     parseFailed: "Word 解析失败",
     clipboardReadFailed: "读取剪贴板失败",
-    errorPrefix: "错误: "
+    errorPrefix: "错误: ",
   },
   en: {
     readClipboard: "Read clipboard",
@@ -59,8 +62,8 @@ const MESSAGES: Record<Locale, {
     noClipboardRead: "navigator.clipboard.read is not supported in this browser",
     parseFailed: "Word parse failed",
     clipboardReadFailed: "Failed to read clipboard",
-    errorPrefix: "Error: "
-  }
+    errorPrefix: "Error: ",
+  },
 };
 
 const BASE_CSS = `
@@ -187,7 +190,9 @@ export class DocsWordElement extends HTMLElement {
 
   private async onUpload(): Promise<void> {
     const file = this.fileInput.files?.[0];
-    if (!file) {return;}
+    if (!file) {
+      return;
+    }
     await this.applyDocx(file);
     this.fileInput.value = "";
   }
@@ -196,7 +201,7 @@ export class DocsWordElement extends HTMLElement {
     try {
       const [parseResult, profile] = await Promise.all([
         parseDocxToHtmlSnapshotWithReport(file),
-        parseDocxStyleProfile(file)
+        parseDocxStyleProfile(file),
       ]);
       this.styleProfile = profile;
       this.htmlSnapshot = parseResult.htmlSnapshot;
@@ -218,12 +223,16 @@ export class DocsWordElement extends HTMLElement {
       const payload = await extractFromClipboardItems(items);
       this.applyPayload(payload.html, payload.text);
     } catch (error) {
-      this.emitError(error instanceof Error ? error.message : MESSAGES[this.locale].clipboardReadFailed);
+      this.emitError(
+        error instanceof Error ? error.message : MESSAGES[this.locale].clipboardReadFailed,
+      );
     }
   }
 
   private async applyFromClipboardData(data: DataTransfer | null): Promise<void> {
-    if (!data) {return;}
+    if (!data) {
+      return;
+    }
     const payload = await extractFromClipboardDataTransfer(data);
     this.applyPayload(payload.html, payload.text);
   }
@@ -233,7 +242,9 @@ export class DocsWordElement extends HTMLElement {
     if (html.trim()) {
       this.htmlSnapshot = buildHtmlSnapshot(html);
     } else if (text.trim()) {
-      this.htmlSnapshot = buildHtmlSnapshot(`<p>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</p>`);
+      this.htmlSnapshot = buildHtmlSnapshot(
+        `<p>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</p>`,
+      );
     } else {
       this.setHint(MESSAGES[this.locale].noContent);
       return;
@@ -245,12 +256,14 @@ export class DocsWordElement extends HTMLElement {
 
   private onFrameLoad(): void {
     const doc = this.frame.contentDocument;
-    if (!doc) {return;}
+    if (!doc) {
+      return;
+    }
 
     applyWordRenderModel({
       doc,
       styleProfile: this.styleProfile,
-      showFormattingMarks: false
+      showFormattingMarks: false,
     });
 
     this.syncHeight();
@@ -259,10 +272,14 @@ export class DocsWordElement extends HTMLElement {
 
   private syncHeight(): void {
     const doc = this.frame.contentDocument;
-    if (!doc) {return;}
+    if (!doc) {
+      return;
+    }
     const measured = Math.max(760, doc.body.scrollHeight, doc.documentElement.scrollHeight);
     const next = measured + 24;
-    if (Math.abs(next - this.frameHeight) < 2) {return;}
+    if (Math.abs(next - this.frameHeight) < 2) {
+      return;
+    }
     this.frameHeight = next;
     this.frame.style.height = `${next}px`;
   }
@@ -274,16 +291,16 @@ export class DocsWordElement extends HTMLElement {
   private emitChange(source: ChangeSource, fileName?: string, parseReport?: DocxParseReport): void {
     sequenceCounter += 1;
     this.dispatchEvent(
-      new CustomEvent("docsjs-change", { 
-        detail: { 
-          htmlSnapshot: this.htmlSnapshot, 
-          source, 
-          fileName, 
+      new CustomEvent("docsjs-change", {
+        detail: {
+          htmlSnapshot: this.htmlSnapshot,
+          source,
+          fileName,
           parseReport,
           timestamp: Date.now(),
-          sequenceId: `seq-${sequenceCounter}`
-        } 
-      })
+          sequenceId: `seq-${sequenceCounter}`,
+        },
+      }),
     );
   }
 
@@ -312,7 +329,11 @@ export class DocsWordElement extends HTMLElement {
     this.btnUpload.textContent = t.uploadWord;
     this.btnClear.textContent = t.clear;
     this.pasteArea.placeholder = t.pastePlaceholder;
-    if (!this.hint.textContent || this.hint.textContent === MESSAGES.en.waitImport || this.hint.textContent === MESSAGES.zh.waitImport) {
+    if (
+      !this.hint.textContent ||
+      this.hint.textContent === MESSAGES.en.waitImport ||
+      this.hint.textContent === MESSAGES.zh.waitImport
+    ) {
       this.hint.textContent = t.waitImport;
     }
   }

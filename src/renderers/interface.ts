@@ -1,6 +1,6 @@
 /**
  * Renderer Interface
- * 
+ *
  * Defines the contract for all document renderers.
  * Each renderer converts DocumentAST to a specific output format.
  */
@@ -44,12 +44,12 @@ export interface IRenderer<T extends RenderOptions = RenderOptions> {
    * Render AST to output format
    */
   render(ast: DocumentNode, options?: Partial<T>): RenderResult;
-  
+
   /**
    * Get the supported output format
    */
   getSupportedFormat(): string;
-  
+
   /**
    * Validate AST before rendering
    */
@@ -64,12 +64,12 @@ export interface RendererFactory {
    * Create a renderer for the given format
    */
   createRenderer(format: string): IRenderer | null;
-  
+
   /**
    * Get list of supported formats
    */
   getSupportedFormats(): string[];
-  
+
   /**
    * Register a custom renderer
    */

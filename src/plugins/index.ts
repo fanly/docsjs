@@ -12,7 +12,7 @@ export type {
   TablePlugin,
   ParagraphParseResult,
   RunParseResult,
-  TableParseResult
+  TableParseResult,
 } from "./base";
 
 export { createGoogleDocsCleanupPlugin } from "./cleanup/googleDocs";

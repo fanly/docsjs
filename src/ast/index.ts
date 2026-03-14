@@ -1,18 +1,18 @@
 /**
  * DocumentAST Module
- * 
+ *
  * Unified document semantic intermediate representation.
- * 
+ *
  * @example
  * ```typescript
- * import { 
- *   createEmptyDocument, 
- *   createParagraphNode, 
+ * import {
+ *   createEmptyDocument,
+ *   createParagraphNode,
  *   createTextNode,
  *   serializeAST,
  *   deserializeAST
  * } from "@coding01/docsjs/ast";
- * 
+ *
  * // Create a document
  * const doc = createEmptyDocument("docx");
  * doc.children.push(
@@ -22,10 +22,10 @@
  *     ])
  *   ])
  * );
- * 
+ *
  * // Serialize
  * const json = serializeAST(doc);
- * 
+ *
  * // Deserialize
  * const restored = deserializeAST(json);
  * ```
@@ -40,12 +40,12 @@ export {
   generateId,
   resetIdCounter,
   generateDeterministicId,
-  
+
   // Serialization
   serializeAST,
   deserializeAST,
   calculateChecksum,
-  
+
   // Node creation
   createMetadata,
   createEmptyDocument,
@@ -60,29 +60,29 @@ export {
   createImageNode,
   createHyperlinkNode,
   createSectionNode,
-  
+
   // Traversal
   walkAST,
   findNodeById,
   findNodesByType,
-  
+
   // Cloning
   cloneAST,
   cloneASTWithNewIds,
-  
+
   // Validation
   validateAST,
-  
+
   // Marks
   hasMark,
   addMark,
   removeMark,
-  
+
   // Extraction
   extractText,
   extractImageSources,
   extractHyperlinks,
-  
+
   // Auxiliary
   createAuxiliaryContent,
   addFootnote,
@@ -91,12 +91,8 @@ export {
   addRevision,
 } from "./utils";
 
-
 // Plugin Adapter
-export {
-  htmlToASTNodes,
-  PluginASTAdapter,
-} from "./pluginAdapter";
+export { htmlToASTNodes, PluginASTAdapter } from "./pluginAdapter";
 export type {
   LegacyPluginOutput,
   ASTPluginOutput,

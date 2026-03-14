@@ -1,12 +1,18 @@
 /**
  * Billing Module
- * 
+ *
  * Handles subscription management, payments, invoicing, and usage-based billing.
  */
 
-import type { SubscriptionPlan, Subscription, UsageRecord, Invoice, BillingInfo } from './organization';
+import type {
+  SubscriptionPlan,
+  Subscription,
+  UsageRecord,
+  Invoice,
+  BillingInfo,
+} from "./organization";
 
-export type PaymentProvider = 'stripe' | 'paddle';
+export type PaymentProvider = "stripe" | "paddle";
 
 export interface PaymentConfig {
   provider: PaymentProvider;
@@ -27,7 +33,7 @@ export interface PaymentIntent {
   organizationId: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'canceled';
+  status: "pending" | "processing" | "succeeded" | "failed" | "canceled";
   clientSecret?: string;
   invoiceId?: string;
 }
@@ -49,7 +55,7 @@ export interface SubscriptionUpdate {
   /** New plan */
   plan: SubscriptionPlan;
   /** Proration behavior */
-  prorationBehavior: 'create_prorations' | 'always_invoice' | 'never_invoice';
+  prorationBehavior: "create_prorations" | "always_invoice" | "never_invoice";
 }
 
 /**
@@ -78,15 +84,15 @@ export class BillingManager {
     coupon?: string;
   }): Promise<CheckoutSession> {
     const session: CheckoutSession = {
-      id: 'cs_' + this.generateId(),
+      id: "cs_" + this.generateId(),
       organizationId: data.organizationId,
       plan: data.plan,
       successUrl: data.successUrl,
       cancelUrl: data.cancelUrl,
-      expiresAt: Date.now() + (30 * 60 * 1000), // 30 minutes
+      expiresAt: Date.now() + 30 * 60 * 1000, // 30 minutes
     };
 
-    if (this.config.provider === 'stripe') {
+    if (this.config.provider === "stripe") {
       session.sessionId = await this.createStripeCheckout(data);
     } else {
       session.checkoutUrl = await this.createPaddleCheckout(data);
@@ -106,12 +112,12 @@ export class BillingManager {
     cancelUrl: string;
   }): Promise<CheckoutSession> {
     const session: CheckoutSession = {
-      id: 'cs_' + this.generateId(),
+      id: "cs_" + this.generateId(),
       organizationId: data.organizationId,
       plan: data.newPlan,
       successUrl: data.successUrl,
       cancelUrl: data.cancelUrl,
-      expiresAt: Date.now() + (30 * 60 * 1000),
+      expiresAt: Date.now() + 30 * 60 * 1000,
     };
 
     // In real implementation, would create Stripe Customer Portal session
@@ -128,11 +134,11 @@ export class BillingManager {
     currency?: string;
   }): Promise<PaymentIntent> {
     const intent: PaymentIntent = {
-      id: 'pi_' + this.generateId(),
+      id: "pi_" + this.generateId(),
       organizationId: data.organizationId,
       amount: data.amount,
-      currency: data.currency || 'usd',
-      status: 'pending',
+      currency: data.currency || "usd",
+      status: "pending",
     };
 
     // In real implementation, would create Stripe PaymentIntent
@@ -145,9 +151,11 @@ export class BillingManager {
    */
   async confirmPayment(paymentId: string): Promise<PaymentIntent | null> {
     const payment = this.payments.get(paymentId);
-    if (!payment) {return null;}
+    if (!payment) {
+      return null;
+    }
 
-    payment.status = 'succeeded';
+    payment.status = "succeeded";
     this.payments.set(paymentId, payment);
     return payment;
   }
@@ -162,9 +170,14 @@ export class BillingManager {
   /**
    * Update subscription plan
    */
-  async updateSubscription(organizationId: string, update: SubscriptionUpdate): Promise<Subscription | null> {
+  async updateSubscription(
+    organizationId: string,
+    update: SubscriptionUpdate,
+  ): Promise<Subscription | null> {
     const current = this.subscriptions.get(organizationId);
-    if (!current) {return null;}
+    if (!current) {
+      return null;
+    }
 
     const updated: Subscription = {
       ...current,
@@ -181,7 +194,9 @@ export class BillingManager {
    */
   async cancelSubscription(organizationId: string): Promise<boolean> {
     const subscription = this.subscriptions.get(organizationId);
-    if (!subscription) {return false;}
+    if (!subscription) {
+      return false;
+    }
 
     subscription.cancelAtPeriodEnd = true;
     this.subscriptions.set(organizationId, subscription);
@@ -193,7 +208,9 @@ export class BillingManager {
    */
   async reactivateSubscription(organizationId: string): Promise<boolean> {
     const subscription = this.subscriptions.get(organizationId);
-    if (!subscription) {return false;}
+    if (!subscription) {
+      return false;
+    }
 
     subscription.cancelAtPeriodEnd = false;
     this.subscriptions.set(organizationId, subscription);
@@ -205,7 +222,7 @@ export class BillingManager {
    */
   getInvoices(organizationId: string): Invoice[] {
     return Array.from(this.invoices.values())
-      .filter(i => i.organizationId === organizationId)
+      .filter((i) => i.organizationId === organizationId)
       .sort((a, b) => b.periodEnd - a.periodEnd);
   }
 
@@ -219,9 +236,9 @@ export class BillingManager {
   /**
    * Create invoice (internal)
    */
-  createInvoice(data: Omit<Invoice, 'id'>): Invoice {
+  createInvoice(data: Omit<Invoice, "id">): Invoice {
     const invoice: Invoice = {
-      id: 'inv_' + this.generateId(),
+      id: "inv_" + this.generateId(),
       ...data,
     };
     this.invoices.set(invoice.id, invoice);
@@ -231,28 +248,31 @@ export class BillingManager {
   /**
    * Handle webhook
    */
-  async handleWebhook(payload: string, signature: string): Promise<{ handled: boolean; event?: string }> {
+  async handleWebhook(
+    payload: string,
+    signature: string,
+  ): Promise<{ handled: boolean; event?: string }> {
     // Verify webhook signature
     if (!this.verifyWebhookSignature(payload, signature)) {
       return { handled: false };
     }
 
     const event = JSON.parse(payload);
-    
+
     switch (event.type) {
-      case 'checkout.session.completed':
+      case "checkout.session.completed":
         await this.handleCheckoutComplete(event.data.object);
         break;
-      case 'invoice.paid':
+      case "invoice.paid":
         await this.handleInvoicePaid(event.data.object);
         break;
-      case 'invoice.payment_failed':
+      case "invoice.payment_failed":
         await this.handlePaymentFailed(event.data.object);
         break;
-      case 'customer.subscription.updated':
+      case "customer.subscription.updated":
         await this.handleSubscriptionUpdated(event.data.object);
         break;
-      case 'customer.subscription.deleted':
+      case "customer.subscription.deleted":
         await this.handleSubscriptionCanceled(event.data.object);
         break;
     }
@@ -267,7 +287,7 @@ export class BillingManager {
     return usage.reduce((total, record) => {
       if (record.used > record.limit && record.limit > 0) {
         const overage = record.used - record.limit;
-        return total + (overage * record.unitPrice);
+        return total + overage * record.unitPrice;
       }
       return total;
     }, 0);
@@ -276,7 +296,7 @@ export class BillingManager {
   /**
    * Get payment methods
    */
-  async getPaymentMethods(organizationId: string): Promise<BillingInfo['paymentMethod'][]> {
+  async getPaymentMethods(organizationId: string): Promise<BillingInfo["paymentMethod"][]> {
     // In real implementation, would fetch from Stripe/Paddle
     return [];
   }
@@ -306,7 +326,7 @@ export class BillingManager {
     coupon?: string;
   }): Promise<string> {
     // In real implementation, would use Stripe API
-    return 'cs_mock_' + this.generateId();
+    return "cs_mock_" + this.generateId();
   }
 
   private async createPaddleCheckout(data: {
@@ -316,17 +336,20 @@ export class BillingManager {
     cancelUrl: string;
   }): Promise<string> {
     // In real implementation, would use Paddle API
-    return 'https://checkout.paddle.com/mock';
+    return "https://checkout.paddle.com/mock";
   }
 
-  private async handleCheckoutComplete(session: { subscription: string; customer: string }): Promise<void> {
+  private async handleCheckoutComplete(session: {
+    subscription: string;
+    customer: string;
+  }): Promise<void> {
     // Handle successful checkout
   }
 
   private async handleInvoicePaid(invoice: { id: string }): Promise<void> {
     const existingInvoice = this.invoices.get(invoice.id);
     if (existingInvoice) {
-      existingInvoice.status = 'paid';
+      existingInvoice.status = "paid";
       existingInvoice.paidAt = Date.now();
       this.invoices.set(invoice.id, existingInvoice);
     }
@@ -335,12 +358,16 @@ export class BillingManager {
   private async handlePaymentFailed(invoice: { id: string }): Promise<void> {
     const existingInvoice = this.invoices.get(invoice.id);
     if (existingInvoice) {
-      existingInvoice.status = 'open';
+      existingInvoice.status = "open";
       this.invoices.set(invoice.id, existingInvoice);
     }
   }
 
-  private async handleSubscriptionUpdated(subscription: { id: string; status: string; plan: string }): Promise<void> {
+  private async handleSubscriptionUpdated(subscription: {
+    id: string;
+    status: string;
+    plan: string;
+  }): Promise<void> {
     // Update subscription status
   }
 
@@ -372,9 +399,13 @@ export class UsageBillingManager {
   /**
    * Record usage
    */
-  async recordUsage(organizationId: string, metric: UsageRecord['metric'], amount: number): Promise<void> {
+  async recordUsage(
+    organizationId: string,
+    metric: UsageRecord["metric"],
+    amount: number,
+  ): Promise<void> {
     const records = this.usageRecords.get(organizationId) || [];
-    const existing = records.find(r => r.metric === metric);
+    const existing = records.find((r) => r.metric === metric);
 
     if (existing) {
       existing.used += amount;
@@ -402,7 +433,7 @@ export class UsageBillingManager {
    */
   checkLimits(organizationId: string): { exceeded: boolean; overages: UsageRecord[] } {
     const records = this.usageRecords.get(organizationId) || [];
-    const overages = records.filter(r => r.limit > 0 && r.used > r.limit);
+    const overages = records.filter((r) => r.limit > 0 && r.used > r.limit);
     return { exceeded: overages.length > 0, overages };
   }
 
@@ -411,20 +442,22 @@ export class UsageBillingManager {
    */
   async generateUsageInvoice(organizationId: string): Promise<Invoice | null> {
     const usage = this.getUsage(organizationId);
-    const overages = usage.filter(r => r.used > r.limit && r.limit > 0);
+    const overages = usage.filter((r) => r.used > r.limit && r.limit > 0);
 
-    if (overages.length === 0) {return null;}
+    if (overages.length === 0) {
+      return null;
+    }
 
     const amount = this.billingManager.calculateUsageCost(overages);
 
     return this.billingManager.createInvoice({
       organizationId,
       amount,
-      currency: 'usd',
-      status: 'open',
-      periodStart: Date.now() - (30 * 24 * 60 * 60 * 1000),
+      currency: "usd",
+      status: "open",
+      periodStart: Date.now() - 30 * 24 * 60 * 60 * 1000,
       periodEnd: Date.now(),
-      lineItems: overages.map(o => ({
+      lineItems: overages.map((o) => ({
         description: `${o.metric} overage`,
         quantity: o.used - o.limit,
         unitAmount: o.unitPrice,

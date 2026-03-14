@@ -1,4 +1,11 @@
-import { PluginPhase, type DocxPlugin, type PluginContext, type PluginConfig, type CleanupPlugin, type TransformPlugin } from "./base";
+import {
+  PluginPhase,
+  type DocxPlugin,
+  type PluginContext,
+  type PluginConfig,
+  type CleanupPlugin,
+  type TransformPlugin,
+} from "./base";
 
 export class PluginRegistry {
   private plugins: Map<string, DocxPlugin> = new Map();
@@ -9,7 +16,7 @@ export class PluginRegistry {
     this.config = {
       experimental: config.experimental ?? false,
       cleanup: config.cleanup ?? { googleDocs: true, wps: true, word: true },
-      features: config.features ?? { mathML: true, shapes: true, oleObjects: false, anchors: true }
+      features: config.features ?? { mathML: true, shapes: true, oleObjects: false, anchors: true },
     };
   }
 
@@ -37,8 +44,10 @@ export class PluginRegistry {
   }
 
   async initialize(context: PluginContext): Promise<void> {
-    if (this.initialized) {return;}
-    
+    if (this.initialized) {
+      return;
+    }
+
     const sorted = this.sortByPriority();
     for (const plugin of sorted) {
       await plugin.init(context);
@@ -48,8 +57,8 @@ export class PluginRegistry {
 
   async execute(context: PluginContext, phase: PluginPhase): Promise<void> {
     const sorted = this.sortByPriority();
-    const phasePlugins = sorted.filter(p => p.phases.includes(phase));
-    
+    const phasePlugins = sorted.filter((p) => p.phases.includes(phase));
+
     for (const plugin of phasePlugins) {
       await plugin.execute(context, phase);
     }
@@ -63,7 +72,9 @@ export class PluginRegistry {
 
   getTransformPlugins(): TransformPlugin[] {
     return this.list()
-      .filter((p): p is TransformPlugin => "transform" in p && p.phases.includes(PluginPhase.TRANSFORM))
+      .filter(
+        (p): p is TransformPlugin => "transform" in p && p.phases.includes(PluginPhase.TRANSFORM),
+      )
       .sort((a, b) => b.priority - a.priority);
   }
 

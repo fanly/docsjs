@@ -1,11 +1,11 @@
 /**
  * Pipeline Type Definitions
- * 
+ *
  * Defines the types for the enhanced document transformation pipeline system.
  */
 
-import type { EngineConfig, TransformationProfile } from '../types/engine';
-import type { DocumentAST } from '../ast/types';
+import type { EngineConfig, TransformationProfile } from "../types/engine";
+import type { DocumentAST } from "../ast/types";
 
 // Pipeline context
 // duplicate import removed
@@ -16,19 +16,19 @@ export interface PipelineContext {
   engine: unknown;
   profile: TransformationProfile;
   config: EngineConfig;
-  
+
   // Input source
   input: File | string;
-  
+
   // Transformation state
   state: PipelineState;
-  
+
   // Hooks for plugins to inject logic
   hooks: PipelineHooks;
-  
+
   // Metrics and performance
   metrics: PipelineMetrics;
-  
+
   // Cancellation support
   abortSignal?: AbortSignal;
 }
@@ -36,20 +36,20 @@ export interface PipelineContext {
 export interface PipelineState {
   // Current pipeline phase
   phase: PipelinePhase;
-  
+
   // AST at current stage of transformation
   ast?: DocumentAST;
-  
-  // Raw input processed so far 
+
+  // Raw input processed so far
   processedInput?: string | ArrayBuffer;
-  
+
   // Intermediate results
   intermediate: Record<string, any>;
-  
+
   // Errors and warnings accumulated
   errors: PipelineError[];
   warnings: PipelineWarning[];
-  
+
   // Plugin-specific context data
   pluginContexts: Record<string, any>;
 }
@@ -68,14 +68,14 @@ export interface PipelineHooks {
 
 export type PipelineHook = (context: PipelineContext) => void | Promise<void>;
 
-export type PipelinePhase = 
-  | 'initializing'
-  | 'parsing' 
-  | 'transforming'
-  | 'rendering'
-  | 'exporting'
-  | 'complete'
-  | 'failed';
+export type PipelinePhase =
+  | "initializing"
+  | "parsing"
+  | "transforming"
+  | "rendering"
+  | "exporting"
+  | "complete"
+  | "failed";
 
 export interface PipelineMetrics {
   totalTimeMs: number;
@@ -92,7 +92,7 @@ export interface PipelineError {
   phase: PipelinePhase;
   timestamp: number;
   pluginName?: string;
-  severity: 'critical' | 'error' | 'warning';
+  severity: "critical" | "error" | "warning";
 }
 
 export interface PipelineWarning {

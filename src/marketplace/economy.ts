@@ -1,12 +1,12 @@
 /**
  * Plugin Marketplace Economy
- * 
+ *
  * Commercial plugin distribution, revenue sharing, and creator payments.
  */
 
 export interface PluginPricing {
   /** Pricing type */
-  type: 'free' | 'freemium' | 'commercial' | 'open-core';
+  type: "free" | "freemium" | "commercial" | "open-core";
   /** Price in USD (for commercial) */
   price?: number;
   /** Monthly subscription price */
@@ -37,8 +37,8 @@ export interface CreatorPayout {
   creatorId: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'processing' | 'paid' | 'failed';
-  method: 'bank_transfer' | 'paypal' | 'stripe_connect';
+  status: "pending" | "processing" | "paid" | "failed";
+  method: "bank_transfer" | "paypal" | "stripe_connect";
   createdAt: number;
   paidAt?: number;
   bankInfo?: {
@@ -63,7 +63,7 @@ export interface CreatorAccount {
     accountHolderName: string;
   };
   /** Payout settings */
-  payoutSchedule: 'weekly' | 'monthly';
+  payoutSchedule: "weekly" | "monthly";
   /** Minimum payout amount */
   minimumPayout: number;
   /** Total earned */
@@ -114,7 +114,7 @@ export const REVENUE_SHARE = {
   /** Processing fee percentage */
   processingFeePercent: 2.9,
   /** Processing fee flat amount */
-  processingFeeFlat: 0.30,
+  processingFeeFlat: 0.3,
 };
 
 /**
@@ -131,10 +131,10 @@ export class PluginEconomyManager {
    */
   async registerCreator(userId: string, email: string): Promise<CreatorAccount> {
     const creator: CreatorAccount = {
-      id: 'creator_' + this.generateId(),
+      id: "creator_" + this.generateId(),
       userId,
       email,
-      payoutSchedule: 'monthly',
+      payoutSchedule: "monthly",
       minimumPayout: 50,
       totalEarned: 0,
       pendingBalance: 0,
@@ -149,7 +149,7 @@ export class PluginEconomyManager {
    * Get creator account
    */
   getCreator(userId: string): CreatorAccount | undefined {
-    return Array.from(this.creators.values()).find(c => c.userId === userId);
+    return Array.from(this.creators.values()).find((c) => c.userId === userId);
   }
 
   /**
@@ -164,10 +164,17 @@ export class PluginEconomyManager {
    */
   async updatePayoutSettings(
     creatorId: string,
-    settings: Partial<Pick<CreatorAccount, 'payoutSchedule' | 'minimumPayout' | 'stripeAccountId' | 'paypalEmail' | 'bankAccount'>>
+    settings: Partial<
+      Pick<
+        CreatorAccount,
+        "payoutSchedule" | "minimumPayout" | "stripeAccountId" | "paypalEmail" | "bankAccount"
+      >
+    >,
   ): Promise<CreatorAccount | null> {
     const creator = this.creators.get(creatorId);
-    if (!creator) {return null;}
+    if (!creator) {
+      return null;
+    }
 
     Object.assign(creator, settings);
     this.creators.set(creatorId, creator);
@@ -186,12 +193,12 @@ export class PluginEconomyManager {
     currency?: string;
   }): Promise<SalesRecord> {
     const salesRecord: SalesRecord = {
-      id: 'sale_' + this.generateId(),
+      id: "sale_" + this.generateId(),
       pluginId: data.pluginId,
       buyerOrganizationId: data.buyerOrganizationId,
       tierId: data.tierId,
       amount: data.amount,
-      currency: data.currency || 'usd',
+      currency: data.currency || "usd",
       timestamp: Date.now(),
       refunded: false,
     };
@@ -215,7 +222,9 @@ export class PluginEconomyManager {
    */
   async processRefund(saleId: string, amount?: number): Promise<boolean> {
     const sale = this.sales.get(saleId);
-    if (!sale || sale.refunded) {return false;}
+    if (!sale || sale.refunded) {
+      return false;
+    }
 
     const refundAmount = amount || sale.amount;
     sale.refunded = true;
@@ -223,7 +232,7 @@ export class PluginEconomyManager {
     this.sales.set(saleId, sale);
 
     // Adjust creator balance
-    const creator = Array.from(this.creators.values()).find(c => c.pluginCount > 0);
+    const creator = Array.from(this.creators.values()).find((c) => c.pluginCount > 0);
     if (creator) {
       const netRefund = this.calculateNetRevenue(refundAmount);
       creator.pendingBalance -= netRefund;
@@ -237,23 +246,27 @@ export class PluginEconomyManager {
    * Get plugin revenue stats
    */
   async getPluginRevenue(pluginId: string): Promise<PluginRevenue> {
-    const pluginSales = Array.from(this.sales.values()).filter(s => s.pluginId === pluginId);
-    
-    const now = Date.now();
-    const monthAgo = now - (30 * 24 * 60 * 60 * 1000);
-    
-    const thisMonthSales = pluginSales.filter(s => s.timestamp > monthAgo && !s.refunded);
-    const totalSales = pluginSales.filter(s => !s.refunded);
-    
-    const totalRevenue = totalSales.reduce((sum, s) => sum + this.calculateNetRevenue(s.amount), 0);
-    const monthlyRevenue = thisMonthSales.reduce((sum, s) => sum + this.calculateNetRevenue(s.amount), 0);
+    const pluginSales = Array.from(this.sales.values()).filter((s) => s.pluginId === pluginId);
 
-    const pluginReviews = Array.from(this.reviews.values()).filter(r => r.pluginId === pluginId);
-    const avgRating = pluginReviews.length > 0
-      ? pluginReviews.reduce((sum, r) => sum + r.rating, 0) / pluginReviews.length
-      : 0;
-    
-    const refundedCount = pluginSales.filter(s => s.refunded).length;
+    const now = Date.now();
+    const monthAgo = now - 30 * 24 * 60 * 60 * 1000;
+
+    const thisMonthSales = pluginSales.filter((s) => s.timestamp > monthAgo && !s.refunded);
+    const totalSales = pluginSales.filter((s) => !s.refunded);
+
+    const totalRevenue = totalSales.reduce((sum, s) => sum + this.calculateNetRevenue(s.amount), 0);
+    const monthlyRevenue = thisMonthSales.reduce(
+      (sum, s) => sum + this.calculateNetRevenue(s.amount),
+      0,
+    );
+
+    const pluginReviews = Array.from(this.reviews.values()).filter((r) => r.pluginId === pluginId);
+    const avgRating =
+      pluginReviews.length > 0
+        ? pluginReviews.reduce((sum, r) => sum + r.rating, 0) / pluginReviews.length
+        : 0;
+
+    const refundedCount = pluginSales.filter((s) => s.refunded).length;
 
     return {
       pluginId,
@@ -280,7 +293,7 @@ export class PluginEconomyManager {
     }
 
     const payouts = Array.from(this.payouts.values()).filter(
-      p => p.creatorId === creatorId && p.status === 'paid'
+      (p) => p.creatorId === creatorId && p.status === "paid",
     );
     const paidOut = payouts.reduce((sum, p) => sum + p.amount, 0);
 
@@ -294,22 +307,27 @@ export class PluginEconomyManager {
   /**
    * Request payout
    */
-  async requestPayout(creatorId: string, method: CreatorPayout['method']): Promise<CreatorPayout | null> {
+  async requestPayout(
+    creatorId: string,
+    method: CreatorPayout["method"],
+  ): Promise<CreatorPayout | null> {
     const creator = this.creators.get(creatorId);
-    if (!creator || creator.pendingBalance < creator.minimumPayout) {return null;}
+    if (!creator || creator.pendingBalance < creator.minimumPayout) {
+      return null;
+    }
 
     const payout: CreatorPayout = {
-      id: 'payout_' + this.generateId(),
+      id: "payout_" + this.generateId(),
       creatorId,
       amount: creator.pendingBalance,
-      currency: 'usd',
-      status: 'pending',
+      currency: "usd",
+      status: "pending",
       method,
       createdAt: Date.now(),
     };
 
     this.payouts.set(payout.id, payout);
-    
+
     // Reset pending balance
     creator.pendingBalance = 0;
     this.creators.set(creatorId, creator);
@@ -322,7 +340,7 @@ export class PluginEconomyManager {
    */
   getPayouts(creatorId: string): CreatorPayout[] {
     return Array.from(this.payouts.values())
-      .filter(p => p.creatorId === creatorId)
+      .filter((p) => p.creatorId === creatorId)
       .sort((a, b) => b.createdAt - a.createdAt);
   }
 
@@ -339,7 +357,7 @@ export class PluginEconomyManager {
     verified: boolean;
   }): Promise<Review> {
     const review: Review = {
-      id: 'review_' + this.generateId(),
+      id: "review_" + this.generateId(),
       pluginId: data.pluginId,
       userId: data.userId,
       organizationId: data.organizationId,
@@ -360,7 +378,7 @@ export class PluginEconomyManager {
    */
   getReviews(pluginId: string): Review[] {
     return Array.from(this.reviews.values())
-      .filter(r => r.pluginId === pluginId)
+      .filter((r) => r.pluginId === pluginId)
       .sort((a, b) => b.createdAt - a.createdAt);
   }
 
@@ -369,7 +387,9 @@ export class PluginEconomyManager {
    */
   async markReviewHelpful(reviewId: string): Promise<boolean> {
     const review = this.reviews.get(reviewId);
-    if (!review) {return false;}
+    if (!review) {
+      return false;
+    }
 
     review.helpful++;
     this.reviews.set(reviewId, review);
@@ -381,7 +401,9 @@ export class PluginEconomyManager {
    */
   async respondToReview(reviewId: string, response: string): Promise<boolean> {
     const review = this.reviews.get(reviewId);
-    if (!review) {return false;}
+    if (!review) {
+      return false;
+    }
 
     review.developerResponse = {
       content: response,
@@ -396,8 +418,8 @@ export class PluginEconomyManager {
    */
   calculateNetRevenue(grossAmount: number): number {
     const platformFee = grossAmount * (REVENUE_SHARE.platformPercent / 100);
-    const processingFee = (grossAmount * (REVENUE_SHARE.processingFeePercent / 100)) + 
-                          REVENUE_SHARE.processingFeeFlat;
+    const processingFee =
+      grossAmount * (REVENUE_SHARE.processingFeePercent / 100) + REVENUE_SHARE.processingFeeFlat;
     return grossAmount - platformFee - processingFee;
   }
 
@@ -411,9 +433,9 @@ export class PluginEconomyManager {
     net: number;
   } {
     const platformFee = amount * (REVENUE_SHARE.platformPercent / 100);
-    const processingFee = (amount * (REVENUE_SHARE.processingFeePercent / 100)) + 
-                         REVENUE_SHARE.processingFeeFlat;
-    
+    const processingFee =
+      amount * (REVENUE_SHARE.processingFeePercent / 100) + REVENUE_SHARE.processingFeeFlat;
+
     return {
       gross: amount,
       platformFee,

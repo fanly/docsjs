@@ -1,10 +1,10 @@
 /**
  * Webhook System
- * 
+ *
  * Event-driven webhook support for conversion completion and other events.
  */
 
-import type { WebhookEvent } from './types';
+import type { WebhookEvent } from "./types";
 
 /**
  * Webhook registration
@@ -33,14 +33,14 @@ export interface WebhookRegistration {
 /**
  * Webhook event types
  */
-export type WebhookEventType = 
-  | 'conversion.completed'
-  | 'conversion.failed'
-  | 'conversion.started'
-  | 'batch.completed'
-  | 'batch.failed'
-  | 'batch.progress'
-  | 'webhook.test';
+export type WebhookEventType =
+  | "conversion.completed"
+  | "conversion.failed"
+  | "conversion.started"
+  | "batch.completed"
+  | "batch.failed"
+  | "batch.progress"
+  | "webhook.test";
 
 /**
  * Webhook delivery result
@@ -69,7 +69,7 @@ export class WebhookManager {
       retryDelayMs: 1000,
       timeoutMs: 30000,
       batchSize: 10,
-      ...config
+      ...config,
     };
 
     // Start processing queue
@@ -82,13 +82,13 @@ export class WebhookManager {
   async register(
     url: string,
     events: WebhookEventType[],
-    secret?: string
+    secret?: string,
   ): Promise<WebhookRegistration> {
     // Validate URL
     try {
       new URL(url);
     } catch {
-      throw new Error('Invalid webhook URL');
+      throw new Error("Invalid webhook URL");
     }
 
     const registration: WebhookRegistration = {
@@ -99,7 +99,7 @@ export class WebhookManager {
       active: true,
       createdAt: Date.now(),
       triggerCount: 0,
-      failureCount: 0
+      failureCount: 0,
     };
 
     this.webhooks.set(registration.id, registration);
@@ -118,10 +118,12 @@ export class WebhookManager {
    */
   update(
     webhookId: string,
-    updates: Partial<Pick<WebhookRegistration, 'url' | 'events' | 'active'>>
+    updates: Partial<Pick<WebhookRegistration, "url" | "events" | "active">>,
   ): WebhookRegistration | undefined {
     const webhook = this.webhooks.get(webhookId);
-    if (!webhook) {return undefined;}
+    if (!webhook) {
+      return undefined;
+    }
 
     Object.assign(webhook, updates);
     return webhook;
@@ -139,11 +141,9 @@ export class WebhookManager {
    */
   list(eventType?: WebhookEventType): WebhookRegistration[] {
     let webhooks = Array.from(this.webhooks.values());
-    
+
     if (eventType) {
-      webhooks = webhooks.filter(w => 
-        w.active && w.events.includes(eventType)
-      );
+      webhooks = webhooks.filter((w) => w.active && w.events.includes(eventType));
     }
 
     return webhooks;
@@ -165,18 +165,18 @@ export class WebhookManager {
     if (!webhook) {
       return {
         success: false,
-        error: 'Webhook not found',
+        error: "Webhook not found",
         durationMs: 0,
-        retryCount: 0
+        retryCount: 0,
       };
     }
 
     return this.deliver(webhook, {
       id: `test_${Date.now()}`,
-      type: 'webhook.test',
+      type: "webhook.test",
       timestamp: Date.now(),
-      data: { message: 'Test webhook from DocsJS' },
-      retryCount: 0
+      data: { message: "Test webhook from DocsJS" },
+      retryCount: 0,
     });
   }
 
@@ -190,18 +190,22 @@ export class WebhookManager {
   }
 
   private async processQueue(): Promise<void> {
-    if (this.eventQueue.length === 0) {return;}
+    if (this.eventQueue.length === 0) {
+      return;
+    }
 
     const events = this.eventQueue.splice(0, this.config.batchSize);
 
     for (const event of events) {
       const webhooks = this.list(event.type as WebhookEventType);
-      
+
       for (const webhook of webhooks) {
-        if (this.deliveryInProgress.has(webhook.id)) {continue;}
-        
+        if (this.deliveryInProgress.has(webhook.id)) {
+          continue;
+        }
+
         this.deliveryInProgress.add(webhook.id);
-        this.deliver(webhook, event).finally(() => {
+        void this.deliver(webhook, event).finally(() => {
           this.deliveryInProgress.delete(webhook.id);
         });
       }
@@ -213,7 +217,7 @@ export class WebhookManager {
    */
   private async deliver(
     webhook: WebhookRegistration,
-    event: WebhookEvent
+    event: WebhookEvent,
   ): Promise<WebhookDeliveryResult> {
     const startTime = Date.now();
     let lastError: string | undefined;
@@ -223,18 +227,18 @@ export class WebhookManager {
       id: event.id,
       type: event.type,
       timestamp: event.timestamp,
-      data: event.data
+      data: event.data,
     });
 
     // Generate signature if secret provided
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-Webhook-Event': event.type,
-      'X-Webhook-Id': webhook.id
+      "Content-Type": "application/json",
+      "X-Webhook-Event": event.type,
+      "X-Webhook-Id": webhook.id,
     };
 
     if (webhook.secret) {
-      headers['X-Webhook-Signature'] = this.generateSignature(payload, webhook.secret);
+      headers["X-Webhook-Signature"] = this.generateSignature(payload, webhook.secret);
     }
 
     // Attempt delivery with retries
@@ -244,10 +248,10 @@ export class WebhookManager {
         const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs);
 
         const response = await fetch(webhook.url, {
-          method: 'POST',
+          method: "POST",
           headers,
           body: payload,
-          signal: controller.signal
+          signal: controller.signal,
         });
 
         clearTimeout(timeout);
@@ -257,7 +261,7 @@ export class WebhookManager {
           statusCode: response.status,
           response: await response.text(),
           durationMs: Date.now() - startTime,
-          retryCount: attempt
+          retryCount: attempt,
         };
 
         // Update webhook stats
@@ -273,7 +277,7 @@ export class WebhookManager {
 
         lastError = `HTTP ${response.status}`;
       } catch (error) {
-        lastError = error instanceof Error ? error.message : 'Unknown error';
+        lastError = error instanceof Error ? error.message : "Unknown error";
       }
 
       // Wait before retry
@@ -288,7 +292,7 @@ export class WebhookManager {
       success: false,
       error: lastError,
       durationMs: Date.now() - startTime,
-      retryCount: this.config.maxRetries
+      retryCount: this.config.maxRetries,
     };
   }
 
@@ -312,11 +316,11 @@ export class WebhookManager {
 
     return {
       totalWebhooks: webhooks.length,
-      activeWebhooks: webhooks.filter(w => w.active).length,
+      activeWebhooks: webhooks.filter((w) => w.active).length,
       totalTriggers,
       totalFailures,
       failureRate: totalTriggers > 0 ? totalFailures / totalTriggers : 0,
-      queueLength: this.eventQueue.length
+      queueLength: this.eventQueue.length,
     };
   }
 
@@ -325,7 +329,7 @@ export class WebhookManager {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -350,13 +354,13 @@ interface WebhookStats {
  */
 export function createWebhookEvent(
   type: WebhookEventType,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): WebhookEvent {
   return {
     id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     type,
     timestamp: Date.now(),
     data,
-    retryCount: 0
+    retryCount: 0,
   };
 }

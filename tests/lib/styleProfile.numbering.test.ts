@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxStyleProfile } from "../../src/lib/styleProfile";
 
 async function makeDocxFile(): Promise<File> {
@@ -19,7 +19,7 @@ async function makeDocxFile(): Promise<File> {
           <w:r><w:t>Item</w:t></w:r>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/styles.xml",
@@ -29,7 +29,7 @@ async function makeDocxFile(): Promise<File> {
         <w:rPrDefault><w:rPr><w:sz w:val="24"/></w:rPr></w:rPrDefault>
         <w:pPrDefault><w:pPr><w:spacing w:line="276" w:lineRule="auto" w:after="120"/></w:pPr></w:pPrDefault>
       </w:docDefaults>
-    </w:styles>`
+    </w:styles>`,
   );
   zip.file(
     "word/numbering.xml",
@@ -52,7 +52,7 @@ async function makeDocxFile(): Promise<File> {
           </w:lvl>
         </w:lvlOverride>
       </w:num>
-    </w:numbering>`
+    </w:numbering>`,
   );
 
   const bytes = await zip.generateAsync({ type: "uint8array" });
@@ -60,7 +60,7 @@ async function makeDocxFile(): Promise<File> {
   const end = bytes.byteOffset + bytes.byteLength;
   return {
     name: "numbering-override.docx",
-    arrayBuffer: async () => bytes.buffer.slice(start, end)
+    arrayBuffer: async () => bytes.buffer.slice(start, end),
   } as unknown as File;
 }
 
@@ -89,12 +89,12 @@ describe("parseDocxStyleProfile numbering overrides", () => {
             <w:r><w:t>X</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/styles.xml",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults/></w:styles>`
+      <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults/></w:styles>`,
     );
     zip.file(
       "word/numbering.xml",
@@ -104,12 +104,13 @@ describe("parseDocxStyleProfile numbering overrides", () => {
           <w:lvl w:ilvl="0"><w:start w:val="3"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl>
         </w:abstractNum>
         <w:num w:numId="5"><w:abstractNumId w:val="2"/></w:num>
-      </w:numbering>`
+      </w:numbering>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "default-numbering.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
     const profile = await parseDocxStyleProfile(file);
     const para = profile.paragraphProfiles[0];

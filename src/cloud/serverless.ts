@@ -1,10 +1,10 @@
 /**
  * Serverless Function Handlers
- * 
+ *
  * Serverless API endpoints for document transformation.
  */
 
-import type { ConversionRequest, ConversionResult, PerformanceTarget } from './types';
+import type { ConversionRequest, ConversionResult, PerformanceTarget } from "./types";
 
 /**
  * Serverless function context
@@ -55,7 +55,7 @@ export class DocumentTransformationHandler {
    */
   async handle(
     request: ConversionRequest,
-    context: ServerlessContext
+    context: ServerlessContext,
   ): Promise<HandlerResult<ConversionResult>> {
     const startTime = Date.now();
 
@@ -67,10 +67,10 @@ export class DocumentTransformationHandler {
           body: {
             requestId: request.requestId,
             success: false,
-            error: 'Missing inputFormat or outputFormat',
+            error: "Missing inputFormat or outputFormat",
             processingTimeMs: Date.now() - startTime,
-            fileSizeBytes: 0
-          }
+            fileSizeBytes: 0,
+          },
         };
       }
 
@@ -79,7 +79,7 @@ export class DocumentTransformationHandler {
         input: request.requestId,
         inputFormat: request.inputFormat,
         outputFormat: request.outputFormat,
-        options: request.options
+        options: request.options,
       });
 
       const processingTime = Date.now() - startTime;
@@ -87,12 +87,12 @@ export class DocumentTransformationHandler {
       // Track performance
       this.performance.record({
         latencyMs: processingTime,
-        success: true
+        success: true,
       });
 
       // If callback URL specified, queue async result
       if (request.callbackUrl) {
-        this.queueCallback(request, result, processingTime);
+        void this.queueCallback(request, result, processingTime);
         return {
           statusCode: 202,
           body: {
@@ -100,8 +100,8 @@ export class DocumentTransformationHandler {
             success: true,
             outputUrl: `/results/${request.requestId}`,
             processingTimeMs: processingTime,
-            fileSizeBytes: result.size || 0
-          }
+            fileSizeBytes: result.size || 0,
+          },
         };
       }
 
@@ -112,15 +112,15 @@ export class DocumentTransformationHandler {
           success: true,
           outputUrl: result.url,
           processingTimeMs: processingTime,
-          fileSizeBytes: result.size || 0
-        }
+          fileSizeBytes: result.size || 0,
+        },
       };
     } catch (error) {
       const processingTime = Date.now() - startTime;
-      
+
       this.performance.record({
         latencyMs: processingTime,
-        success: false
+        success: false,
       });
 
       return {
@@ -128,10 +128,10 @@ export class DocumentTransformationHandler {
         body: {
           requestId: request.requestId,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : "Unknown error",
           processingTimeMs: processingTime,
-          fileSizeBytes: 0
-        }
+          fileSizeBytes: 0,
+        },
       };
     }
   }
@@ -141,7 +141,7 @@ export class DocumentTransformationHandler {
    */
   handleHealthCheck(): HandlerResult<HealthCheckResult> {
     const stats = this.performance.getStats();
-    
+
     return {
       statusCode: stats.healthy ? 200 : 503,
       body: {
@@ -149,26 +149,24 @@ export class DocumentTransformationHandler {
         timestamp: Date.now(),
         averageLatencyMs: stats.averageLatencyMs,
         errorRate: stats.errorRate,
-        requestsPerMinute: stats.requestsPerMinute
-      }
+        requestsPerMinute: stats.requestsPerMinute,
+      },
     };
   }
 
   /**
    * Handle webhook test
    */
-  async handleWebhookTest(
-    webhookUrl: string
-  ): Promise<HandlerResult<WebhookTestResult>> {
+  async handleWebhookTest(webhookUrl: string): Promise<HandlerResult<WebhookTestResult>> {
     try {
       const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: 'webhook.test',
+          type: "webhook.test",
           timestamp: Date.now(),
-          message: 'Webhook test from DocsJS'
-        })
+          message: "Webhook test from DocsJS",
+        }),
       });
 
       return {
@@ -176,8 +174,8 @@ export class DocumentTransformationHandler {
         body: {
           success: response.ok,
           statusCode: response.status,
-          responseTimeMs: 0
-        }
+          responseTimeMs: 0,
+        },
       };
     } catch (error) {
       return {
@@ -185,8 +183,8 @@ export class DocumentTransformationHandler {
         body: {
           success: false,
           statusCode: 0,
-          error: error instanceof Error ? error.message : 'Network error'
-        }
+          error: error instanceof Error ? error.message : "Network error",
+        },
       };
     }
   }
@@ -194,9 +192,11 @@ export class DocumentTransformationHandler {
   private async queueCallback(
     request: ConversionRequest,
     result: TransformResult,
-    processingTime: number
+    processingTime: number,
   ): Promise<void> {
-    if (!request.callbackUrl) {return;}
+    if (!request.callbackUrl) {
+      return;
+    }
 
     // In production, would queue to a message queue
     console.log(`Queuing callback for request ${request.requestId}`);
@@ -249,12 +249,12 @@ class PerformanceTracker {
   record(sample: PerformanceSample): void {
     this.samples.push({
       ...sample,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     // Trim old samples
     const cutoff = Date.now() - this.windowMs;
-    this.samples = this.samples.filter(s => s.timestamp > cutoff);
+    this.samples = this.samples.filter((s) => s.timestamp > cutoff);
 
     if (this.samples.length > this.maxSamples) {
       this.samples = this.samples.slice(-this.maxSamples);
@@ -272,19 +272,19 @@ class PerformanceTracker {
         healthy: true,
         averageLatencyMs: 0,
         errorRate: 0,
-        requestsPerMinute: 0
+        requestsPerMinute: 0,
       };
     }
 
     const total = this.samples.length;
-    const errors = this.samples.filter(s => !s.success).length;
+    const errors = this.samples.filter((s) => !s.success).length;
     const totalLatency = this.samples.reduce((sum, s) => sum + s.latencyMs, 0);
 
     return {
       healthy: true, // Could add threshold checks
       averageLatencyMs: Math.round(totalLatency / total),
       errorRate: errors / total,
-      requestsPerMinute: total
+      requestsPerMinute: total,
     };
   }
 }
@@ -299,7 +299,7 @@ interface PerformanceSample {
  * Create AWS Lambda handler
  */
 export function createLambdaHandler(
-  engine: DocumentTransformationEngine
+  engine: DocumentTransformationEngine,
 ): (event: unknown, context: ServerlessContext) => Promise<HandlerResult> {
   const handler = new DocumentTransformationHandler(engine);
 
@@ -313,38 +313,38 @@ export function createLambdaHandler(
  * Create Vercel API handler
  */
 export function createVercelHandler(
-  engine: DocumentTransformationEngine
+  engine: DocumentTransformationEngine,
 ): (req: unknown, res: unknown) => Promise<void> {
   const handler = new DocumentTransformationHandler(engine);
 
   return async (req: any, res: any) => {
-    if (req.method === 'GET' && req.url === '/health') {
+    if (req.method === "GET" && req.url === "/health") {
       const result = handler.handleHealthCheck();
       res.status(result.statusCode).json(result.body);
       return;
     }
 
-    if (req.method === 'POST' && req.url === '/convert') {
-      let body = '';
+    if (req.method === "POST" && req.url === "/convert") {
+      let body = "";
       for await (const chunk of req) {
         body += chunk;
       }
-      
+
       const request = JSON.parse(body) as ConversionRequest;
       const result = await handler.handle(request, {
         requestId: request.requestId || `req_${Date.now()}`,
-        functionName: 'docsjs-convert',
-        functionVersion: '1.0',
+        functionName: "docsjs-convert",
+        functionVersion: "1.0",
         memoryLimit: 1024,
         timeLimit: 30000,
-        env: process.env
+        env: process.env,
       });
 
       res.status(result.statusCode).json(result.body);
       return;
     }
 
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).json({ error: "Not found" });
   };
 }
 
@@ -352,7 +352,7 @@ export function createVercelHandler(
  * Create Netlify Function handler
  */
 export function createNetlifyHandler(
-  engine: DocumentTransformationEngine
+  engine: DocumentTransformationEngine,
 ): (event: any) => Promise<any> {
   const handler = new DocumentTransformationHandler(engine);
 
@@ -360,34 +360,34 @@ export function createNetlifyHandler(
     const path = event.path;
     const method = event.httpMethod;
 
-    if (method === 'GET' && path === '/health') {
+    if (method === "GET" && path === "/health") {
       const result = handler.handleHealthCheck();
       return {
         statusCode: result.statusCode,
-        body: JSON.stringify(result.body)
+        body: JSON.stringify(result.body),
       };
     }
 
-    if (method === 'POST' && path === '/convert') {
+    if (method === "POST" && path === "/convert") {
       const request = JSON.parse(event.body) as ConversionRequest;
       const result = await handler.handle(request, {
         requestId: request.requestId || `req_${Date.now()}`,
-        functionName: 'docsjs-convert',
-        functionVersion: '1.0',
+        functionName: "docsjs-convert",
+        functionVersion: "1.0",
         memoryLimit: 1024,
         timeLimit: 30000,
-        env: process.env
+        env: process.env,
       });
 
       return {
         statusCode: result.statusCode,
-        body: JSON.stringify(result.body)
+        body: JSON.stringify(result.body),
       };
     }
 
     return {
       statusCode: 404,
-      body: JSON.stringify({ error: 'Not found' })
+      body: JSON.stringify({ error: "Not found" }),
     };
   };
 }

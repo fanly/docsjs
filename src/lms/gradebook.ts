@@ -1,10 +1,10 @@
 /**
  * Grade Book Integration
- * 
+ *
  * Integrates with learning management systems for grade synchronization and academic analytics.
  */
 
-import type { ConvertResultData } from '../server/types';
+import type { ConvertResultData } from "../server/types";
 
 /**
  * Grade entry
@@ -28,7 +28,7 @@ export interface GradeEntry {
 /**
  * Grade status
  */
-export type GradeStatus = 'pending' | 'submitted' | 'graded' | 'returned';
+export type GradeStatus = "pending" | "submitted" | "graded" | "returned";
 
 /**
  * Grade book
@@ -67,11 +67,11 @@ export interface GradeStatistics {
  * Grade distribution
  */
 export interface GradeDistribution {
-  a: number;  // 90-100
-  b: number;  // 80-89
-  c: number;  // 70-79
-  d: number;  // 60-69
-  f: number;  // 0-59
+  a: number; // 90-100
+  b: number; // 80-89
+  c: number; // 70-79
+  d: number; // 60-69
+  f: number; // 0-59
 }
 
 /**
@@ -82,7 +82,7 @@ export interface StudentPerformance {
   studentName: string;
   overallGrade: number;
   assignments: StudentAssignment[];
-  trend: 'improving' | 'declining' | 'stable';
+  trend: "improving" | "declining" | "stable";
   predictedFinal: number;
   atRisk: boolean;
   recommendations: string[];
@@ -123,7 +123,7 @@ export interface CourseOverview {
   averageGrade: number;
   completionRate: number;
   engagementScore: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }
 
 /**
@@ -138,7 +138,7 @@ export interface AssignmentAnalysis {
   stdDev: number;
   completionRate: number;
   timeSpent: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
   discriminationIndex: number;
 }
 
@@ -156,7 +156,7 @@ export interface GradePrediction {
  * Academic insight
  */
 export interface AcademicInsight {
-  type: 'positive' | 'warning' | 'suggestion';
+  type: "positive" | "warning" | "suggestion";
   title: string;
   description: string;
   affectedStudents?: string[];
@@ -173,8 +173,8 @@ export class GradeBookManager {
   constructor(config: Partial<GradeBookConfig> = {}) {
     this.config = {
       passThreshold: 60,
-      gradeScale: 'standard',
-      ...config
+      gradeScale: "standard",
+      ...config,
     };
   }
 
@@ -193,8 +193,8 @@ export class GradeBookManager {
         createdAt: Date.now(),
         updatedAt: Date.now(),
         totalStudents: 0,
-        totalAssignments: 0
-      }
+        totalAssignments: 0,
+      },
     };
 
     this.gradeBooks.set(gradeBook.id, gradeBook);
@@ -204,7 +204,7 @@ export class GradeBookManager {
   /**
    * Add grade entry
    */
-  addGrade(gradeBookId: string, entry: Omit<GradeEntry, 'id'>): GradeEntry {
+  addGrade(gradeBookId: string, entry: Omit<GradeEntry, "id">): GradeEntry {
     const gradeBook = this.gradeBooks.get(gradeBookId);
     if (!gradeBook) {
       throw new Error(`Grade book not found: ${gradeBookId}`);
@@ -212,13 +212,13 @@ export class GradeBookManager {
 
     const fullEntry: GradeEntry = {
       ...entry,
-      id: `grade_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      id: `grade_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
     gradeBook.entries.push(fullEntry);
     gradeBook.statistics = this.calculateStatistics(gradeBook.entries);
     gradeBook.metadata.updatedAt = Date.now();
-    gradeBook.metadata.totalStudents = new Set(gradeBook.entries.map(e => e.studentId)).size;
+    gradeBook.metadata.totalStudents = new Set(gradeBook.entries.map((e) => e.studentId)).size;
 
     return fullEntry;
   }
@@ -228,29 +228,29 @@ export class GradeBookManager {
    */
   async importFromDocument(document: ConvertResultData): Promise<GradeEntry[]> {
     const entries: GradeEntry[] = [];
-    const content = document.output || '';
-    
+    const content = document.output || "";
+
     // Parse grade information from document
     const studentPattern = /([A-Z][a-z]+ [A-Z][a-z]+)\s+(\d+(?:\.\d+)?)\s*\/\s*(\d+)/g;
     let match;
-    
+
     while ((match = studentPattern.exec(content)) !== null) {
       const score = parseFloat(match[2]);
       const maxScore = parseFloat(match[3]);
-      
+
       entries.push({
         id: `grade_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        studentId: '',
+        studentId: "",
         studentName: match[1],
-        assignmentId: 'imported',
-        assignmentName: 'Imported Grade',
+        assignmentId: "imported",
+        assignmentName: "Imported Grade",
         score,
         maxScore,
         percentage: (score / maxScore) * 100,
         letterGrade: this.scoreToLetter((score / maxScore) * 100),
         submittedAt: Date.now(),
         gradedAt: Date.now(),
-        status: 'graded'
+        status: "graded",
       });
     }
 
@@ -276,7 +276,7 @@ export class GradeBookManager {
         synced.push(entry.id);
       } catch (error) {
         failed.push(entry.id);
-        errors.push(error instanceof Error ? error.message : 'Unknown error');
+        errors.push(error instanceof Error ? error.message : "Unknown error");
       }
     }
 
@@ -284,7 +284,7 @@ export class GradeBookManager {
       success: failed.length === 0,
       synced: synced.length,
       failed: failed.length,
-      errors
+      errors,
     };
   }
 
@@ -293,7 +293,9 @@ export class GradeBookManager {
    */
   getStudentPerformance(gradeBookId: string): StudentPerformance[] {
     const gradeBook = this.gradeBooks.get(gradeBookId);
-    if (!gradeBook) {return [];}
+    if (!gradeBook) {
+      return [];
+    }
 
     const studentMap = new Map<string, StudentAssignment[]>();
     const studentNames = new Map<string, string>();
@@ -311,25 +313,29 @@ export class GradeBookManager {
         dueDate: entry.submittedAt,
         submittedAt: entry.submittedAt || undefined,
         gradedAt: entry.gradedAt || undefined,
-        feedback: entry.feedback
+        feedback: entry.feedback,
       });
     }
 
     const performances: StudentPerformance[] = [];
-    
+
     for (const [studentId, assignments] of studentMap) {
-      const scores = assignments.map(a => (a.score / a.maxScore) * 100);
+      const scores = assignments.map((a) => (a.score / a.maxScore) * 100);
       const overall = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-      
+
       performances.push({
         studentId,
-        studentName: studentNames.get(studentId) || '',
+        studentName: studentNames.get(studentId) || "",
         overallGrade: overall,
         assignments,
         trend: this.calculateTrend(scores),
-        predictedFinal: this.predictFinalGrade(overall, assignments.length, gradeBook.metadata.totalAssignments),
+        predictedFinal: this.predictFinalGrade(
+          overall,
+          assignments.length,
+          gradeBook.metadata.totalAssignments,
+        ),
         atRisk: overall < this.config.passThreshold,
-        recommendations: this.generateRecommendations(overall, assignments)
+        recommendations: this.generateRecommendations(overall, assignments),
       });
     }
 
@@ -358,28 +364,28 @@ export class GradeBookManager {
         averageGrade: gradeBook.statistics.average,
         completionRate: this.calculateCompletionRate(gradeBook.entries),
         engagementScore: this.calculateEngagementScore(gradeBook.entries),
-        difficulty: this.estimateDifficulty(gradeBook.statistics)
+        difficulty: this.estimateDifficulty(gradeBook.statistics),
       },
       studentPerformance,
       assignmentAnalysis,
       predictions,
-      insights
+      insights,
     };
   }
 
   /**
    * Export grade report
    */
-  exportReport(gradeBookId: string, format: 'pdf' | 'csv' | 'json'): string {
+  exportReport(gradeBookId: string, format: "pdf" | "csv" | "json"): string {
     const gradeBook = this.gradeBooks.get(gradeBookId);
     if (!gradeBook) {
       throw new Error(`Grade book not found: ${gradeBookId}`);
     }
 
     switch (format) {
-      case 'json':
+      case "json":
         return JSON.stringify(gradeBook, null, 2);
-      case 'csv':
+      case "csv":
         return this.toCSV(gradeBook);
       default:
         return JSON.stringify(gradeBook);
@@ -397,31 +403,38 @@ export class GradeBookManager {
         distribution: { a: 0, b: 0, c: 0, d: 0, f: 0 },
         passRate: 0,
         topPerformers: [],
-        atRiskStudents: []
+        atRiskStudents: [],
       };
     }
 
-    const scores = entries.map(e => e.percentage).sort((a, b) => a - b);
+    const scores = entries.map((e) => e.percentage).sort((a, b) => a - b);
     const sum = scores.reduce((a, b) => a + b, 0);
     const avg = sum / scores.length;
-    
-    const median = scores.length % 2 === 0
-      ? (scores[scores.length / 2 - 1] + scores[scores.length / 2]) / 2
-      : scores[Math.floor(scores.length / 2)];
+
+    const median =
+      scores.length % 2 === 0
+        ? (scores[scores.length / 2 - 1] + scores[scores.length / 2]) / 2
+        : scores[Math.floor(scores.length / 2)];
 
     const variance = scores.reduce((acc, s) => acc + Math.pow(s - avg, 2), 0) / scores.length;
     const stdDev = Math.sqrt(variance);
 
     const distribution: GradeDistribution = { a: 0, b: 0, c: 0, d: 0, f: 0 };
     for (const s of scores) {
-      if (s >= 90) {distribution.a++;}
-      else if (s >= 80) {distribution.b++;}
-      else if (s >= 70) {distribution.c++;}
-      else if (s >= 60) {distribution.d++;}
-      else {distribution.f++;}
+      if (s >= 90) {
+        distribution.a++;
+      } else if (s >= 80) {
+        distribution.b++;
+      } else if (s >= 70) {
+        distribution.c++;
+      } else if (s >= 60) {
+        distribution.d++;
+      } else {
+        distribution.f++;
+      }
     }
 
-    const passRate = (scores.filter(s => s >= 60).length / scores.length) * 100;
+    const passRate = (scores.filter((s) => s >= 60).length / scores.length) * 100;
 
     const studentAvg = new Map<string, number>();
     for (const e of entries) {
@@ -430,7 +443,7 @@ export class GradeBookManager {
     }
 
     const studentAverages = Array.from(studentAvg.entries())
-      .map(([id, sum]) => ({ id, avg: sum / (entries.filter(e => e.studentId === id).length) }))
+      .map(([id, sum]) => ({ id, avg: sum / entries.filter((e) => e.studentId === id).length }))
       .sort((a, b) => b.avg - a.avg);
 
     return {
@@ -441,69 +454,86 @@ export class GradeBookManager {
       maxScore: scores[scores.length - 1],
       distribution,
       passRate,
-      topPerformers: studentAverages.slice(0, 5).map(s => s.id),
-      atRiskStudents: studentAverages.filter(s => s.avg < 60).map(s => s.id)
+      topPerformers: studentAverages.slice(0, 5).map((s) => s.id),
+      atRiskStudents: studentAverages.filter((s) => s.avg < 60).map((s) => s.id),
     };
   }
 
   private scoreToLetter(score: number): string {
-    if (score >= 90) {return 'A';}
-    if (score >= 80) {return 'B';}
-    if (score >= 70) {return 'C';}
-    if (score >= 60) {return 'D';}
-    return 'F';
+    if (score >= 90) {
+      return "A";
+    }
+    if (score >= 80) {
+      return "B";
+    }
+    if (score >= 70) {
+      return "C";
+    }
+    if (score >= 60) {
+      return "D";
+    }
+    return "F";
   }
 
-  private calculateTrend(scores: number[]): 'improving' | 'declining' | 'stable' {
-    if (scores.length < 3) {return 'stable';}
-    
+  private calculateTrend(scores: number[]): "improving" | "declining" | "stable" {
+    if (scores.length < 3) {
+      return "stable";
+    }
+
     const recent = scores.slice(-3);
     const earlier = scores.slice(0, -3);
-    
+
     const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
-    const earlierAvg = earlier.length > 0 
-      ? earlier.reduce((a, b) => a + b, 0) / earlier.length 
-      : recentAvg;
-    
+    const earlierAvg =
+      earlier.length > 0 ? earlier.reduce((a, b) => a + b, 0) / earlier.length : recentAvg;
+
     const diff = recentAvg - earlierAvg;
-    
-    if (diff > 5) {return 'improving';}
-    if (diff < -5) {return 'declining';}
-    return 'stable';
+
+    if (diff > 5) {
+      return "improving";
+    }
+    if (diff < -5) {
+      return "declining";
+    }
+    return "stable";
   }
 
   private predictFinalGrade(currentAvg: number, completed: number, total: number): number {
-    if (completed === 0) {return currentAvg;}
+    if (completed === 0) {
+      return currentAvg;
+    }
     const remaining = total - completed;
-    if (remaining === 0) {return currentAvg;}
-    
+    if (remaining === 0) {
+      return currentAvg;
+    }
+
     // Weighted prediction - current grades weighted more
     return (currentAvg * completed + 70 * remaining) / total;
   }
 
   private generateRecommendations(overall: number, assignments: StudentAssignment[]): string[] {
     const recs: string[] = [];
-    
+
     if (overall < 60) {
-      recs.push('Schedule meeting with instructor');
-      recs.push('Review fundamental concepts');
+      recs.push("Schedule meeting with instructor");
+      recs.push("Review fundamental concepts");
     }
-    
-    const recentScores = assignments.slice(-3).map(a => (a.score / a.maxScore) * 100);
-    if (recentScores.length > 0 && recentScores.every(s => s < 70)) {
-      recs.push('Seek tutoring support');
+
+    const recentScores = assignments.slice(-3).map((a) => (a.score / a.maxScore) * 100);
+    if (recentScores.length > 0 && recentScores.every((s) => s < 70)) {
+      recs.push("Seek tutoring support");
     }
-    
-    if (assignments.some(a => !a.submittedAt)) {
-      recs.push('Complete pending assignments');
+
+    if (assignments.some((a) => !a.submittedAt)) {
+      recs.push("Complete pending assignments");
     }
-    
+
     return recs;
   }
 
   private analyzeAssignments(gradeBook: GradeBook): AssignmentAnalysis[] {
     const assignmentMap = new Map<string, GradeEntry[]>();
-    
+
     for (const entry of gradeBook.entries) {
       if (!assignmentMap.has(entry.assignmentId)) {
         assignmentMap.set(entry.assignmentId, []);
@@ -512,11 +542,11 @@ export class GradeBookManager {
     }
 
     const analyses: AssignmentAnalysis[] = [];
-    
+
     for (const [id, entries] of assignmentMap) {
-      const scores = entries.map(e => e.percentage);
+      const scores = entries.map((e) => e.percentage);
       const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-      
+
       analyses.push({
         assignmentId: id,
         name: entries[0].assignmentName,
@@ -524,10 +554,11 @@ export class GradeBookManager {
         highestScore: Math.max(...scores),
         lowestScore: Math.min(...scores),
         stdDev: this.calculateStdDev(scores, avg),
-        completionRate: (entries.filter(e => e.status === 'graded').length / entries.length) * 100,
+        completionRate:
+          (entries.filter((e) => e.status === "graded").length / entries.length) * 100,
         timeSpent: 0,
-        difficulty: avg > 80 ? 'easy' : avg > 60 ? 'medium' : 'hard',
-        discriminationIndex: 0
+        difficulty: avg > 80 ? "easy" : avg > 60 ? "medium" : "hard",
+        discriminationIndex: 0,
       });
     }
 
@@ -535,45 +566,48 @@ export class GradeBookManager {
   }
 
   private predictGrades(performances: StudentPerformance[]): GradePrediction[] {
-    return performances.map(p => ({
+    return performances.map((p) => ({
       studentId: p.studentId,
       predictedGrade: p.predictedFinal,
       confidence: Math.min(0.9, 0.5 + (performances.length / 100) * 0.4),
-      factors: ['Previous performance', 'Assignment completion', 'Trend analysis']
+      factors: ["Previous performance", "Assignment completion", "Trend analysis"],
     }));
   }
 
-  private generateInsights(gradeBook: GradeBook, performances: StudentPerformance[]): AcademicInsight[] {
+  private generateInsights(
+    gradeBook: GradeBook,
+    performances: StudentPerformance[],
+  ): AcademicInsight[] {
     const insights: AcademicInsight[] = [];
 
     // Overall pass rate
     if (gradeBook.statistics.passRate < 70) {
       insights.push({
-        type: 'warning',
-        title: 'Low Pass Rate',
+        type: "warning",
+        title: "Low Pass Rate",
         description: `Only ${gradeBook.statistics.passRate.toFixed(1)}% of students are passing.`,
-        action: 'Consider reviewing course material difficulty'
+        action: "Consider reviewing course material difficulty",
       });
     }
 
     // Top performers
     if (gradeBook.statistics.topPerformers.length > 0) {
       insights.push({
-        type: 'positive',
-        title: 'High Performers',
+        type: "positive",
+        title: "High Performers",
         description: `${gradeBook.statistics.topPerformers.length} students are excelling.`,
-        affectedStudents: gradeBook.statistics.topPerformers
+        affectedStudents: gradeBook.statistics.topPerformers,
       });
     }
 
     // At-risk students
     if (gradeBook.statistics.atRiskStudents.length > 0) {
       insights.push({
-        type: 'warning',
-        title: 'At-Risk Students',
+        type: "warning",
+        title: "At-Risk Students",
         description: `${gradeBook.statistics.atRiskStudents.length} students are at risk of failing.`,
         affectedStudents: gradeBook.statistics.atRiskStudents,
-        action: 'Schedule intervention meetings'
+        action: "Schedule intervention meetings",
       });
     }
 
@@ -581,7 +615,7 @@ export class GradeBookManager {
   }
 
   private calculateCompletionRate(entries: GradeEntry[]): number {
-    const graded = entries.filter(e => e.status === 'graded').length;
+    const graded = entries.filter((e) => e.status === "graded").length;
     return entries.length > 0 ? (graded / entries.length) * 100 : 0;
   }
 
@@ -590,10 +624,14 @@ export class GradeBookManager {
     return 75;
   }
 
-  private estimateDifficulty(stats: GradeStatistics): 'easy' | 'medium' | 'hard' {
-    if (stats.average > 80) {return 'easy';}
-    if (stats.average > 60) {return 'medium';}
-    return 'hard';
+  private estimateDifficulty(stats: GradeStatistics): "easy" | "medium" | "hard" {
+    if (stats.average > 80) {
+      return "easy";
+    }
+    if (stats.average > 60) {
+      return "medium";
+    }
+    return "hard";
   }
 
   private calculateStdDev(scores: number[], mean: number): number {
@@ -602,18 +640,18 @@ export class GradeBookManager {
   }
 
   private toCSV(gradeBook: GradeBook): string {
-    const headers = ['Student', 'Assignment', 'Score', 'Max', 'Percentage', 'Grade', 'Status'];
-    const rows = gradeBook.entries.map(e => [
+    const headers = ["Student", "Assignment", "Score", "Max", "Percentage", "Grade", "Status"];
+    const rows = gradeBook.entries.map((e) => [
       e.studentName,
       e.assignmentName,
       e.score,
       e.maxScore,
       e.percentage.toFixed(2),
-      e.letterGrade || '',
-      e.status
+      e.letterGrade || "",
+      e.status,
     ]);
-    
-    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+    return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
   }
 
   private async pushToLMS(config: LMSSyncConfig, entry: GradeEntry): Promise<void> {
@@ -634,7 +672,7 @@ export interface GradeBookConfig {
  * LMS sync config
  */
 export interface LMSSyncConfig {
-  lmsType: 'moodle' | 'blackboard' | 'canvas';
+  lmsType: "moodle" | "blackboard" | "canvas";
   baseUrl: string;
   apiKey: string;
   courseId: string;

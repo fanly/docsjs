@@ -66,19 +66,25 @@ export interface BenchmarkEnvironment {
 
 export class BenchmarkRunner {
   private results: Map<string, BenchmarkResult> = new Map();
-  private version: string = '2.0.0';
+  private version: string = "2.0.0";
 
   constructor(version?: string) {
-    if (version) {this.version = version;}
+    if (version) {
+      this.version = version;
+    }
   }
 
   /**
    * Run a single benchmark
    */
-  async run(name: string, fn: () => Promise<void> | void, options: {
-    iterations?: number;
-    warmup?: number;
-  } = {}): Promise<BenchmarkResult> {
+  async run(
+    name: string,
+    fn: () => Promise<void> | void,
+    options: {
+      iterations?: number;
+      warmup?: number;
+    } = {},
+  ): Promise<BenchmarkResult> {
     const iterations = options.iterations || 10;
     const warmup = options.warmup || 2;
 
@@ -94,12 +100,12 @@ export class BenchmarkRunner {
     for (let i = 0; i < iterations; i++) {
       const startMem = process.memoryUsage().heapUsed;
       const startTime = performance.now();
-      
+
       await fn();
-      
+
       const endTime = performance.now();
       const endMem = process.memoryUsage().heapUsed;
-      
+
       durations.push(endTime - startTime);
       memorySnapshots.push(endMem - startMem);
     }
@@ -117,7 +123,7 @@ export class BenchmarkRunner {
       maxDuration: durations[durations.length - 1],
       p50: this.percentile(durations, 50),
       p95: this.percentile(durations, 95),
-      p99: this.percentile(durations, 99)
+      p99: this.percentile(durations, 99),
     };
 
     this.results.set(name, result);
@@ -135,17 +141,13 @@ export class BenchmarkRunner {
 
     for (const benchmark of suite.benchmarks) {
       process.stdout.write(`   Running ${benchmark.name}...`);
-      
+
       try {
-        const result = await this.run(
-          benchmark.name,
-          benchmark.fn,
-          {
-            iterations: benchmark.iterations,
-            warmup: benchmark.warmup
-          }
-        );
-        
+        const result = await this.run(benchmark.name, benchmark.fn, {
+          iterations: benchmark.iterations,
+          warmup: benchmark.warmup,
+        });
+
         console.log(` ${result.avgDuration.toFixed(2)}ms (p95: ${result.p95.toFixed(2)}ms)`);
         results.push(result);
       } catch (error) {
@@ -159,7 +161,10 @@ export class BenchmarkRunner {
   /**
    * Compare two benchmark results
    */
-  compare(baseline: BenchmarkResult, current: BenchmarkResult): {
+  compare(
+    baseline: BenchmarkResult,
+    current: BenchmarkResult,
+  ): {
     durationDiff: number;
     durationPercentChange: number;
     memoryDiff: number;
@@ -168,7 +173,7 @@ export class BenchmarkRunner {
   } {
     const durationDiff = current.avgDuration - baseline.avgDuration;
     const durationPercentChange = (durationDiff / baseline.avgDuration) * 100;
-    
+
     const memoryDiff = current.memoryUsed - baseline.memoryUsed;
     const memoryPercentChange = (memoryDiff / baseline.memoryUsed) * 100;
 
@@ -180,7 +185,7 @@ export class BenchmarkRunner {
       durationPercentChange,
       memoryDiff,
       memoryPercentChange,
-      passed
+      passed,
     };
   }
 
@@ -189,7 +194,7 @@ export class BenchmarkRunner {
    */
   generateReport(): BenchmarkReport {
     const results = Array.from(this.results.values());
-    
+
     return {
       timestamp: Date.now(),
       version: this.version,
@@ -199,8 +204,8 @@ export class BenchmarkRunner {
         totalTests: results.length,
         passed: results.length, // All run successfully
         failed: 0,
-        avgDuration: results.reduce((sum, r) => sum + r.avgDuration, 0) / results.length
-      }
+        avgDuration: results.reduce((sum, r) => sum + r.avgDuration, 0) / results.length,
+      },
     };
   }
 
@@ -221,8 +226,8 @@ export class BenchmarkRunner {
       nodeVersion: process.version,
       platform: process.platform,
       arch: process.arch,
-      cpus: require('os').cpus().length,
-      memory: require('os').totalmem()
+      cpus: require("os").cpus().length,
+      memory: require("os").totalmem(),
     };
   }
 }
@@ -233,35 +238,45 @@ export class BenchmarkRunner {
 
 export function createStandardBenchmarkSuite(): BenchmarkSuite {
   return {
-    name: 'Standard Documents',
-    description: 'Benchmarks for common document transformation scenarios',
+    name: "Standard Documents",
+    description: "Benchmarks for common document transformation scenarios",
     benchmarks: [
       {
-        name: 'empty-document',
-        fn: () => { /* Test with empty document */ },
-        iterations: 100
+        name: "empty-document",
+        fn: () => {
+          /* Test with empty document */
+        },
+        iterations: 100,
       },
       {
-        name: 'simple-paragraph',
-        fn: () => { /* Test with simple paragraph */ },
-        iterations: 50
+        name: "simple-paragraph",
+        fn: () => {
+          /* Test with simple paragraph */
+        },
+        iterations: 50,
       },
       {
-        name: 'document-with-tables',
-        fn: () => { /* Test with tables */ },
-        iterations: 20
+        name: "document-with-tables",
+        fn: () => {
+          /* Test with tables */
+        },
+        iterations: 20,
       },
       {
-        name: 'document-with-images',
-        fn: () => { /* Test with images */ },
-        iterations: 10
+        name: "document-with-images",
+        fn: () => {
+          /* Test with images */
+        },
+        iterations: 10,
       },
       {
-        name: 'large-document-100pages',
-        fn: () => { /* Test with 100 page document */ },
-        iterations: 5
-      }
-    ]
+        name: "large-document-100pages",
+        fn: () => {
+          /* Test with 100 page document */
+        },
+        iterations: 5,
+      },
+    ],
   };
 }
 
@@ -276,9 +291,9 @@ export interface RegressionThreshold {
 
 export class RegressionChecker {
   private thresholds: RegressionThreshold[] = [
-    { metric: 'avgDuration', threshold: 10 }, // 10% slower = regression
-    { metric: 'p95', threshold: 15 },
-    { metric: 'memoryUsed', threshold: 20 }
+    { metric: "avgDuration", threshold: 10 }, // 10% slower = regression
+    { metric: "p95", threshold: 15 },
+    { metric: "memoryUsed", threshold: 20 },
   ];
 
   /**
@@ -286,7 +301,7 @@ export class RegressionChecker {
    */
   checkForRegression(
     baseline: BenchmarkReport,
-    current: BenchmarkReport
+    current: BenchmarkReport,
   ): {
     hasRegression: boolean;
     regressions: Array<{
@@ -306,8 +321,10 @@ export class RegressionChecker {
     }> = [];
 
     for (const currentResult of current.results) {
-      const baselineResult = baseline.results.find(r => r.name === currentResult.name);
-      if (!baselineResult) {continue;}
+      const baselineResult = baseline.results.find((r) => r.name === currentResult.name);
+      if (!baselineResult) {
+        continue;
+      }
 
       for (const threshold of this.thresholds) {
         const baselineValue = baselineResult[threshold.metric];
@@ -317,14 +334,20 @@ export class RegressionChecker {
         const percentChange = ((currentNum - baselineNum) / baselineNum) * 100;
 
         if (percentChange > threshold.threshold) {
-          regressions.push({ name: currentResult.name, metric: threshold.metric, baselineValue: Number(baselineValue), currentValue: Number(currentValue), percentChange } as any);
+          regressions.push({
+            name: currentResult.name,
+            metric: threshold.metric,
+            baselineValue: Number(baselineValue),
+            currentValue: Number(currentValue),
+            percentChange,
+          } as any);
         }
       }
     }
 
     return {
       hasRegression: regressions.length > 0,
-      regressions
+      regressions,
     };
   }
 }

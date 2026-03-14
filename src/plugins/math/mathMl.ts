@@ -18,37 +18,45 @@ export function createMathMlPlugin(config?: MathMlConfig): TransformPlugin {
     execute() {},
 
     transform(html: string, context: PluginContext): string {
-      if (!context.config.features.mathML) {return html;}
-      if (!context.documentXml) {return html;}
+      if (!context.config.features.mathML) {
+        return html;
+      }
+      if (!context.documentXml) {
+        return html;
+      }
 
       const ommlElements = context.documentXml.querySelectorAll("m\\:oMath, oMath");
-      if (ommlElements.length === 0) {return html;}
+      if (ommlElements.length === 0) {
+        return html;
+      }
 
       let result = html;
 
       for (let i = 0; i < ommlElements.length; i++) {
         const omml = ommlElements[i];
-        const converted = outputFormat === "katex"
-          ? ommlToKaTeX(omml)
-          : ommlToMathml(omml);
+        const converted = outputFormat === "katex" ? ommlToKaTeX(omml) : ommlToMathml(omml);
 
         result = result.replace(`<span data-word-omml="1"></span>`, converted);
       }
 
       return result;
-    }
+    },
   };
 }
 
 function ommlToMathml(omml: Element): string {
   const math = document.createElementNS("http://www.w3.org/1998/Math/MathML", "math");
   const converted = convertOmml(omml);
-  if (converted) {math.appendChild(converted);}
+  if (converted) {
+    math.appendChild(converted);
+  }
   return `<math xmlns="http://www.w3.org/1998/Math/MathML">${math.innerHTML}</math>`;
 }
 
 function convertOmml(node: Element | null): Element | null {
-  if (!node) {return null;}
+  if (!node) {
+    return null;
+  }
 
   const localName = node.localName || "";
 
@@ -148,7 +156,9 @@ function convertRow(node: Element): Element {
   for (const child of Array.from(node.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE) {
       const converted = convertOmml(child as Element);
-      if (converted) {result.appendChild(converted);}
+      if (converted) {
+        result.appendChild(converted);
+      }
     } else if (child.nodeType === Node.TEXT_NODE) {
       const text = child.textContent?.trim();
       if (text) {
@@ -167,11 +177,15 @@ function convertFraction(node: Element): Element {
   const den = node.querySelector("m\\:den, den");
   if (num) {
     const converted = convertOmml(num);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (den) {
     const convertedDen = convertOmml(den);
-    if (convertedDen) {result.appendChild(convertedDen);}
+    if (convertedDen) {
+      result.appendChild(convertedDen);
+    }
   }
   return result;
 }
@@ -182,11 +196,15 @@ function convertSuperscript(node: Element): Element {
   const sup = node.querySelector("m\\:sup, sup");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (sup) {
     const convertedSup = convertOmml(sup);
-    if (convertedSup) {result.appendChild(convertedSup);}
+    if (convertedSup) {
+      result.appendChild(convertedSup);
+    }
   }
   return result;
 }
@@ -197,11 +215,15 @@ function convertSubscript(node: Element): Element {
   const sub = node.querySelector("m\\:sub, sub");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (sub) {
     const convertedSub = convertOmml(sub);
-    if (convertedSub) {result.appendChild(convertedSub);}
+    if (convertedSub) {
+      result.appendChild(convertedSub);
+    }
   }
   return result;
 }
@@ -213,15 +235,21 @@ function convertSubSup(node: Element): Element {
   const sup = node.querySelector("m\\:sup, sup");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (sub) {
     const convertedSub = convertOmml(sub);
-    if (convertedSub) {result.appendChild(convertedSub);}
+    if (convertedSub) {
+      result.appendChild(convertedSub);
+    }
   }
   if (sup) {
     const convertedSup = convertOmml(sup);
-    if (convertedSup) {result.appendChild(convertedSup);}
+    if (convertedSup) {
+      result.appendChild(convertedSup);
+    }
   }
   return result;
 }
@@ -232,11 +260,15 @@ function convertRoot(node: Element): Element {
   const deg = node.querySelector("m\\:deg, deg, m\\:degree, degree");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (deg) {
     const convertedDeg = convertOmml(deg);
-    if (convertedDeg) {result.appendChild(convertedDeg);}
+    if (convertedDeg) {
+      result.appendChild(convertedDeg);
+    }
   } else {
     const degEl = createMathElement("mn");
     degEl.textContent = "2";
@@ -250,7 +282,9 @@ function convertBarOver(node: Element): Element {
   const base = node.querySelector("m\\:e, e");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   const overBar = createMathElement("mo");
   overBar.textContent = "̄";
@@ -263,7 +297,9 @@ function convertBarUnder(node: Element): Element {
   const base = node.querySelector("m\\:e, e");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   const underLine = createMathElement("mo");
   underLine.textContent = "̱";
@@ -277,7 +313,9 @@ function convertAccent(node: Element): Element {
   const char = node.getAttribute("chr") || "^";
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   const accent = createMathElement("mo");
   accent.textContent = char;
@@ -291,11 +329,15 @@ function convertLim(node: Element): Element {
   const low = node.querySelector("m\\:lim, lim, m\\:bottom, bottom");
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (low) {
     const convertedLow = convertOmml(low);
-    if (convertedLow) {result.appendChild(convertedLow);}
+    if (convertedLow) {
+      result.appendChild(convertedLow);
+    }
   }
   const limSym = createMathElement("mi");
   limSym.textContent = "lim";
@@ -309,11 +351,15 @@ function convertFunc(node: Element): Element {
   const arg = node.querySelector("m\\:arg, arg, m\\:e, e");
   if (name) {
     const converted = convertOmml(name);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   if (arg) {
     const converted = convertOmml(arg);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   return result;
 }
@@ -323,7 +369,9 @@ function convertBox(node: Element): Element {
   for (const child of Array.from(node.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE) {
       const converted = convertOmml(child as Element);
-      if (converted) {result.appendChild(converted);}
+      if (converted) {
+        result.appendChild(converted);
+      }
     }
   }
   return result;
@@ -335,7 +383,9 @@ function convertGroupChr(node: Element): Element {
   const char = node.getAttribute("chr") || "{";
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   const groupChr = createMathElement("mo");
   groupChr.textContent = char;
@@ -349,7 +399,9 @@ function convertBorderBox(node: Element): Element {
   for (const child of Array.from(node.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE) {
       const converted = convertOmml(child as Element);
-      if (converted) {result.appendChild(converted);}
+      if (converted) {
+        result.appendChild(converted);
+      }
     }
   }
   return result;
@@ -360,7 +412,9 @@ function convertDegree(node: Element): Element {
   const base = node.previousElementSibling;
   if (base) {
     const converted = convertOmml(base);
-    if (converted) {result.appendChild(converted);}
+    if (converted) {
+      result.appendChild(converted);
+    }
   }
   const deg = createMathElement("mn");
   deg.textContent = node.textContent || "0";
@@ -373,7 +427,9 @@ function convertDefault(node: Element): Element {
   for (const child of Array.from(node.childNodes)) {
     if (child.nodeType === Node.ELEMENT_NODE) {
       const converted = convertOmml(child as Element);
-      if (converted) {result.appendChild(converted);}
+      if (converted) {
+        result.appendChild(converted);
+      }
     } else if (child.nodeType === Node.TEXT_NODE) {
       const text = child.textContent?.trim();
       if (text) {
@@ -388,7 +444,9 @@ function convertDefault(node: Element): Element {
 
 function ommlToKaTeX(omml: Element): string {
   function convert(node: Element | null): string {
-    if (!node) {return "";}
+    if (!node) {
+      return "";
+    }
 
     const localName = node.localName || "";
 
@@ -453,7 +511,9 @@ function ommlToKaTeX(omml: Element): string {
         parts.push(convert(child as Element));
       } else if (child.nodeType === Node.TEXT_NODE) {
         const text = child.textContent?.trim();
-        if (text) {parts.push(text);}
+        if (text) {
+          parts.push(text);
+        }
       }
     }
     return parts.join("");

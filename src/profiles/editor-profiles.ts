@@ -1,13 +1,13 @@
 /**
  * Editor Profiles
- * 
+ *
  * Specialized profiles optimized for different editor use cases:
  * - Academic: Papers, theses, research documents
  * - Business: Reports, memos, presentations
  * - Tech Author: API docs, technical documentation
  */
 
-import type { TransformationProfile } from '../types/engine';
+import type { TransformationProfile } from "../types/engine";
 
 export interface EditorProfile extends TransformationProfile {
   /** Specific editor features */
@@ -40,9 +40,9 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
    * - Bibliography handling
    */
   academic: {
-    id: 'academic',
-    name: 'Academic Editor',
-    description: 'Profile optimized for academic papers, theses, and research documents',
+    id: "academic",
+    name: "Academic Editor",
+    description: "Profile optimized for academic papers, theses, and research documents",
     editorFeatures: {
       changeTracking: true,
       comments: true,
@@ -68,16 +68,16 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     transform: {
       enablePlugins: true,
       operations: [
-        'normalize-citations',
-        'preserve-footnotes',
-        'number-figures',
-        'number-tables',
-        'preserve-cross-references',
+        "normalize-citations",
+        "preserve-footnotes",
+        "number-figures",
+        "number-tables",
+        "preserve-cross-references",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'academic',
+      outputFormat: "html",
+      theme: "academic",
       options: {
         fidelityMode: true,
         includeImageData: true,
@@ -86,8 +86,8 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
       },
     },
     security: {
-      allowedDomains: ['arxiv.org', 'pubmed.ncbi.nlm.nih.gov', 'scholar.google.com'],
-      sanitizerProfile: 'strict',
+      allowedDomains: ["arxiv.org", "pubmed.ncbi.nlm.nih.gov", "scholar.google.com"],
+      sanitizerProfile: "strict",
     },
   },
 
@@ -100,9 +100,9 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
    * - Watermark support
    */
   business: {
-    id: 'business',
-    name: 'Business Editor',
-    description: 'Profile optimized for business documents, reports, and corporate communications',
+    id: "business",
+    name: "Business Editor",
+    description: "Profile optimized for business documents, reports, and corporate communications",
     editorFeatures: {
       changeTracking: true,
       comments: true,
@@ -128,15 +128,15 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     transform: {
       enablePlugins: true,
       operations: [
-        'preserve-headers-footers',
-        'preserve-watermarks',
-        'normalize-styles',
-        'business-formatting',
+        "preserve-headers-footers",
+        "preserve-watermarks",
+        "normalize-styles",
+        "business-formatting",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'business',
+      outputFormat: "html",
+      theme: "business",
       options: {
         fidelityMode: true,
         includeImageData: true,
@@ -146,7 +146,7 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     },
     security: {
       allowedDomains: [],
-      sanitizerProfile: 'business',
+      sanitizerProfile: "business",
     },
   },
 
@@ -158,10 +158,10 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
    - Collapsible sections
    - Search optimization
    */
-  'tech-author': {
-    id: 'tech-author',
-    name: 'Tech Author',
-    description: 'Profile optimized for technical documentation and API references',
+  "tech-author": {
+    id: "tech-author",
+    name: "Tech Author",
+    description: "Profile optimized for technical documentation and API references",
     editorFeatures: {
       collaboration: true,
       changeTracking: true,
@@ -188,16 +188,16 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     transform: {
       enablePlugins: true,
       operations: [
-        'syntax-highlight-code',
-        'extract-code-examples',
-        'generate-toc',
-        'optimize-for-search',
-        'add-anchor-links',
+        "syntax-highlight-code",
+        "extract-code-examples",
+        "generate-toc",
+        "optimize-for-search",
+        "add-anchor-links",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'tech-author',
+      outputFormat: "html",
+      theme: "tech-author",
       options: {
         fidelityMode: true,
         includeImageData: true,
@@ -207,8 +207,8 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
       },
     },
     security: {
-      allowedDomains: ['github.com', 'gitlab.com', 'readthedocs.org'],
-      sanitizerProfile: 'fidelity-first',
+      allowedDomains: ["github.com", "gitlab.com", "readthedocs.org"],
+      sanitizerProfile: "fidelity-first",
     },
   },
 
@@ -221,9 +221,9 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
    * - Cursor sharing
    */
   collaborative: {
-    id: 'collaborative',
-    name: 'Collaborative Editor',
-    description: 'Profile optimized for real-time collaborative document editing',
+    id: "collaborative",
+    name: "Collaborative Editor",
+    description: "Profile optimized for real-time collaborative document editing",
     editorFeatures: {
       collaboration: true,
       changeTracking: true,
@@ -247,14 +247,11 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     },
     transform: {
       enablePlugins: true,
-      operations: [
-        'normalize',
-        'prepare-for-collab',
-      ],
+      operations: ["normalize", "prepare-for-collab"],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'default',
+      outputFormat: "html",
+      theme: "default",
       options: {
         fidelityMode: true,
         includeImageData: false,
@@ -263,7 +260,7 @@ export const EDITOR_PROFILES: Record<string, EditorProfile> = {
     },
     security: {
       allowedDomains: [],
-      sanitizerProfile: 'balanced',
+      sanitizerProfile: "balanced",
     },
   },
 };
@@ -287,13 +284,13 @@ export function listEditorProfiles(): EditorProfile[] {
  */
 export function createCustomEditorProfile(
   baseId: string,
-  overrides: Partial<EditorProfile>
+  overrides: Partial<EditorProfile>,
 ): EditorProfile {
   const base = EDITOR_PROFILES[baseId];
   if (!base) {
     throw new Error(`Base profile '${baseId}' not found`);
   }
-  
+
   return {
     ...base,
     ...overrides,

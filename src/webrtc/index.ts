@@ -1,6 +1,6 @@
 /**
  * WebRTC Module
- * 
+ *
  * Provides real-time peer-to-peer communication for collaboration.
  */
 
@@ -9,11 +9,11 @@ export interface PeerConnection {
   peerId: string;
   connection: RTCPeerConnection;
   dataChannel?: RTCDataChannel;
-  status: 'connecting' | 'connected' | 'disconnected' | 'failed';
+  status: "connecting" | "connected" | "disconnected" | "failed";
 }
 
 export interface SignalingMessage {
-  type: 'offer' | 'answer' | 'ice-candidate' | 'join' | 'leave';
+  type: "offer" | "answer" | "ice-candidate" | "join" | "leave";
   from: string;
   to?: string;
   payload: RTCSessionDescriptionInit | RTCIceCandidateInit;
@@ -32,8 +32,8 @@ export interface PeerCallbacks {
 }
 
 const DEFAULT_IC_SERVERS: RTCIceServer[] = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' }
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
 ];
 
 export class WebRTCManager {
@@ -47,7 +47,7 @@ export class WebRTCManager {
     this.localId = localId;
     this.config = {
       iceServers: config?.iceServers || DEFAULT_IC_SERVERS,
-      iceCandidatePoolSize: config?.iceCandidatePoolSize || 10
+      iceCandidatePoolSize: config?.iceCandidatePoolSize || 10,
     };
     this.callbacks = callbacks || {};
   }
@@ -62,9 +62,9 @@ export class WebRTCManager {
       this.signalingSocket.onopen = () => {
         // Send join message
         this.sendSignaling({
-          type: 'join',
+          type: "join",
           from: this.localId,
-          payload: {}
+          payload: {},
         });
         resolve();
       };
@@ -106,17 +106,17 @@ export class WebRTCManager {
     const connection = new RTCPeerConnection(this.config);
 
     // Create data channel
-    const dataChannel = connection.createDataChannel('data');
+    const dataChannel = connection.createDataChannel("data");
     this.setupDataChannel(peerId, dataChannel);
 
     // Handle ICE candidates
     connection.onicecandidate = (event) => {
       if (event.candidate) {
         this.sendSignaling({
-          type: 'ice-candidate',
+          type: "ice-candidate",
           from: this.localId,
           to: peerId,
-          payload: event.candidate.toJSON()
+          payload: event.candidate.toJSON(),
         });
       }
     };
@@ -125,9 +125,12 @@ export class WebRTCManager {
     connection.onconnectionstatechange = () => {
       const peer = this.peers.get(peerId);
       if (peer) {
-        peer.status = connection.connectionState as PeerConnection['status'];
-        
-        if (connection.connectionState === 'failed' || connection.connectionState === 'disconnected') {
+        peer.status = connection.connectionState as PeerConnection["status"];
+
+        if (
+          connection.connectionState === "failed" ||
+          connection.connectionState === "disconnected"
+        ) {
           this.callbacks.onDisconnect?.(peerId);
           this.peers.delete(peerId);
         }
@@ -139,10 +142,10 @@ export class WebRTCManager {
     await connection.setLocalDescription(offer);
 
     this.sendSignaling({
-      type: 'offer',
+      type: "offer",
       from: this.localId,
       to: peerId,
-      payload: offer
+      payload: offer,
     });
 
     this.peers.set(peerId, {
@@ -150,7 +153,7 @@ export class WebRTCManager {
       peerId,
       connection,
       dataChannel,
-      status: 'connecting'
+      status: "connecting",
     });
   }
 
@@ -181,7 +184,7 @@ export class WebRTCManager {
    */
   sendToPeer(peerId: string, data: unknown): boolean {
     const peer = this.peers.get(peerId);
-    if (!peer || !peer.dataChannel || peer.status !== 'connected') {
+    if (!peer || !peer.dataChannel || peer.status !== "connected") {
       return false;
     }
 
@@ -213,7 +216,7 @@ export class WebRTCManager {
   /**
    * Get peer connection status
    */
-  getPeerStatus(peerId: string): PeerConnection['status'] | null {
+  getPeerStatus(peerId: string): PeerConnection["status"] | null {
     return this.peers.get(peerId)?.status || null;
   }
 
@@ -221,7 +224,7 @@ export class WebRTCManager {
     channel.onopen = () => {
       const peer = this.peers.get(peerId);
       if (peer) {
-        peer.status = 'connected';
+        peer.status = "connected";
       }
       this.callbacks.onConnect?.(peerId);
     };
@@ -241,30 +244,30 @@ export class WebRTCManager {
     };
 
     channel.onerror = (error) => {
-      this.callbacks.onError?.(peerId, new Error('Data channel error'));
+      this.callbacks.onError?.(peerId, new Error("Data channel error"));
     };
   }
 
   private handleSignalingMessage(message: SignalingMessage): void {
     switch (message.type) {
-      case 'join':
+      case "join":
         // New peer joined, could auto-connect
         break;
 
-      case 'leave':
+      case "leave":
         this.disconnectFromPeer(message.from);
         break;
 
-      case 'offer':
-        this.handleOffer(message.from, message.payload as RTCSessionDescriptionInit);
+      case "offer":
+        void this.handleOffer(message.from, message.payload as RTCSessionDescriptionInit);
         break;
 
-      case 'answer':
-        this.handleAnswer(message.from, message.payload as RTCSessionDescriptionInit);
+      case "answer":
+        void this.handleAnswer(message.from, message.payload as RTCSessionDescriptionInit);
         break;
 
-      case 'ice-candidate':
-        this.handleIceCandidate(message.from, message.payload as RTCIceCandidateInit);
+      case "ice-candidate":
+        void this.handleIceCandidate(message.from, message.payload as RTCIceCandidateInit);
         break;
     }
   }
@@ -280,10 +283,10 @@ export class WebRTCManager {
     connection.onicecandidate = (event) => {
       if (event.candidate) {
         this.sendSignaling({
-          type: 'ice-candidate',
+          type: "ice-candidate",
           from: this.localId,
           to: peerId,
-          payload: event.candidate.toJSON()
+          payload: event.candidate.toJSON(),
         });
       }
     };
@@ -293,17 +296,17 @@ export class WebRTCManager {
     await connection.setLocalDescription(answer);
 
     this.sendSignaling({
-      type: 'answer',
+      type: "answer",
       from: this.localId,
       to: peerId,
-      payload: answer
+      payload: answer,
     });
 
     this.peers.set(peerId, {
       id: this.localId,
       peerId,
       connection,
-      status: 'connecting'
+      status: "connecting",
     });
   }
 
@@ -331,7 +334,7 @@ export class WebRTCManager {
 export function createWebRTCManager(
   localId: string,
   config?: WebRTCConfig,
-  callbacks?: PeerCallbacks
+  callbacks?: PeerCallbacks,
 ): WebRTCManager {
   return new WebRTCManager(localId, config, callbacks);
 }

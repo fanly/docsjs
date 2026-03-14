@@ -1,11 +1,20 @@
 /**
  * TipTap Adapter
- * 
+ *
  * Converts DocumentAST to/from TipTap JSON format.
  * TipTap is a headless editor based on Prosemirror.
  */
 
-import type { DocumentNode, BlockNode, InlineNode, ParagraphNode, HeadingNode, TextNode, ImageNode, HyperlinkNode } from "../ast/types";
+import type {
+  DocumentNode,
+  BlockNode,
+  InlineNode,
+  ParagraphNode,
+  HeadingNode,
+  TextNode,
+  ImageNode,
+  HyperlinkNode,
+} from "../ast/types";
 
 export interface TipTapNode {
   type: string;
@@ -31,8 +40,8 @@ export interface TipTapDocument {
 export function astToTipTap(doc: DocumentNode): TipTapDocument {
   return {
     type: "doc",
-    content: doc.children.flatMap(section => 
-      section.children.map(block => blockToTipTap(block))
+    content: doc.children.flatMap((section) =>
+      section.children.map((block) => blockToTipTap(block)),
     ),
   };
 }
@@ -174,11 +183,13 @@ function markToTipTap(mark: any): TipTapMark {
 function hyperlinkToTipTap(link: HyperlinkNode): TipTapNode {
   return {
     type: "text",
-    text: link.children.map(c => c.type === "text" ? c.text : "").join(""),
-    marks: [{
-      type: "link",
-      attrs: { href: link.href, title: link.title },
-    }],
+    text: link.children.map((c) => (c.type === "text" ? c.text : "")).join(""),
+    marks: [
+      {
+        type: "link",
+        attrs: { href: link.href, title: link.title },
+      },
+    ],
   };
 }
 
@@ -199,7 +210,7 @@ export function tipTapToAst(tiptap: TipTapDocument): DocumentNode {
       {
         type: "section",
         id: generateId(),
-        children: tiptap.content?.map(tipTapToBlock).filter(Boolean) as BlockNode[] || [],
+        children: (tiptap.content?.map(tipTapToBlock).filter(Boolean) as BlockNode[]) || [],
       },
     ],
   };
@@ -223,7 +234,7 @@ function tipTapToParagraph(node: TipTapNode): ParagraphNode {
   return {
     type: "paragraph",
     id: generateId(),
-    children: node.content?.map(tipTapToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.content?.map(tipTapToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -232,7 +243,7 @@ function tipTapToHeading(node: TipTapNode): HeadingNode {
     type: "heading",
     id: generateId(),
     level: (node.attrs?.level || 1) as 1 | 2 | 3 | 4 | 5 | 6,
-    children: node.content?.map(tipTapToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.content?.map(tipTapToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -241,11 +252,12 @@ function tipTapToList(node: TipTapNode): any {
     type: "list",
     id: generateId(),
     listType: node.type === "orderedList" ? "ordered" : "unordered",
-    items: node.content?.map((item: any) => ({
-      type: "listItem",
-      id: generateId(),
-      children: item.content?.map(tipTapToBlock).filter(Boolean) || [],
-    })) || [],
+    items:
+      node.content?.map((item: any) => ({
+        type: "listItem",
+        id: generateId(),
+        children: item.content?.map(tipTapToBlock).filter(Boolean) || [],
+      })) || [],
   };
 }
 

@@ -1,6 +1,6 @@
 /**
  * AST Utility Functions
- * 
+ *
  * Provides utilities for:
  * - Node ID generation
  * - Serialization / Deserialization
@@ -70,7 +70,7 @@ export function generateDeterministicId(content: string, prefix = "node"): strin
   let hash = 0;
   for (let i = 0; i < content.length; i++) {
     const char = content.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   return `${ID_PREFIX}${prefix}_${Math.abs(hash).toString(36)}`;
@@ -132,7 +132,7 @@ export function calculateChecksum(ast: DocumentNode): string {
     }
     return value;
   });
-  
+
   let hash = 5381;
   for (let i = 0; i < content.length; i++) {
     hash = ((hash << 5) + hash) ^ content.charCodeAt(i);
@@ -186,7 +186,7 @@ export function createTextNode(text: string, marks?: TextMark[]): TextNode {
 export function createParagraphNode(
   children: InlineNode[] = [],
   semantics?: ParagraphSemantics,
-  styleId?: string
+  styleId?: string,
 ): ParagraphNode {
   return {
     type: "paragraph",
@@ -203,7 +203,7 @@ export function createParagraphNode(
 export function createHeadingNode(
   level: 1 | 2 | 3 | 4 | 5 | 6,
   children: InlineNode[] = [],
-  styleId?: string
+  styleId?: string,
 ): HeadingNode {
   return {
     type: "heading",
@@ -219,7 +219,7 @@ export function createHeadingNode(
  */
 export function createListNode(
   listType: "ordered" | "unordered" | "description",
-  items: ListItemNode[] = []
+  items: ListItemNode[] = [],
 ): ListNode {
   return {
     type: "list",
@@ -236,7 +236,7 @@ export function createListItemNode(
   children: BlockNode[] = [],
   level = 0,
   marker?: string,
-  number?: number
+  number?: number,
 ): ListItemNode {
   return {
     type: "listItem",
@@ -282,7 +282,7 @@ export function createTableCellNode(
     isHeader?: boolean;
     valign?: "top" | "middle" | "bottom";
     width?: number;
-  }
+  },
 ): TableCellNode {
   return {
     type: "tableCell",
@@ -302,7 +302,7 @@ export function createImageNode(
     title?: string;
     dimensions?: ImageDimensions;
     positioning?: ImagePositioning;
-  }
+  },
 ): ImageNode {
   return {
     type: "image",
@@ -322,7 +322,7 @@ export function createHyperlinkNode(
     title?: string;
     target?: "_blank" | "_self";
     anchor?: string;
-  }
+  },
 ): HyperlinkNode {
   return {
     type: "hyperlink",
@@ -355,10 +355,12 @@ export function walkAST(
   node: ASTNode,
   visitor: (node: ASTNode, parent: ASTNode | null, path: string[]) => void | boolean,
   parent: ASTNode | null = null,
-  path: string[] = []
+  path: string[] = [],
 ): void {
   const result = visitor(node, parent, path);
-  if (result === false) {return;}
+  if (result === false) {
+    return;
+  }
 
   const children = getNodeChildren(node);
   if (children) {
@@ -386,10 +388,7 @@ export function findNodeById(ast: DocumentNode, id: string): ASTNode | null {
 /**
  * Find all nodes of a specific type
  */
-export function findNodesByType<T extends ASTNode>(
-  ast: DocumentNode,
-  type: T["type"]
-): T[] {
+export function findNodesByType<T extends ASTNode>(ast: DocumentNode, type: T["type"]): T[] {
   const nodes: T[] = [];
   walkAST(ast, (node) => {
     if (node.type === type) {
@@ -437,9 +436,15 @@ function getNodeChildren(node: ASTNode): ASTNode[] | null {
  * Get the key name for children property
  */
 function getChildrenKey(node: ASTNode): string | null {
-  if (node.type === "list") {return "items";}
-  if (node.type === "table") {return "rows";}
-  if (node.type === "tableRow") {return "cells";}
+  if (node.type === "list") {
+    return "items";
+  }
+  if (node.type === "table") {
+    return "rows";
+  }
+  if (node.type === "tableRow") {
+    return "cells";
+  }
   return "children";
 }
 
@@ -483,7 +488,7 @@ function assignNewIds(node: ASTNode): void {
  */
 export function validateAST(node: ASTNode): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   walkAST(node, (n) => {
     // Check required fields
     if (!("type" in n)) {
@@ -492,7 +497,7 @@ export function validateAST(node: ASTNode): { valid: boolean; errors: string[] }
     if (!("id" in n)) {
       errors.push(`Node missing 'id' field: ${JSON.stringify(n)}`);
     }
-    
+
     // Type-specific validation
     if (n.type === "heading") {
       const heading = n as HeadingNode;
@@ -501,7 +506,7 @@ export function validateAST(node: ASTNode): { valid: boolean; errors: string[] }
       }
     }
   });
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -534,7 +539,9 @@ export function addMark(node: TextNode, mark: TextMark): TextNode {
  * Remove a mark from text node
  */
 export function removeMark(node: TextNode, markType: TextMark["type"]): TextNode {
-  if (!node.marks) {return node;}
+  if (!node.marks) {
+    return node;
+  }
   const marks = node.marks.filter((m) => m.type !== markType);
   if (marks.length === 0) {
     const { marks: _, ...rest } = node;
@@ -552,13 +559,13 @@ export function removeMark(node: TextNode, markType: TextMark["type"]): TextNode
  */
 export function extractText(node: ASTNode): string {
   const texts: string[] = [];
-  
+
   walkAST(node, (n) => {
     if (n.type === "text") {
       texts.push((n as TextNode).text);
     }
   });
-  
+
   return texts.join("");
 }
 
@@ -567,13 +574,13 @@ export function extractText(node: ASTNode): string {
  */
 export function extractImageSources(node: ASTNode): string[] {
   const sources: string[] = [];
-  
+
   walkAST(node, (n) => {
     if (n.type === "image") {
       sources.push((n as ImageNode).src);
     }
   });
-  
+
   return sources;
 }
 
@@ -582,7 +589,7 @@ export function extractImageSources(node: ASTNode): string[] {
  */
 export function extractHyperlinks(node: ASTNode): Array<{ href: string; text: string }> {
   const links: Array<{ href: string; text: string }> = [];
-  
+
   walkAST(node, (n) => {
     if (n.type === "hyperlink") {
       const link = n as HyperlinkNode;
@@ -592,7 +599,7 @@ export function extractHyperlinks(node: ASTNode): Array<{ href: string; text: st
       });
     }
   });
-  
+
   return links;
 }
 
@@ -621,7 +628,7 @@ export function addFootnote(
   auxiliary: AuxiliaryContent,
   id: string,
   children: BlockNode[],
-  number?: number
+  number?: number,
 ): FootnoteNode {
   const footnote: FootnoteNode = {
     type: "footnote",
@@ -629,12 +636,12 @@ export function addFootnote(
     number: number ?? (auxiliary.footnotes?.size ?? 0) + 1,
     children,
   };
-  
+
   if (!auxiliary.footnotes) {
     auxiliary.footnotes = new Map();
   }
   auxiliary.footnotes.set(id, footnote);
-  
+
   return footnote;
 }
 
@@ -645,7 +652,7 @@ export function addEndnote(
   auxiliary: AuxiliaryContent,
   id: string,
   children: BlockNode[],
-  number?: number
+  number?: number,
 ): EndnoteNode {
   const endnote: EndnoteNode = {
     type: "endnote",
@@ -653,12 +660,12 @@ export function addEndnote(
     number: number ?? (auxiliary.endnotes?.size ?? 0) + 1,
     children,
   };
-  
+
   if (!auxiliary.endnotes) {
     auxiliary.endnotes = new Map();
   }
   auxiliary.endnotes.set(id, endnote);
-  
+
   return endnote;
 }
 
@@ -669,7 +676,7 @@ export function addComment(
   auxiliary: AuxiliaryContent,
   id: string,
   children: BlockNode[],
-  options?: { author?: string; date?: string }
+  options?: { author?: string; date?: string },
 ): CommentNode {
   const comment: CommentNode = {
     type: "comment",
@@ -678,12 +685,12 @@ export function addComment(
     date: options?.date,
     children,
   };
-  
+
   if (!auxiliary.comments) {
     auxiliary.comments = new Map();
   }
   auxiliary.comments.set(id, comment);
-  
+
   return comment;
 }
 
@@ -694,12 +701,12 @@ export function addRevision(
   auxiliary: AuxiliaryContent,
   revisionType: "insert" | "delete",
   content: InlineNode[],
-  options?: { author?: string; date?: string }
+  options?: { author?: string; date?: string },
 ): RevisionNode {
   if (!auxiliary.revisions) {
     auxiliary.revisions = [];
   }
-  
+
   const revision: RevisionNode = {
     type: "revision",
     id: generateId("rev"),
@@ -708,8 +715,8 @@ export function addRevision(
     date: options?.date,
     content,
   };
-  
+
   auxiliary.revisions.push(revision);
-  
+
   return revision;
 }

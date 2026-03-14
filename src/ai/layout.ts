@@ -1,10 +1,10 @@
 /**
  * Intelligent Layout Optimization
- * 
+ *
  * Analyzes document layout and provides optimization suggestions for better rendering and readability.
  */
 
-import type { DocumentNode } from '../ast/types';
+import type { DocumentNode } from "../ast/types";
 
 /**
  * Layout analysis result
@@ -27,23 +27,23 @@ export interface LayoutAnalysis {
 /**
  * Layout types
  */
-export type LayoutType = 
-  | 'article'
-  | 'report'
-  | 'academic'
-  | 'technical'
-  | 'marketing'
-  | 'documentation'
-  | 'mixed';
+export type LayoutType =
+  | "article"
+  | "report"
+  | "academic"
+  | "technical"
+  | "marketing"
+  | "documentation"
+  | "mixed";
 
 /**
  * Layout section
  */
 export interface LayoutSection {
   /** Section type */
-  type: 'header' | 'footer' | 'sidebar' | 'main' | 'toc' | 'references';
+  type: "header" | "footer" | "sidebar" | "main" | "toc" | "references";
   /** Position */
-  position: 'top' | 'bottom' | 'left' | 'right' | 'center';
+  position: "top" | "bottom" | "left" | "right" | "center";
   /** Estimated size */
   size: { width?: number; height?: number; percentage?: number };
   /** Confidence */
@@ -67,9 +67,9 @@ export interface LayoutHierarchy {
  */
 export interface LayoutIssue {
   /** Issue type */
-  type: 'spacing' | 'alignment' | 'hierarchy' | 'overflow' | 'contrast' | 'responsiveness';
+  type: "spacing" | "alignment" | "hierarchy" | "overflow" | "contrast" | "responsiveness";
   /** Severity */
-  severity: 'critical' | 'major' | 'minor';
+  severity: "critical" | "major" | "minor";
   /** Description */
   description: string;
   /** Location */
@@ -83,15 +83,15 @@ export interface LayoutIssue {
  */
 export interface LayoutSuggestion {
   /** Category */
-  category: 'readability' | 'accessibility' | 'responsiveness' | 'consistency' | 'engagement';
+  category: "readability" | "accessibility" | "responsiveness" | "consistency" | "engagement";
   /** Priority */
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   /** Action */
   action: string;
   /** Impact */
   impact: string;
   /** Effort */
-  effort: 'low' | 'medium' | 'high';
+  effort: "low" | "medium" | "high";
 }
 
 /**
@@ -102,10 +102,10 @@ export class LayoutOptimizer {
 
   constructor(config: Partial<OptimizerConfig> = {}) {
     this.config = {
-      targetDevice: 'all',
+      targetDevice: "all",
       minWidth: 320,
       maxWidth: 1920,
-      ...config
+      ...config,
     };
   }
 
@@ -126,7 +126,7 @@ export class LayoutOptimizer {
       sections,
       hierarchy,
       issues,
-      suggestions
+      suggestions,
     };
   }
 
@@ -136,13 +136,13 @@ export class LayoutOptimizer {
   optimize(node: DocumentNode, targetDevice: DeviceType): DocumentNode {
     // Clone to avoid mutation
     const optimized = this.cloneNode(node);
-    
+
     switch (targetDevice) {
-      case 'mobile':
+      case "mobile":
         return this.optimizeForMobile(optimized);
-      case 'tablet':
+      case "tablet":
         return this.optimizeForTablet(optimized);
-      case 'desktop':
+      case "desktop":
         return this.optimizeForDesktop(optimized);
       default:
         return optimized;
@@ -158,16 +158,16 @@ export class LayoutOptimizer {
 
     // Check heading hierarchy
     checks.push(this.checkHeadingHierarchy(node));
-    
+
     // Check spacing consistency
     checks.push(this.checkSpacingConsistency(node));
-    
+
     // Check image sizing
     checks.push(this.checkImageSizing(node));
-    
+
     // Check contrast
     checks.push(this.checkContrast(node));
-    
+
     // Check responsiveness
     checks.push(this.checkResponsiveness(node));
 
@@ -178,10 +178,10 @@ export class LayoutOptimizer {
     }
 
     return {
-      valid: issues.filter(i => i.severity === 'critical').length === 0,
-      score: (checks.filter(c => c.passed).length / checks.length) * 100,
+      valid: issues.filter((i) => i.severity === "critical").length === 0,
+      score: (checks.filter((c) => c.passed).length / checks.length) * 100,
       issues,
-      checks
+      checks,
     };
   }
 
@@ -189,7 +189,7 @@ export class LayoutOptimizer {
    * Detect layout type from content
    */
   private detectLayoutType(node: DocumentNode | string): LayoutType {
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       return this.detectFromText(node);
     }
 
@@ -197,60 +197,74 @@ export class LayoutOptimizer {
     const structure = this.analyzeStructure(node);
 
     // Academic: has references, citations
-    if (text.includes('references') || text.includes('bibliography') || structure.hasNumberedHeadings) {
-      return 'academic';
+    if (
+      text.includes("references") ||
+      text.includes("bibliography") ||
+      structure.hasNumberedHeadings
+    ) {
+      return "academic";
     }
 
     // Technical: has code blocks, APIs
-    if (structure.hasCodeBlocks || text.includes('function') || text.includes('API')) {
-      return 'technical';
+    if (structure.hasCodeBlocks || text.includes("function") || text.includes("API")) {
+      return "technical";
     }
 
     // Documentation: has multiple headings, lists
     if (structure.headingCount > 5 && structure.listCount > 3) {
-      return 'documentation';
+      return "documentation";
     }
 
     // Marketing: has CTAs, short paragraphs
-    if (structure.avgParagraphLength < 50 && text.includes('contact')) {
-      return 'marketing';
+    if (structure.avgParagraphLength < 50 && text.includes("contact")) {
+      return "marketing";
     }
 
     // Report: has tables, numbered sections
     if (structure.tableCount > 0 && structure.hasNumberedHeadings) {
-      return 'report';
+      return "report";
     }
 
     // Article: balanced content
     if (structure.paragraphCount > 3 && structure.headingCount > 1) {
-      return 'article';
+      return "article";
     }
 
-    return 'mixed';
+    return "mixed";
   }
 
   private detectFromText(text: string): LayoutType {
     const lowerText = text.toLowerCase();
-    
-    if (lowerText.includes('references') || lowerText.includes('bibliography')) {return 'academic';}
-    if (lowerText.includes('function') || lowerText.includes('api')) {return 'technical';}
-    if (lowerText.includes('documentation') || lowerText.includes('guide')) {return 'documentation';}
-    if (lowerText.includes('contact') || lowerText.includes('buy')) {return 'marketing';}
-    if (lowerText.includes('table') && lowerText.includes('figure')) {return 'report';}
-    
-    return 'article';
+
+    if (lowerText.includes("references") || lowerText.includes("bibliography")) {
+      return "academic";
+    }
+    if (lowerText.includes("function") || lowerText.includes("api")) {
+      return "technical";
+    }
+    if (lowerText.includes("documentation") || lowerText.includes("guide")) {
+      return "documentation";
+    }
+    if (lowerText.includes("contact") || lowerText.includes("buy")) {
+      return "marketing";
+    }
+    if (lowerText.includes("table") && lowerText.includes("figure")) {
+      return "report";
+    }
+
+    return "article";
   }
 
   private detectSections(node: DocumentNode | string): LayoutSection[] {
     const sections: LayoutSection[] = [];
 
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       // Simple detection from text
-      if (node.includes('abstract')) {
-        sections.push({ type: 'main', position: 'top', size: { percentage: 10 }, confidence: 0.7 });
+      if (node.includes("abstract")) {
+        sections.push({ type: "main", position: "top", size: { percentage: 10 }, confidence: 0.7 });
       }
-      if (node.includes('table of contents') || node.includes('toc')) {
-        sections.push({ type: 'toc', position: 'left', size: { percentage: 20 }, confidence: 0.8 });
+      if (node.includes("table of contents") || node.includes("toc")) {
+        sections.push({ type: "toc", position: "left", size: { percentage: 20 }, confidence: 0.8 });
       }
       return sections;
     }
@@ -258,15 +272,27 @@ export class LayoutOptimizer {
     // AST-based detection
     // AST-based detection
     const traverse = (n: any, depth: number) => {
-      if (n.type === 'heading' && n.properties?.level === 1) {
-        if (n.content?.toLowerCase().includes('abstract')) {
-          sections.push({ type: 'main', position: 'top', size: { percentage: 10 }, confidence: 0.8 });
+      if (n.type === "heading" && n.properties?.level === 1) {
+        if (n.content?.toLowerCase().includes("abstract")) {
+          sections.push({
+            type: "main",
+            position: "top",
+            size: { percentage: 10 },
+            confidence: 0.8,
+          });
         }
-        if (n.content?.toLowerCase().includes('table of contents')) {
-          sections.push({ type: 'toc', position: 'left', size: { percentage: 20 }, confidence: 0.9 });
+        if (n.content?.toLowerCase().includes("table of contents")) {
+          sections.push({
+            type: "toc",
+            position: "left",
+            size: { percentage: 20 },
+            confidence: 0.9,
+          });
         }
       }
-      if (n.children) {n.children.forEach(c => traverse(c, depth + 1));}
+      if (n.children) {
+        n.children.forEach((c) => traverse(c, depth + 1));
+      }
     };
 
     traverse(node, 0);
@@ -274,12 +300,12 @@ export class LayoutOptimizer {
   }
 
   private analyzeHierarchy(node: DocumentNode | string): LayoutHierarchy {
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       const headingMatches = node.match(/^#+ /gm) || [];
       return {
         depth: Math.max(...headingMatches.map((h: string) => h.length - 2)),
         levels: [1, 2, 3],
-        isBalanced: true
+        isBalanced: true,
       };
     }
 
@@ -287,12 +313,14 @@ export class LayoutOptimizer {
     let maxDepth = 0;
 
     const traverse = (n: any, depth: number) => {
-      if (n.type?.startsWith('heading')) {
-        const level = parseInt(n.type.replace('heading', '')) || 1;
+      if (n.type?.startsWith("heading")) {
+        const level = parseInt(n.type.replace("heading", "")) || 1;
         levels.add(level);
         maxDepth = Math.max(maxDepth, level);
       }
-      if (n.children) {n.children.forEach(c => traverse(c, depth + 1));}
+      if (n.children) {
+        n.children.forEach((c) => traverse(c, depth + 1));
+      }
     };
 
     traverse(node, 0);
@@ -300,7 +328,7 @@ export class LayoutOptimizer {
     return {
       depth: maxDepth,
       levels: [...levels].sort((a, b) => a - b),
-      isBalanced: levels.size <= 3
+      isBalanced: levels.size <= 3,
     };
   }
 
@@ -313,36 +341,36 @@ export class LayoutOptimizer {
       const gaps = this.findHierarchyGaps(hierarchy.levels);
       if (gaps.length > 0) {
         issues.push({
-          type: 'hierarchy',
-          severity: 'minor',
-          description: `Heading hierarchy has gaps at levels: ${gaps.join(', ')}`,
-          suggestedFix: 'Add intermediate heading levels or consolidate'
+          type: "hierarchy",
+          severity: "minor",
+          description: `Heading hierarchy has gaps at levels: ${gaps.join(", ")}`,
+          suggestedFix: "Add intermediate heading levels or consolidate",
         });
       }
     }
 
     // Spacing issues
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       const doubleNewlines = (node.match(/\n\n/g) || []).length;
       if (doubleNewlines < 3 && node.length > 1000) {
         issues.push({
-          type: 'spacing',
-          severity: 'minor',
-          description: 'Limited paragraph spacing may affect readability',
-          suggestedFix: 'Add more paragraph breaks'
+          type: "spacing",
+          severity: "minor",
+          description: "Limited paragraph spacing may affect readability",
+          suggestedFix: "Add more paragraph breaks",
         });
       }
     }
 
     // Responsiveness issues
-    if (node && typeof node !== 'string') {
+    if (node && typeof node !== "string") {
       const hasFixedWidth = this.hasFixedWidthElements(node);
       if (hasFixedWidth) {
         issues.push({
-          type: 'responsiveness',
-          severity: 'major',
-          description: 'Contains fixed-width elements that may not adapt to screen size',
-          suggestedFix: 'Use relative units (%, em, rem) instead of pixels'
+          type: "responsiveness",
+          severity: "major",
+          description: "Contains fixed-width elements that may not adapt to screen size",
+          suggestedFix: "Use relative units (%, em, rem) instead of pixels",
         });
       }
     }
@@ -364,68 +392,87 @@ export class LayoutOptimizer {
 
   private hasFixedWidthElements(node: DocumentNode): boolean {
     let hasFixed = false;
-    
+
     const traverse = (n: any) => {
-      if (n.properties?.style?.includes('width:') && !n.properties.style.includes('%') && !n.properties.style.includes('em')) {
+      if (
+        n.properties?.style?.includes("width:") &&
+        !n.properties.style.includes("%") &&
+        !n.properties.style.includes("em")
+      ) {
         hasFixed = true;
       }
-      if (n.children) {n.children.forEach(traverse);}
+      if (n.children) {
+        n.children.forEach(traverse);
+      }
     };
 
     traverse(node);
     return hasFixed;
   }
 
-  private generateSuggestions(issues: LayoutIssue[], hierarchy: LayoutHierarchy): LayoutSuggestion[] {
+  private generateSuggestions(
+    issues: LayoutIssue[],
+    hierarchy: LayoutHierarchy,
+  ): LayoutSuggestion[] {
     const suggestions: LayoutSuggestion[] = [];
 
     // Hierarchy suggestions
     if (!hierarchy.isBalanced || hierarchy.depth > 4) {
       suggestions.push({
-        category: 'readability',
-        priority: 'high',
-        action: 'Simplify heading hierarchy to 3-4 levels',
-        impact: 'Improves document scannability and navigation',
-        effort: 'medium'
+        category: "readability",
+        priority: "high",
+        action: "Simplify heading hierarchy to 3-4 levels",
+        impact: "Improves document scannability and navigation",
+        effort: "medium",
       });
     }
 
     // Spacing suggestions
-    const spacingIssues = issues.filter(i => i.type === 'spacing');
+    const spacingIssues = issues.filter((i) => i.type === "spacing");
     if (spacingIssues.length > 0) {
       suggestions.push({
-        category: 'readability',
-        priority: 'medium',
-        action: 'Improve paragraph spacing for better readability',
-        impact: 'Increases reading comfort by 20-30%',
-        effort: 'low'
+        category: "readability",
+        priority: "medium",
+        action: "Improve paragraph spacing for better readability",
+        impact: "Increases reading comfort by 20-30%",
+        effort: "low",
       });
     }
 
     // Responsiveness suggestions
-    const responsiveIssues = issues.filter(i => i.type === 'responsiveness');
+    const responsiveIssues = issues.filter((i) => i.type === "responsiveness");
     if (responsiveIssues.length > 0) {
       suggestions.push({
-        category: 'responsiveness',
-        priority: 'high',
-        action: 'Make layout responsive with flexible units',
-        impact: 'Ensures good experience on all devices',
-        effort: 'medium'
+        category: "responsiveness",
+        priority: "high",
+        action: "Make layout responsive with flexible units",
+        impact: "Ensures good experience on all devices",
+        effort: "medium",
       });
     }
 
     return suggestions;
   }
 
-  private calculateLayoutScore(type: LayoutType, hierarchy: LayoutHierarchy, issues: LayoutIssue[]): number {
+  private calculateLayoutScore(
+    type: LayoutType,
+    hierarchy: LayoutHierarchy,
+    issues: LayoutIssue[],
+  ): number {
     let score = 80;
 
     // Deduct for issues
     for (const issue of issues) {
       switch (issue.severity) {
-        case 'critical': score -= 20; break;
-        case 'major': score -= 10; break;
-        case 'minor': score -= 5; break;
+        case "critical":
+          score -= 20;
+          break;
+        case "major":
+          score -= 10;
+          break;
+        case "minor":
+          score -= 5;
+          break;
       }
     }
 
@@ -440,10 +487,10 @@ export class LayoutOptimizer {
   private optimizeForMobile(node: DocumentNode): DocumentNode {
     // Make images responsive, adjust font sizes
     const traverse = (n: any): any => {
-      if (n.type === 'image') {
-        n.properties = { ...n.properties, style: 'max-width: 100%; height: auto;' };
+      if (n.type === "image") {
+        n.properties = { ...n.properties, style: "max-width: 100%; height: auto;" };
       }
-      if (n.type?.startsWith('heading')) {
+      if (n.type?.startsWith("heading")) {
         // Reduce heading sizes
       }
       if (n.children) {
@@ -469,10 +516,12 @@ export class LayoutOptimizer {
   }
 
   private extractText(node: DocumentNode): string {
-    let text = '';
+    let text = "";
     const traverse = (n: any) => {
-      text += n.content || '';
-      if (n.children) {n.children.forEach(traverse);}
+      text += n.content || "";
+      if (n.children) {
+        n.children.forEach(traverse);
+      }
     };
     traverse(node);
     return text;
@@ -496,18 +545,28 @@ export class LayoutOptimizer {
     const lengths: number[] = [];
 
     const traverse = (n: any) => {
-      if (n.type?.startsWith('heading')) {
+      if (n.type?.startsWith("heading")) {
         headingCount++;
-        if (n.content?.match(/^\d+\./)) {hasNumberedHeadings = true;}
+        if (n.content?.match(/^\d+\./)) {
+          hasNumberedHeadings = true;
+        }
       }
-      if (n.type === 'list') {listCount++;}
-      if (n.type === 'table') {tableCount++;}
-      if (n.type === 'paragraph') {
+      if (n.type === "list") {
+        listCount++;
+      }
+      if (n.type === "table") {
+        tableCount++;
+      }
+      if (n.type === "paragraph") {
         paragraphCount++;
         lengths.push(n.content?.split(/\s+/).length || 0);
       }
-      if (n.type === 'code') {hasCodeBlocks = true;}
-      if (n.children) {n.children.forEach(traverse);}
+      if (n.type === "code") {
+        hasCodeBlocks = true;
+      }
+      if (n.children) {
+        n.children.forEach(traverse);
+      }
     };
 
     traverse(node);
@@ -519,50 +578,60 @@ export class LayoutOptimizer {
       paragraphCount,
       hasNumberedHeadings,
       hasCodeBlocks,
-      avgParagraphLength: lengths.length > 0 ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0
+      avgParagraphLength:
+        lengths.length > 0 ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0,
     };
   }
 
   private checkHeadingHierarchy(node: DocumentNode): ValidationCheck {
     const hierarchy = this.analyzeHierarchy(node);
     const gaps = this.findHierarchyGaps(hierarchy.levels);
-    
+
     return {
-      name: 'Heading Hierarchy',
+      name: "Heading Hierarchy",
       passed: gaps.length === 0 && hierarchy.depth <= 4,
-      issues: gaps.length > 0 ? [{
-        type: 'hierarchy',
-        severity: 'major',
-        description: `Heading gaps at levels: ${gaps.join(', ')}`,
-        suggestedFix: 'Fill in missing heading levels or consolidate'
-      }] : []
+      issues:
+        gaps.length > 0
+          ? [
+              {
+                type: "hierarchy",
+                severity: "major",
+                description: `Heading gaps at levels: ${gaps.join(", ")}`,
+                suggestedFix: "Fill in missing heading levels or consolidate",
+              },
+            ]
+          : [],
     };
   }
 
   private checkSpacingConsistency(node: DocumentNode): ValidationCheck {
-    return { name: 'Spacing Consistency', passed: true, issues: [] };
+    return { name: "Spacing Consistency", passed: true, issues: [] };
   }
 
   private checkImageSizing(node: DocumentNode): ValidationCheck {
     const hasImages = this.analyzeStructure(node).tableCount > 0; // Simplified
-    return { name: 'Image Sizing', passed: true, issues: [] };
+    return { name: "Image Sizing", passed: true, issues: [] };
   }
 
   private checkContrast(node: DocumentNode): ValidationCheck {
-    return { name: 'Contrast', passed: true, issues: [] };
+    return { name: "Contrast", passed: true, issues: [] };
   }
 
   private checkResponsiveness(node: DocumentNode): ValidationCheck {
     const hasFixed = this.hasFixedWidthElements(node);
     return {
-      name: 'Responsiveness',
+      name: "Responsiveness",
       passed: !hasFixed,
-      issues: hasFixed ? [{
-        type: 'responsiveness',
-        severity: 'major',
-        description: 'Contains fixed-width elements',
-        suggestedFix: 'Use relative units'
-      }] : []
+      issues: hasFixed
+        ? [
+            {
+              type: "responsiveness",
+              severity: "major",
+              description: "Contains fixed-width elements",
+              suggestedFix: "Use relative units",
+            },
+          ]
+        : [],
     };
   }
 }
@@ -570,7 +639,7 @@ export class LayoutOptimizer {
 /**
  * Device types
  */
-export type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'all';
+export type DeviceType = "mobile" | "tablet" | "desktop" | "all";
 
 /**
  * Validation result

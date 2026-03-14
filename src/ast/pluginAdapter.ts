@@ -1,9 +1,9 @@
 /**
  * Plugin Adapter for AST Compatibility
- * 
+ *
  * Provides backward compatibility for existing plugins while enabling
  * new AST-aware plugin capabilities.
- * 
+ *
  * Strategy:
  * - Legacy plugins output HTML strings
  * - New plugins output AST nodes or transform AST
@@ -11,23 +11,12 @@
  */
 
 import type JSZip from "jszip";
-import type { 
-  DocumentNode, 
-  BlockNode, 
-  InlineNode, 
-  ParagraphNode,
-  ASTNode,
-} from "../ast/types";
-import { 
-  generateId, 
-  createParagraphNode, 
-  createTextNode,
-  walkAST,
-} from "../ast/utils";
-import type { 
-  DocxPlugin, 
-  PluginContext, 
-  PluginConfig, 
+import type { DocumentNode, BlockNode, InlineNode, ParagraphNode, ASTNode } from "../ast/types";
+import { generateId, createParagraphNode, createTextNode, walkAST } from "../ast/utils";
+import type {
+  DocxPlugin,
+  PluginContext,
+  PluginConfig,
   ParagraphParseResult,
   RunParseResult,
   TableParseResult,
@@ -58,10 +47,10 @@ export type HybridPluginOutput = LegacyPluginOutput | ASTPluginOutput;
 export interface ASTAwarePlugin extends DocxPlugin {
   /** Whether this plugin outputs AST nodes instead of HTML */
   readonly outputsAST?: boolean;
-  
+
   /** Parse paragraph and return AST nodes */
   parseParagraphToAST?(element: Element, context: PluginContext): ParagraphASTResult;
-  
+
   /** Transform AST after parsing */
   transformAST?(ast: DocumentNode, context: PluginContext): DocumentNode | Promise<DocumentNode>;
 }
@@ -80,16 +69,20 @@ export interface ParagraphASTResult {
  * Convert legacy HTML output to AST nodes
  */
 export function htmlToASTNodes(html: string): BlockNode[] {
-  if (!html || !html.trim()) {return [];}
+  if (!html || !html.trim()) {
+    return [];
+  }
 
   const nodes: BlockNode[] = [];
-  
+
   // Parse HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(`<div>${html}</div>`, "text/html");
   const container = doc.body.firstElementChild;
-  
-  if (!container) {return nodes;}
+
+  if (!container) {
+    return nodes;
+  }
 
   for (const child of Array.from(container.children)) {
     const node = htmlElementToASTNode(child);
@@ -110,11 +103,11 @@ export function htmlToASTNodes(html: string): BlockNode[] {
  */
 function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
   const tagName = el.tagName.toLowerCase();
-  
+
   switch (tagName) {
     case "p":
       return createParagraphNode(htmlChildrenToInlines(el));
-      
+
     case "h1":
     case "h2":
     case "h3":
@@ -129,16 +122,15 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
         children: htmlChildrenToInlines(el),
       };
     }
-    
+
     case "ul":
     case "ol": {
-      const items = Array.from(el.querySelectorAll(":scope > li"))
-        .map((li) => ({
-          type: "listItem" as const,
-          id: generateId("li"),
-          children: [createParagraphNode(htmlChildrenToInlines(li))],
-          level: 0,
-        }));
+      const items = Array.from(el.querySelectorAll(":scope > li")).map((li) => ({
+        type: "listItem" as const,
+        id: generateId("li"),
+        children: [createParagraphNode(htmlChildrenToInlines(li))],
+        level: 0,
+      }));
       return {
         type: "list",
         id: generateId("list"),
@@ -146,35 +138,38 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
         items,
       };
     }
-    
+
     case "table": {
-      const rows = Array.from(el.querySelectorAll(":scope > tr, :scope > tbody > tr"))
-        .map((tr) => ({
+      const rows = Array.from(el.querySelectorAll(":scope > tr, :scope > tbody > tr")).map(
+        (tr) => ({
           type: "tableRow" as const,
           id: generateId("tr"),
-          cells: Array.from(tr.querySelectorAll(":scope > td, :scope > th"))
-            .map((cell) => ({
-              type: "tableCell" as const,
-              id: generateId("tc"),
-              children: [createParagraphNode(htmlChildrenToInlines(cell))],
-              colspan: (cell as HTMLTableCellElement).colSpan > 1 ? (cell as HTMLTableCellElement).colSpan : undefined,
-              rowspan: (cell as HTMLTableCellElement).rowSpan > 1 ? (cell as HTMLTableCellElement).rowSpan : undefined
-
-
-
-            })),
-        }));
+          cells: Array.from(tr.querySelectorAll(":scope > td, :scope > th")).map((cell) => ({
+            type: "tableCell" as const,
+            id: generateId("tc"),
+            children: [createParagraphNode(htmlChildrenToInlines(cell))],
+            colspan:
+              (cell as HTMLTableCellElement).colSpan > 1
+                ? (cell as HTMLTableCellElement).colSpan
+                : undefined,
+            rowspan:
+              (cell as HTMLTableCellElement).rowSpan > 1
+                ? (cell as HTMLTableCellElement).rowSpan
+                : undefined,
+          })),
+        }),
+      );
       return {
         type: "table",
         id: generateId("tbl"),
         rows,
       };
     }
-    
+
     case "figure": {
       const img = el.querySelector("img");
       const caption = el.querySelector("figcaption");
-      
+
       if (img) {
         return {
           type: "figure",
@@ -186,16 +181,18 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
             alt: img.getAttribute("alt") ?? undefined,
             title: img.getAttribute("title") ?? undefined,
           },
-          caption: caption ? {
-            type: "figcaption",
-            id: generateId("caption"),
-            children: htmlChildrenToInlines(caption),
-          } : undefined,
+          caption: caption
+            ? {
+                type: "figcaption",
+                id: generateId("caption"),
+                children: htmlChildrenToInlines(caption),
+              }
+            : undefined,
         };
       }
       return null;
     }
-    
+
     case "pre": {
       const code = el.querySelector("code");
       return {
@@ -205,7 +202,7 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
         language: code?.className.replace(/^language-/, "") || undefined,
       };
     }
-    
+
     case "blockquote": {
       const children: BlockNode[] = [];
       for (const child of Array.from(el.children)) {
@@ -225,13 +222,13 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
         attribution: el.getAttribute("cite") ?? undefined,
       };
     }
-    
+
     case "hr":
       return {
         type: "divider",
         id: generateId("hr"),
       };
-    
+
     case "span": {
       // Inline span - wrap in paragraph
       const dataAttrs = extractDataAttrs(el);
@@ -249,7 +246,7 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
       }
       return createParagraphNode(htmlChildrenToInlines(el));
     }
-    
+
     default:
       // For unknown elements, try to extract content
       if (el.children.length > 0) {
@@ -275,7 +272,7 @@ function htmlElementToASTNode(el: Element): BlockNode | BlockNode[] | null {
  */
 function htmlChildrenToInlines(el: Element): InlineNode[] {
   const inlines: InlineNode[] = [];
-  
+
   for (const child of Array.from(el.childNodes)) {
     if (child.nodeType === Node.TEXT_NODE) {
       const text = child.textContent?.trim();
@@ -293,7 +290,7 @@ function htmlChildrenToInlines(el: Element): InlineNode[] {
       }
     }
   }
-  
+
   return inlines;
 }
 
@@ -302,36 +299,36 @@ function htmlChildrenToInlines(el: Element): InlineNode[] {
  */
 function htmlElementToInlineNode(el: Element): InlineNode | InlineNode[] | null {
   const tagName = el.tagName.toLowerCase();
-  
+
   switch (tagName) {
     case "strong":
     case "b":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "bold" });
-      
+
     case "em":
     case "i":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "italic" });
-      
+
     case "u":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "underline" });
-      
+
     case "s":
     case "del":
     case "strike":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "strikethrough" });
-      
+
     case "code":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "code" });
-      
+
     case "sub":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "subscript" });
-      
+
     case "sup":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "superscript" });
-      
+
     case "mark":
       return wrapInlinesWithMark(htmlChildrenToInlines(el), { type: "highlight" });
-      
+
     case "a": {
       const href = el.getAttribute("href") ?? "";
       return {
@@ -343,7 +340,7 @@ function htmlElementToInlineNode(el: Element): InlineNode | InlineNode[] | null 
         target: el.getAttribute("target") as "_blank" | "_self" | undefined,
       };
     }
-    
+
     case "img":
       return {
         type: "image",
@@ -352,10 +349,10 @@ function htmlElementToInlineNode(el: Element): InlineNode | InlineNode[] | null 
         alt: el.getAttribute("alt") ?? undefined,
         title: el.getAttribute("title") ?? undefined,
       };
-    
+
     case "br":
       return { type: "hardBreak", id: generateId("br") };
-    
+
     case "span": {
       const dataAttrs = extractDataAttrs(el);
       if (Object.keys(dataAttrs).length > 0) {
@@ -369,7 +366,7 @@ function htmlElementToInlineNode(el: Element): InlineNode | InlineNode[] | null 
       }
       return htmlChildrenToInlines(el);
     }
-    
+
     default:
       return htmlChildrenToInlines(el);
   }
@@ -413,7 +410,7 @@ function extractDataAttrs(el: Element): Record<string, string> {
 export class PluginASTAdapter {
   private legacyPlugins: DocxPlugin[] = [];
   private astPlugins: ASTAwarePlugin[] = [];
-  
+
   /**
    * Register a plugin (legacy or AST-aware)
    */
@@ -424,54 +421,54 @@ export class PluginASTAdapter {
       this.legacyPlugins.push(plugin);
     }
   }
-  
+
   /**
    * Transform AST using all registered plugins
    */
   async transformAST(ast: DocumentNode, context: PluginContext): Promise<DocumentNode> {
     let result = ast;
-    
+
     // Apply AST-aware plugins first
     for (const plugin of this.astPlugins) {
       if (plugin.transformAST) {
         result = await plugin.transformAST(result, context);
       }
     }
-    
+
     // Apply legacy plugins via HTML round-trip
     // This is a compatibility layer - not ideal but maintains backward compatibility
     result = await this.applyLegacyPluginsViaHTML(result, context);
-    
+
     return result;
   }
-  
+
   /**
    * Apply legacy plugins via HTML round-trip
    * (Converts AST → HTML → applies plugin → converts back to AST)
    */
   private async applyLegacyPluginsViaHTML(
-    ast: DocumentNode, 
-    _context: PluginContext
+    ast: DocumentNode,
+    _context: PluginContext,
   ): Promise<DocumentNode> {
     // For now, return AST unchanged
     // Full implementation would:
     // 1. Render AST to HTML
     // 2. Apply legacy plugins to HTML
     // 3. Parse HTML back to AST
-    
+
     // This is a placeholder - the full implementation would require
     // the HTML renderer to be available here
-    
+
     return ast;
   }
-  
+
   /**
    * Check if any plugins are registered
    */
   hasPlugins(): boolean {
     return this.legacyPlugins.length > 0 || this.astPlugins.length > 0;
   }
-  
+
   /**
    * Get all registered plugins
    */

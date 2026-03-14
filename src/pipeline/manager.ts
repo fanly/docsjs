@@ -1,46 +1,37 @@
 /**
  * Pipeline Manager Implementation
- * 
+ *
  * Handles the orchestration of the document transformation lifecycle.
  */
 
-import type { 
-  PipelineContext, 
-  PipelineState, 
+import type {
+  PipelineContext,
+  PipelineState,
   PipelinePhase,
   PipelineHook,
   PipelineMetrics,
   ExportResult,
   PipelineError,
-  PipelineHooks
-} from './types';
-import type { CoreEngine } from '../engine/core';
-import type { EngineConfig } from '../types/engine';
+  PipelineHooks,
+} from "./types";
+import type { CoreEngine } from "../engine/core";
+import type { EngineConfig } from "../types/engine";
 
-
-
-
-
-
-import { DocxParser } from '../parsers/docx/parser';
-import type { 
-  DocxParseOptions, 
-  DocxParseResult,
-  HtmlParseResult 
-} from '../parsers';
-import { HtmlParser } from '../parsers/html/parser';
-import type { HtmlRenderOptions, HtmlRenderResult } from '../renderers';
-import { MarkdownRenderer } from '../renderers/markdown/renderer';
-import { HtmlRenderer } from '../renderers/html/renderer';
-import { DocumentAST } from '../ast/types';
+import { DocxParser } from "../parsers/docx/parser";
+import type { DocxParseOptions, DocxParseResult, HtmlParseResult } from "../parsers";
+import { HtmlParser } from "../parsers/html/parser";
+import type { HtmlRenderOptions, HtmlRenderResult } from "../renderers";
+import { MarkdownRenderer } from "../renderers/markdown/renderer";
+import { HtmlRenderer } from "../renderers/html/renderer";
+import { DocumentAST } from "../ast/types";
 
 export const DEFAULT_PIPELINE_CONTEXT: PipelineContext = {
   engine: null as any, // Will be set at runtime
   profile: null as any, // Will be set at runtime
   config: null as any, // Will be set at runtime
-  input: '',
+  input: "",
   state: {
-    phase: 'initializing',
+    phase: "initializing",
     intermediate: {},
     errors: [],
     warnings: [],
@@ -58,7 +49,7 @@ export const DEFAULT_PIPELINE_CONTEXT: PipelineContext = {
   },
   metrics: {
     totalTimeMs: 0,
-    currentPhase: 'initializing',
+    currentPhase: "initializing",
     phaseTimes: {
       initializing: 0,
       parsing: 0,
@@ -71,120 +62,123 @@ export const DEFAULT_PIPELINE_CONTEXT: PipelineContext = {
     processedChars: 0,
     processedBytes: 0,
     pluginApplications: 0,
-  }
+  },
 };
 
 export class PipelineManager {
   private engine: CoreEngine;
-  
+
   constructor(engine: CoreEngine) {
     this.engine = engine;
   }
 
-  updatePerformanceLimits(performanceConfig: EngineConfig['performance']): void {
+  updatePerformanceLimits(performanceConfig: EngineConfig["performance"]): void {
     // Eventually we can adjust pipeline behavior based on these limits
     console.log(`Performance limits updated: ${JSON.stringify(performanceConfig)}`);
   }
 
   async execute(context: PipelineContext): Promise<ExportResult> {
     const startTime = Date.now();
-    
+
     try {
       // Set up the context
       const execContext = { ...context };
-      execContext.state.phase = 'initializing';
+      execContext.state.phase = "initializing";
       context.metrics.totalTimeMs = startTime;
-      
+
       // Run lifecycle hooks and operations
       await this.runBeforeParseHooks(execContext);
-      
+
       // Parse input to AST
-      execContext.state.phase = 'parsing';
+      execContext.state.phase = "parsing";
       const parseStartTime = Date.now();
       await this.parseToAST(execContext);
       context.metrics.phaseTimes.parsing += Date.now() - parseStartTime;
-      
+
       await this.runAfterParseHooks(execContext);
-      
+
       // Run transforms on AST
-      execContext.state.phase = 'transforming';
+      execContext.state.phase = "transforming";
       const transformStartTime = Date.now();
       await this.applyTransformations(execContext);
       context.metrics.phaseTimes.transforming += Date.now() - transformStartTime;
-      
+
       await this.runAfterTransformHooks(execContext);
-      
+
       // Render into desired output format
-      execContext.state.phase = 'rendering';
+      execContext.state.phase = "rendering";
       const renderStartTime = Date.now();
       await this.renderOutput(execContext);
       context.metrics.phaseTimes.rendering += Date.now() - renderStartTime;
-      
+
       await this.runAfterRenderHooks(execContext);
-      
+
       // Prepare final export
-      execContext.state.phase = 'exporting';
+      execContext.state.phase = "exporting";
       const exportResult = await this.prepareExport(execContext);
-      
-      execContext.state.phase = 'complete';
+
+      execContext.state.phase = "complete";
       context.metrics.phaseTimes.complete = Date.now();
       context.metrics.totalTimeMs = Date.now() - startTime;
-      
+
       await this.runAfterExportHooks(execContext);
-      
+
       return exportResult;
     } catch (error) {
       // Log error and update state
       const pipelineError: PipelineError = {
-        code: 'PIPELINE_ERROR',
+        code: "PIPELINE_ERROR",
         message: error instanceof Error ? error.message : String(error),
         phase: context.state.phase,
         timestamp: Date.now(),
-        severity: 'critical'
+        severity: "critical",
       };
-      
+
       context.state.errors.push(pipelineError);
-      context.state.phase = 'failed';
+      context.state.phase = "failed";
       context.metrics.phaseTimes.failed = Date.now();
       context.metrics.totalTimeMs = Date.now() - startTime;
-      
+
       throw error;
     }
   }
 
   private async runBeforeParseHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('beforeParse', context);
+    await this.runHookSequence("beforeParse", context);
   }
 
   private async runAfterParseHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('afterParse', context);
+    await this.runHookSequence("afterParse", context);
   }
 
   private async runBeforeTransformHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('beforeTransform', context);
+    await this.runHookSequence("beforeTransform", context);
   }
 
   private async runAfterTransformHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('afterTransform', context);
+    await this.runHookSequence("afterTransform", context);
   }
 
   private async runBeforeRenderHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('beforeRender', context);
+    await this.runHookSequence("beforeRender", context);
   }
 
   private async runAfterRenderHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('afterRender', context);
+    await this.runHookSequence("afterRender", context);
   }
 
   private async runBeforeExportHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('beforeExport', context);
+    await this.runHookSequence("beforeExport", context);
   }
 
   private async runAfterExportHooks(context: PipelineContext): Promise<void> {
-    await this.runHookSequence('afterExport', context);
+    await this.runHookSequence("afterExport", context);
   }
 
-  private async runHookSequence(hookName: keyof PipelineHooks, context: PipelineContext): Promise<void> {
+  private async runHookSequence(
+    hookName: keyof PipelineHooks,
+    context: PipelineContext,
+  ): Promise<void> {
     const hooks = context.hooks[hookName];
     for (const hook of hooks) {
       try {
@@ -192,11 +186,11 @@ export class PipelineManager {
         context.metrics.pluginApplications++;
       } catch (error) {
         const pipelineError: PipelineError = {
-          code: 'HOOK_EXECUTION_ERROR',
+          code: "HOOK_EXECUTION_ERROR",
           message: `Hook ${hookName} failed: ${error instanceof Error ? error.message : String(error)}`,
           phase: context.state.phase,
           timestamp: Date.now(),
-          severity: 'error'
+          severity: "error",
         };
         context.state.errors.push(pipelineError);
       }
@@ -206,42 +200,42 @@ export class PipelineManager {
   private async parseToAST(context: PipelineContext): Promise<void> {
     // Determine file type and route to appropriate parser
     let result: DocxParseResult | null = null;
-    
+
     if (context.input instanceof File) {
-      if (context.input.name.endsWith('.docx')) {
+      if (context.input.name.endsWith(".docx")) {
         const parser = new DocxParser(context.profile.parse);
         result = await parser.parse(context.input);
       } else {
         throw new Error(`Unsupported file type: ${context.input.name}`);
       }
-    } else if (typeof context.input === 'string') {
+    } else if (typeof context.input === "string") {
       // Parse string input as HTML
       const htmlParser = new HtmlParser(context.profile.parse as any);
       const htmlResult: HtmlParseResult = await htmlParser.parse(context.input);
-      
+
       context.state.ast = htmlResult.ast;
       context.metrics.processedBytes = (htmlResult.report as any).processedBytes || 0;
       context.metrics.processedChars = (htmlResult.report as any).processedChars || 0;
       context.metrics.processedChars = (htmlResult.report as any).processedChars || 0;
-      
+
       // Process parser-generated diagnostics
       if (htmlResult.report.warnings && htmlResult.report.warnings.length > 0) {
         for (const warning of htmlResult.report.warnings) {
           context.state.warnings.push({
-            code: 'PARSER_WARNING',
+            code: "PARSER_WARNING",
             message: warning,
-            phase: 'parsing',
-            timestamp: Date.now()
+            phase: "parsing",
+            timestamp: Date.now(),
           });
         }
       }
-      
+
       // Return early since we've handled everything
       return;
     } else {
-      throw new Error('Unsupported input type');
+      throw new Error("Unsupported input type");
     }
-    
+
     if (result) {
       context.state.ast = result.ast;
       context.metrics.processedBytes = result.report.elapsedMs || 0;
@@ -252,10 +246,10 @@ export class PipelineManager {
       if (result.report.warnings && result.report.warnings.length > 0) {
         for (const warning of result.report.warnings) {
           context.state.warnings.push({
-            code: 'PARSER_WARNING',
+            code: "PARSER_WARNING",
             message: warning,
-            phase: 'parsing',
-            timestamp: Date.now()
+            phase: "parsing",
+            timestamp: Date.now(),
           });
         }
       }
@@ -264,7 +258,7 @@ export class PipelineManager {
 
   private async applyTransformations(context: PipelineContext): Promise<void> {
     if (!context.state.ast) {
-      throw new Error('Cannot apply transformations - AST is null');
+      throw new Error("Cannot apply transformations - AST is null");
     }
 
     // Apply all registered transformation plugins
@@ -305,47 +299,47 @@ export class PipelineManager {
     context.state.ast = currentAST;
 
     // Post-transformation validation hook
-    await this.runHookSequence('afterTransform', context);
+    await this.runHookSequence("afterTransform", context);
   }
 
   private async renderOutput(context: PipelineContext): Promise<void> {
     if (!context.state.ast) {
-      throw new Error('Cannot render - AST is null');
+      throw new Error("Cannot render - AST is null");
     }
 
     // Route to appropriate renderer based on profile
     switch (context.profile.render.outputFormat) {
-      case 'html':
+      case "html":
         const htmlOpts: HtmlRenderOptions = {
-          mode: 'fidelity', // Could be configurable
+          mode: "fidelity", // Could be configurable
           includeDataAttrs: true,
           wrapAsDocument: false,
-          ...context.profile.render.options
+          ...context.profile.render.options,
         };
         const htmlRenderer = new HtmlRenderer(htmlOpts);
         const htmlResult: HtmlRenderResult = htmlRenderer.render(context.state.ast);
-        
+
         context.state.intermediate.renderedOutput = htmlResult.html;
         break;
-        
-      case 'markdown':
+
+      case "markdown":
         // Use MarkdownRenderer
         const mdOpts = {
-          mode: 'gfm' as const,
+          mode: "gfm" as const,
           includeFrontmatter: false,
           includeTOC: context.profile.render.options?.generateTOC || false,
-          ...context.profile.render.options
+          ...context.profile.render.options,
         };
         const mdRenderer = new MarkdownRenderer(mdOpts as any);
         const mdResult = mdRenderer.render(context.state.ast);
-        
+
         context.state.intermediate.renderedOutput = mdResult.markdown;
         break;
-        
-      case 'json':
+
+      case "json":
         context.state.intermediate.renderedOutput = JSON.stringify(context.state.ast, null, 2);
         break;
-        
+
       default:
         throw new Error(`Unknown output format: ${context.profile.render.outputFormat}`);
     }
@@ -354,29 +348,30 @@ export class PipelineManager {
   private async prepareExport(context: PipelineContext): Promise<ExportResult> {
     // Prepare the final export result
     const exportResult: ExportResult = {
-      output: context.state.intermediate.renderedOutput || '',
+      output: context.state.intermediate.renderedOutput || "",
       diagnostics: {
-        errors: context.state.errors.map(err => `${err.code}: ${err.message}`),
-        warnings: context.state.warnings.map(warn => `${warn.code}: ${warn.message}`),
+        errors: context.state.errors.map((err) => `${err.code}: ${err.message}`),
+        warnings: context.state.warnings.map((warn) => `${warn.code}: ${warn.message}`),
         stats: {
           phase_times: context.metrics.phaseTimes,
           processed_bytes: context.metrics.processedBytes,
           processed_chars: context.metrics.processedChars,
           plugin_applications: context.metrics.pluginApplications,
-          total_time_ms: context.metrics.totalTimeMs
+          total_time_ms: context.metrics.totalTimeMs,
         },
         metadata: {
-          engineVersion: '2.0.0-alpha', // Placeholder
+          engineVersion: "2.0.0-alpha", // Placeholder
           // @ts-ignore
-          astVersion: context.state.ast?.version || 'unknown',
+          astVersion: context.state.ast?.version || "unknown",
           pipelineProfile: context.profile.id,
           transformTimeMs: context.metrics.totalTimeMs,
           inputSizeBytes: context.metrics.processedBytes || 0,
-          outputSizeBytes: typeof context.state.intermediate.renderedOutput === 'string' 
-            ? context.state.intermediate.renderedOutput.length 
-            : 0
-        }
-      }
+          outputSizeBytes:
+            typeof context.state.intermediate.renderedOutput === "string"
+              ? context.state.intermediate.renderedOutput.length
+              : 0,
+        },
+      },
     };
 
     return exportResult;

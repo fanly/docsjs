@@ -1,11 +1,11 @@
 /**
  * Collaboration Module
- * 
+ *
  * Provides real-time collaboration using Yjs CRDT.
  */
 
 // @ts-ignore
-import Y from 'yjs';
+import Y from "yjs";
 
 export interface CollaborationUser {
   id: string;
@@ -15,7 +15,7 @@ export interface CollaborationUser {
 }
 
 export interface CollaborationEvent {
-  type: 'join' | 'leave' | 'update' | 'sync';
+  type: "join" | "leave" | "update" | "sync";
   userId: string;
   timestamp: number;
   data?: unknown;
@@ -36,8 +36,16 @@ export interface CollaborationDoc {
 }
 
 const USER_COLORS = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+  "#FF6B6B",
+  "#4ECDC4",
+  "#45B7D1",
+  "#96CEB4",
+  "#FFEAA7",
+  "#DDA0DD",
+  "#98D8C8",
+  "#F7DC6F",
+  "#BB8FCE",
+  "#85C1E9",
 ];
 
 export class CollaborationManager {
@@ -63,10 +71,10 @@ export class CollaborationManager {
       id,
       ydoc,
       users: new Map(),
-      awareness
+      awareness,
     };
 
-    ydoc.on('update', (update: Uint8Array, origin: string) => {
+    ydoc.on("update", (update: Uint8Array, origin: string) => {
       if (this.callbacks.onUpdate) {
         this.callbacks.onUpdate(update, origin);
       }
@@ -76,9 +84,12 @@ export class CollaborationManager {
     return doc;
   }
 
-  async joinDocument(docId: string, user: { id: string; name: string }): Promise<CollaborationDoc | null> {
+  async joinDocument(
+    docId: string,
+    user: { id: string; name: string },
+  ): Promise<CollaborationDoc | null> {
     let doc = this.docs.get(docId);
-    
+
     if (!doc) {
       doc = await this.createDocument(docId);
     }
@@ -87,7 +98,7 @@ export class CollaborationManager {
     const collaborationUser: CollaborationUser = {
       id: user.id,
       name: user.name,
-      color: USER_COLORS[colorIndex]
+      color: USER_COLORS[colorIndex],
     };
 
     doc.users.set(user.id, collaborationUser);
@@ -101,7 +112,9 @@ export class CollaborationManager {
 
   async leaveDocument(docId: string, userId: string): Promise<void> {
     const doc = this.docs.get(docId);
-    if (!doc) {return;}
+    if (!doc) {
+      return;
+    }
 
     doc.users.delete(userId);
 
@@ -120,17 +133,19 @@ export class CollaborationManager {
 
   getText(docId: string): Y.Text | null {
     const doc = this.docs.get(docId);
-    return doc ? doc.ydoc.getText('content') : null;
+    return doc ? doc.ydoc.getText("content") : null;
   }
 
-  getXmlFragment(docId: string, name: string = 'default'): Y.XmlFragment | null {
+  getXmlFragment(docId: string, name: string = "default"): Y.XmlFragment | null {
     const doc = this.docs.get(docId);
     return doc ? doc.ydoc.getXmlFragment(name) : null;
   }
 
-  applyUpdate(docId: string, update: Uint8Array, origin: string = 'remote'): void {
+  applyUpdate(docId: string, update: Uint8Array, origin: string = "remote"): void {
     const doc = this.docs.get(docId);
-    if (!doc) {return;}
+    if (!doc) {
+      return;
+    }
 
     Y.applyUpdate(doc.ydoc, update);
   }
@@ -165,7 +180,9 @@ export class CollaborationManager {
   }
 }
 
-export function createCollaborationManager(callbacks?: CollaborationCallbacks): CollaborationManager {
+export function createCollaborationManager(
+  callbacks?: CollaborationCallbacks,
+): CollaborationManager {
   return new CollaborationManager(callbacks);
 }
 
@@ -187,19 +204,21 @@ export class WebSocketCollaborationProvider {
       this.socket = new WebSocket(url);
 
       this.socket.onopen = () => {
-        this.socket?.send(JSON.stringify({
-          type: 'join',
-          docId: this.docId,
-          userId: this.userId
-        }));
+        this.socket?.send(
+          JSON.stringify({
+            type: "join",
+            docId: this.docId,
+            userId: this.userId,
+          }),
+        );
         resolve();
       };
 
       this.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'update' && data.update) {
+        if (data.type === "update" && data.update) {
           const update = new Uint8Array(data.update);
-          this.manager.applyUpdate(this.docId, update, 'remote');
+          this.manager.applyUpdate(this.docId, update, "remote");
         }
       };
 
@@ -219,11 +238,13 @@ export class WebSocketCollaborationProvider {
 
   sendUpdate(update: Uint8Array): void {
     if (this.socket?.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({
-        type: 'update',
-        docId: this.docId,
-        update: Array.from(update)
-      }));
+      this.socket.send(
+        JSON.stringify({
+          type: "update",
+          docId: this.docId,
+          update: Array.from(update),
+        }),
+      );
     }
   }
 }
@@ -264,6 +285,9 @@ export function createPresenceSystem(): { update: (userId: string, presence: unk
   return { update: () => {} };
 }
 
-export function createLockManager(): { acquire: (resourceId: string, userId: string) => Promise<boolean>; release: (resourceId: string, userId: string) => Promise<void> } {
+export function createLockManager(): {
+  acquire: (resourceId: string, userId: string) => Promise<boolean>;
+  release: (resourceId: string, userId: string) => Promise<void>;
+} {
   return { acquire: async () => true, release: async () => {} };
 }

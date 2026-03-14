@@ -1,22 +1,22 @@
 /**
  * Plugin Approval Workflow
- * 
+ *
  * Handles plugin submission review, security audit, and approval process.
  */
 
-import type { MarketplacePlugin, PluginSubmission } from './types';
+import type { MarketplacePlugin, PluginSubmission } from "./types";
 
 /**
  * Approval status for plugin submissions
  */
 export enum ApprovalStatus {
-  PENDING = 'pending',
-  IN_REVIEW = 'in_review',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  NEEDS_REVISION = 'needs_revision',
-  SECURITY_AUDIT = 'security_audit',
-  COMPLIANCE_CHECK = 'compliance_check'
+  PENDING = "pending",
+  IN_REVIEW = "in_review",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  NEEDS_REVISION = "needs_revision",
+  SECURITY_AUDIT = "security_audit",
+  COMPLIANCE_CHECK = "compliance_check",
 }
 
 /**
@@ -36,7 +36,7 @@ export interface ReviewCriteria {
   /** Compatibility score (0-100) */
   compatibilityScore: number;
   /** Overall recommendation */
-  recommendation: 'approve' | 'reject' | 'revision';
+  recommendation: "approve" | "reject" | "revision";
   /** Comments from reviewers */
   comments: ReviewComment[];
 }
@@ -48,8 +48,8 @@ export interface ReviewComment {
   id: string;
   reviewerId: string;
   timestamp: number;
-  category: 'security' | 'code' | 'docs' | 'performance' | 'compatibility';
-  severity: 'critical' | 'major' | 'minor' | 'suggestion';
+  category: "security" | "code" | "docs" | "performance" | "compatibility";
+  severity: "critical" | "major" | "minor" | "suggestion";
   message: string;
   resolved: boolean;
 }
@@ -75,7 +75,7 @@ export interface SecurityAuditResult {
  */
 export interface SecurityVulnerability {
   id: string;
-  severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
+  severity: "critical" | "high" | "medium" | "low" | "info";
   category: string;
   title: string;
   description: string;
@@ -105,7 +105,7 @@ export class PluginApprovalWorkflow {
       reviews: [],
       reviewers: [],
       securityAudit: null,
-      version: submission.config?.version as string || '1.0.0'
+      version: (submission.config?.version as string) || "1.0.0",
     };
 
     // Initial validation
@@ -116,11 +116,11 @@ export class PluginApprovalWorkflow {
     }
 
     this.submissions.set(record.id, record);
-    
+
     return {
       submissionId: record.id,
       status: record.status,
-      message: validation.valid ? 'Submission received' : validation.reason
+      message: validation.valid ? "Submission received" : validation.reason,
     };
   }
 
@@ -138,7 +138,7 @@ export class PluginApprovalWorkflow {
 
     // Perform security scan (simplified)
     const auditResult = await this.performSecurityScan(record.submission);
-    
+
     record.securityAudit = auditResult;
     record.updatedAt = Date.now();
 
@@ -152,7 +152,7 @@ export class PluginApprovalWorkflow {
   /**
    * Add reviewer to submission
    */
-  addReviewer(submissionId: string, reviewerId: string, role: 'primary' | 'secondary'): void {
+  addReviewer(submissionId: string, reviewerId: string, role: "primary" | "secondary"): void {
     const record = this.submissions.get(submissionId);
     if (!record) {
       throw new Error(`Submission not found: ${submissionId}`);
@@ -169,7 +169,7 @@ export class PluginApprovalWorkflow {
   async submitReview(
     submissionId: string,
     reviewerId: string,
-    criteria: Partial<ReviewCriteria>
+    criteria: Partial<ReviewCriteria>,
   ): Promise<void> {
     const record = this.submissions.get(submissionId);
     if (!record) {
@@ -181,11 +181,16 @@ export class PluginApprovalWorkflow {
       pluginId: submissionId,
       reviewerId,
       rating: criteria.codeQuality ? Math.round(criteria.codeQuality / 20) : 3,
-      title: criteria.recommendation === 'approve' ? 'Approved' : criteria.recommendation === 'reject' ? 'Rejected' : 'Needs Revision',
-      content: criteria.comments?.map(c => c.message).join('\n') || '',
+      title:
+        criteria.recommendation === "approve"
+          ? "Approved"
+          : criteria.recommendation === "reject"
+            ? "Rejected"
+            : "Needs Revision",
+      content: criteria.comments?.map((c) => c.message).join("\n") || "",
       createdAt: Date.now(),
       verified: true,
-      helpful: 0
+      helpful: 0,
     };
 
     record.reviews.push(review);
@@ -211,7 +216,7 @@ export class PluginApprovalWorkflow {
   listSubmissions(status?: ApprovalStatus): PluginSubmissionRecord[] {
     const all = Array.from(this.submissions.values());
     if (status) {
-      return all.filter(r => r.status === status);
+      return all.filter((r) => r.status === status);
     }
     return all;
   }
@@ -222,25 +227,32 @@ export class PluginApprovalWorkflow {
   private async finalizeApproval(record: PluginSubmissionRecord): Promise<void> {
     const criteria = record.reviewCriteria;
     if (!criteria) {
-      throw new Error('No review criteria found');
+      throw new Error("No review criteria found");
     }
 
     // Calculate overall score
-    const avgScore = (
-      criteria.codeQuality +
-      criteria.securityScore +
-      criteria.documentationScore +
-      criteria.performanceScore +
-      criteria.compatibilityScore
-    ) / 5;
+    const avgScore =
+      (criteria.codeQuality +
+        criteria.securityScore +
+        criteria.documentationScore +
+        criteria.performanceScore +
+        criteria.compatibilityScore) /
+      5;
 
     // Check security audit
     const securityPassed = record.securityAudit?.passed ?? false;
-    const noCriticalVulns = (record.securityAudit?.vulnerabilities.filter(v => v.severity === 'critical').length ?? 0) === 0;
+    const noCriticalVulns =
+      (record.securityAudit?.vulnerabilities.filter((v) => v.severity === "critical").length ??
+        0) === 0;
 
-    if (criteria.recommendation === 'approve' && securityPassed && noCriticalVulns && avgScore >= 70) {
+    if (
+      criteria.recommendation === "approve" &&
+      securityPassed &&
+      noCriticalVulns &&
+      avgScore >= 70
+    ) {
       record.status = ApprovalStatus.APPROVED;
-    } else if (criteria.recommendation === 'reject' || avgScore < 50) {
+    } else if (criteria.recommendation === "reject" || avgScore < 50) {
       record.status = ApprovalStatus.REJECTED;
     } else {
       record.status = ApprovalStatus.NEEDS_REVISION;
@@ -249,13 +261,15 @@ export class PluginApprovalWorkflow {
     record.updatedAt = Date.now();
   }
 
-  private async validateSubmission(submission: PluginSubmission): Promise<{ valid: boolean; reason?: string }> {
+  private async validateSubmission(
+    submission: PluginSubmission,
+  ): Promise<{ valid: boolean; reason?: string }> {
     // Basic validation
     if (!submission.package) {
-      return { valid: false, reason: 'Package is required' };
+      return { valid: false, reason: "Package is required" };
     }
     if (!submission.readme || submission.readme.length < 50) {
-      return { valid: false, reason: 'README must be at least 50 characters' };
+      return { valid: false, reason: "README must be at least 50 characters" };
     }
     return { valid: true };
   }
@@ -265,41 +279,46 @@ export class PluginApprovalWorkflow {
     const vulnerabilities: SecurityVulnerability[] = [];
 
     // Check for dangerous patterns in config
-    const config = submission.config as Record<string, unknown> || {};
-    
+    const config = (submission.config as Record<string, unknown>) || {};
+
     if ((config as any).permissions?.network === true) {
       vulnerabilities.push({
         id: this.generateId(),
-        severity: 'medium',
-        category: 'Network Access',
-        title: 'Plugin requests network access',
-        description: 'Network access should be minimized for security',
-        location: 'manifest.permissions.network',
-        remediation: 'Remove network permission if not required'
+        severity: "medium",
+        category: "Network Access",
+        title: "Plugin requests network access",
+        description: "Network access should be minimized for security",
+        location: "manifest.permissions.network",
+        remediation: "Remove network permission if not required",
       });
     }
 
     const riskScore = vulnerabilities.reduce((score, v) => {
       switch (v.severity) {
-        case 'critical': return score + 30;
-        case 'high': return score + 20;
-        case 'medium': return score + 10;
-        case 'low': return score + 5;
-        default: return score;
+        case "critical":
+          return score + 30;
+        case "high":
+          return score + 20;
+        case "medium":
+          return score + 10;
+        case "low":
+          return score + 5;
+        default:
+          return score;
       }
     }, 0);
 
     return {
-      passed: vulnerabilities.filter(v => v.severity === 'critical').length === 0,
+      passed: vulnerabilities.filter((v) => v.severity === "critical").length === 0,
       vulnerabilities,
       riskScore: Math.min(100, riskScore),
       scannedAt: Date.now(),
-      scannerVersion: '1.0.0'
+      scannerVersion: "1.0.0",
     };
   }
 
   private areReviewsComplete(record: PluginSubmissionRecord): boolean {
-    const requiredReviewers = record.reviewers.filter(r => r.role === 'primary').length;
+    const requiredReviewers = record.reviewers.filter((r) => r.role === "primary").length;
     const completedReviews = record.reviews.length;
     return completedReviews >= requiredReviewers;
   }
@@ -312,7 +331,7 @@ export class PluginApprovalWorkflow {
 /**
  * Plugin submission record
  */
-export interface PluginSubmissionRecord {
+export type PluginSubmissionRecord = {
   id: string;
   submission: PluginSubmission;
   status: ApprovalStatus;
@@ -324,21 +343,21 @@ export interface PluginSubmissionRecord {
   reviewCriteria?: ReviewCriteria;
   rejectionReason?: string;
   version: string;
-}
+};
 
 /**
  * Reviewer assignment
  */
-interface Reviewer {
+type Reviewer = {
   reviewerId: string;
-  role: 'primary' | 'secondary';
+  role: "primary" | "secondary";
   assignedAt: number;
-}
+};
 
 /**
  * Plugin review (from types)
  */
-interface PluginReview {
+type PluginReview = {
   id: string;
   pluginId: string;
   reviewerId: string;
@@ -348,22 +367,21 @@ interface PluginReview {
   createdAt: number;
   verified: boolean;
   helpful: number;
-}
+};
 
 /**
  * Submission result
  */
-export interface SubmissionResult {
+export type SubmissionResult = {
   submissionId: string;
   status: ApprovalStatus;
   message: string;
-}
+};
 
 export { ApprovalStatus as default };
 
-
 // Re-export from other marketplace modules
-export { VersionConstraint, UpdateInfo } from './version';
-export { CompatibilityResult } from './version';
-export { UsageEvent, DashboardSummary } from './analytics';
-export { PerformanceMetrics } from './analytics';
+export type { VersionConstraint, UpdateInfo } from "./version";
+export type { CompatibilityResult } from "./version";
+export type { UsageEvent, DashboardSummary } from "./analytics";
+export type { PerformanceMetrics } from "./analytics";

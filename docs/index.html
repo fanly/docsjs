@@ -39,7 +39,13 @@
         margin: 0;
         color: var(--ink);
         background: var(--bg);
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
         line-height: 1.6;
       }
 
@@ -347,9 +353,15 @@
         border-radius: 50%;
       }
 
-      .code-dot:nth-child(1) { background: #ff5f56; }
-      .code-dot:nth-child(2) { background: #ffbd2e; }
-      .code-dot:nth-child(3) { background: #27ca40; }
+      .code-dot:nth-child(1) {
+        background: #ff5f56;
+      }
+      .code-dot:nth-child(2) {
+        background: #ffbd2e;
+      }
+      .code-dot:nth-child(3) {
+        background: #27ca40;
+      }
 
       .code-content {
         padding: 24px;
@@ -488,15 +500,15 @@
         .nav-links {
           display: none;
         }
-        
+
         .hero {
           padding: 48px 0 40px;
         }
-        
+
         .stats-bar {
           gap: 24px;
         }
-        
+
         .feature-grid {
           grid-template-columns: 1fr;
         }
@@ -531,15 +543,18 @@
       <div class="container">
         <h1>The <span>Lossless</span> Word Pipeline for Web</h1>
         <p data-i18n="heroLead">
-          Bring Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep structure, styles, and semantics in one import flow.
+          Bring Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep
+          structure, styles, and semantics in one import flow.
         </p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="https://www.npmjs.com/package/@coding01/docsjs" target="_blank">
+          <a
+            class="btn btn-primary"
+            href="https://www.npmjs.com/package/@coding01/docsjs"
+            target="_blank"
+          >
             Get Started
           </a>
-          <a class="btn btn-secondary" href="#showcase">
-            View Demo
-          </a>
+          <a class="btn btn-secondary" href="#showcase"> View Demo </a>
         </div>
         <div class="stats-bar">
           <div class="stat-item">
@@ -570,32 +585,50 @@
           <div class="feature-card">
             <div class="feature-icon">📋</div>
             <h3 data-i18n="feat1Title">Lossless Paste</h3>
-            <p data-i18n="feat1Desc">Paste from Word/WPS/Google Docs and preserve every element: lists, tables, images, formulas, and more.</p>
+            <p data-i18n="feat1Desc">
+              Paste from Word/WPS/Google Docs and preserve every element: lists, tables, images,
+              formulas, and more.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🔌</div>
             <h3 data-i18n="feat2Title">Multi-Framework</h3>
-            <p data-i18n="feat2Desc">First-class support for React, Vue, and vanilla Web Components. Drop in and start using immediately.</p>
+            <p data-i18n="feat2Desc">
+              First-class support for React, Vue, and vanilla Web Components. Drop in and start
+              using immediately.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🧩</div>
             <h3 data-i18n="feat3Title">Plugin Architecture</h3>
-            <p data-i18n="feat3Desc">Extensible pipeline with 23+ built-in plugins for cleanup, parsing, and rendering. Customize as needed.</p>
+            <p data-i18n="feat3Desc">
+              Extensible pipeline with 23+ built-in plugins for cleanup, parsing, and rendering.
+              Customize as needed.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🧪</div>
             <h3 data-i18n="feat4Title">Quality Assured</h3>
-            <p data-i18n="feat4Desc">157 tests, baseline regression, and fidelity benchmarks. Every release passes strict quality gates.</p>
+            <p data-i18n="feat4Desc">
+              157 tests, baseline regression, and fidelity benchmarks. Every release passes strict
+              quality gates.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📊</div>
             <h3 data-i18n="feat5Title">Deep Semantics</h3>
-            <p data-i18n="feat5Desc">Footnotes, revisions, bookmarks, cross-references, and more. Desktop Word features in HTML output.</p>
+            <p data-i18n="feat5Desc">
+              Footnotes, revisions, bookmarks, cross-references, and more. Desktop Word features in
+              HTML output.
+            </p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">⚡</div>
             <h3 data-i18n="feat6Title">Production Ready</h3>
-            <p data-i18n="feat6Desc">TypeScript, tree-shakeable, CSP-friendly. Built for real-world enterprise applications.</p>
+            <p data-i18n="feat6Desc">
+              TypeScript, tree-shakeable, CSP-friendly. Built for real-world enterprise
+              applications.
+            </p>
           </div>
         </div>
       </div>
@@ -710,21 +743,24 @@
             <div class="feature-icon">📝</div>
             <h3 data-i18n="ecoCardTitle">Continue to delivery: Markdown and editor bridge</h3>
             <p data-i18n="ecoCardDesc">
-              Use docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime switching while keeping one canonical content source.
+              Use docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime
+              switching while keeping one canonical content source.
             </p>
-            <p style="margin-top:16px;">
+            <p style="margin-top: 16px">
               <a
                 class="btn btn-secondary"
                 href="https://www.npmjs.com/package/@coding01/docsjs-markdown"
                 target="_blank"
                 data-i18n="ecoBtn"
-              >Open @coding01/docsjs-markdown</a>
+                >Open @coding01/docsjs-markdown</a
+              >
               <a
                 class="btn btn-secondary"
                 href="https://www.npmjs.com/package/@coding01/docsjs-editor"
                 target="_blank"
-                style="margin-left:8px;"
-              >Open @coding01/docsjs-editor</a>
+                style="margin-left: 8px"
+                >Open @coding01/docsjs-editor</a
+              >
             </p>
           </div>
         </div>
@@ -762,181 +798,93 @@
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-jsx.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
     <script>
-      // Code snippets
-      const snippets = {
-        react: {
-          language: "language-jsx",
-          code: `npm i @coding01/docsjs
+            // Code snippets
+            const snippets = {
+              react: {
+                language: "language-jsx",
+                code: `npm i @coding01/docsjs
 
-// App.jsx
-import { WordFidelityEditorReact } from "@coding01/docsjs/react";
+      // App.jsx
+      import { WordFidelityEditorReact } from "@coding01/docsjs/react";
 
-export default function Page() {
-  return (
-    <WordFidelityEditorReact
-      lang="en"
-      onChange={({ htmlSnapshot }) => {
+      export default function Page() {
+        return (
+          <WordFidelityEditorReact
+            lang="en"
+            onChange={({ htmlSnapshot }) => {
+              console.log(htmlSnapshot);
+            }}
+          />
+        );
+      }`
+              },
+              vue: {
+                language: "language-markup",
+                code: `npm i @coding01/docsjs
+
+      <!-- App.vue -->
+      <template>
+        <WordFidelityEditorVue
+          lang="en"
+          @change="onChange"
+        />
+      </template>
+
+      <script setup>
+      import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
+
+      const onChange = ({ htmlSnapshot }) => {
         console.log(htmlSnapshot);
-      }}
-    />
-  );
-}`
-        },
-        vue: {
-          language: "language-markup",
-          code: `npm i @coding01/docsjs
-
-<!-- App.vue -->
-<template>
-  <WordFidelityEditorVue
-    lang="en"
-    @change="onChange"
-  />
-</template>
-
-<script setup>
-import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
-
-const onChange = ({ htmlSnapshot }) => {
-  console.log(htmlSnapshot);
-};
-</script>`
-        },
-        wc: {
-          language: "language-js",
-          code: `npm i @coding01/docsjs
-
-// main.js
-import { defineDocsWordElement } from "@coding01/docsjs";
-
-defineDocsWordElement();
-
-const el = document.createElement("docs-word-editor");
-el.setAttribute("lang", "en");
-
-el.addEventListener("docsjs-change", (e) => {
-  console.log(e.detail.htmlSnapshot);
-});
-
-document.body.appendChild(el);`
-        }
       };
-
-      // i18n translations
-      const i18n = {
-        en: {
-          heroLead: "Bring Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep structure, styles, and semantics in one import flow.",
-          statTests: "Quality Gate",
-          statVersion: "Latest",
-          statAdapters: "Frameworks",
-          statPlugins: "Built-in Plugins",
-          feat1Title: "Lossless Paste",
-          feat1Desc: "Keep lists, tables, images, and formatting when importing from Word/WPS/Google Docs.",
-          feat2Title: "Multi-Framework",
-          feat2Desc: "Start with React, Vue, or Web Components without rewriting your current editor shell.",
-          feat3Title: "Plugin Architecture",
-          feat3Desc: "Use built-in cleanup/parser plugins first, then extend only where your business rules differ.",
-          feat4Title: "Quality Assured",
-          feat4Desc: "Regression baseline + fidelity checks keep import behavior stable as your docs evolve.",
-          feat5Title: "Deep Semantics",
-          feat5Desc: "Preserve advanced semantics such as notes, revisions, bookmarks, and cross references.",
-          feat6Title: "Production Ready",
-          feat6Desc: "TypeScript-first, tree-shakeable, CSP-friendly package for production web products.",
-          ecoTitle: "Recommended Pair: @coding01/docsjs-markdown",
-          ecoCardTitle: "Continue to delivery: Markdown and editor bridge",
-          ecoCardDesc: "Use docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime switching while keeping one canonical content source.",
-          ecoBtn: "Open @coding01/docsjs-markdown"
-        },
-        zh: {
-          heroLead: "把 Word/WPS/Google Docs 内容接入 Web 应用，不再手工重构版式；在一次导入中保留结构、样式与语义。",
-          statTests: "质量门",
-          statVersion: "当前版本",
-          statAdapters: "框架支持",
-          statPlugins: "内置插件",
-          feat1Title: "无损粘贴",
-          feat1Desc: "从 Word/WPS/Google Docs 导入时保留列表、表格、图片与格式细节。",
-          feat2Title: "多框架支持",
-          feat2Desc: "支持 React、Vue 与 Web Components，不用重写现有编辑器外壳。",
-          feat3Title: "插件架构",
-          feat3Desc: "先用内置清洗/解析插件快速上线，再按业务规则做最小扩展。",
-          feat4Title: "质量保证",
-          feat4Desc: "通过回归基线与保真检查，持续保证导入行为稳定可预期。",
-          feat5Title: "深度语义",
-          feat5Desc: "保留脚注、修订、书签、交叉引用等高级语义能力。",
-          feat6Title: "生产就绪",
-          feat6Desc: "TypeScript 优先、Tree-shakeable、CSP 友好，可直接用于生产环境。",
-          ecoTitle: "重点推荐：@coding01/docsjs-markdown",
-          ecoCardTitle: "下一步交付：Markdown 与编辑器桥接",
-          ecoCardDesc: "用 docsjs-markdown 输出发布级 Markdown；用 docsjs-editor 在多编辑器间切换且保持同一内容源。",
-          ecoBtn: "打开 @coding01/docsjs-markdown"
-        }
-      };
-
-      // State
-      let currentTab = "react";
-      let currentLang = "en";
-
-      // DOM elements
-      const codeBlock = document.getElementById("code-block");
-      const codeTabs = document.querySelectorAll(".code-tab");
-      const langBtns = document.querySelectorAll(".lang-btn");
-      const navLinks = document.querySelectorAll(".nav-links a");
-
-      // Render code
-      function renderCode(tab) {
-        const snippet = snippets[tab];
-        codeBlock.className = snippet.language;
-        codeBlock.textContent = snippet.code;
-        if (window.Prism) {
-          window.Prism.highlightElement(codeBlock);
-        }
-      }
-
-      // Switch tab
-      codeTabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-          codeTabs.forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          currentTab = tab.dataset.tab;
-          renderCode(currentTab);
-        });
-      });
-
-      // Switch language
-      function switchLang(lang) {
-        currentLang = lang;
-        langBtns.forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.lang === lang);
-        });
-        
-        // Update translations
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-          const key = el.dataset.i18n;
-          if (i18n[lang][key]) {
-            el.textContent = i18n[lang][key];
-          }
-        });
-      }
-
-      langBtns.forEach(btn => {
-        btn.addEventListener("click", () => switchLang(btn.dataset.lang));
-      });
-
-      // Smooth scroll - update URL hash
-      navLinks.forEach(link => {
-        link.addEventListener("click", (e) => {
-          const href = link.getAttribute("href");
-          const target = document.querySelector(href);
-          if (target) {
-            // Update URL hash for browser history
-            history.pushState(null, "", href);
-            target.scrollIntoView({ behavior: "smooth" });
-          }
-        });
-      });
-
-      // Init
-      renderCode(currentTab);
     </script>
+    ` }, wc: { language: "language-js", code: `npm i @coding01/docsjs // main.js import {
+    defineDocsWordElement } from "@coding01/docsjs"; defineDocsWordElement(); const el =
+    document.createElement("docs-word-editor"); el.setAttribute("lang", "en");
+    el.addEventListener("docsjs-change", (e) => { console.log(e.detail.htmlSnapshot); });
+    document.body.appendChild(el);` } }; // i18n translations const i18n = { en: { heroLead: "Bring
+    Word/WPS/Google Docs content to web apps without rebuilding layout by hand. Keep structure,
+    styles, and semantics in one import flow.", statTests: "Quality Gate", statVersion: "Latest",
+    statAdapters: "Frameworks", statPlugins: "Built-in Plugins", feat1Title: "Lossless Paste",
+    feat1Desc: "Keep lists, tables, images, and formatting when importing from Word/WPS/Google
+    Docs.", feat2Title: "Multi-Framework", feat2Desc: "Start with React, Vue, or Web Components
+    without rewriting your current editor shell.", feat3Title: "Plugin Architecture", feat3Desc:
+    "Use built-in cleanup/parser plugins first, then extend only where your business rules differ.",
+    feat4Title: "Quality Assured", feat4Desc: "Regression baseline + fidelity checks keep import
+    behavior stable as your docs evolve.", feat5Title: "Deep Semantics", feat5Desc: "Preserve
+    advanced semantics such as notes, revisions, bookmarks, and cross references.", feat6Title:
+    "Production Ready", feat6Desc: "TypeScript-first, tree-shakeable, CSP-friendly package for
+    production web products.", ecoTitle: "Recommended Pair: @coding01/docsjs-markdown",
+    ecoCardTitle: "Continue to delivery: Markdown and editor bridge", ecoCardDesc: "Use
+    docsjs-markdown for publishing output, and docsjs-editor for multi-editor runtime switching
+    while keeping one canonical content source.", ecoBtn: "Open @coding01/docsjs-markdown" }, zh: {
+    heroLead: "把 Word/WPS/Google Docs 内容接入 Web
+    应用，不再手工重构版式；在一次导入中保留结构、样式与语义。", statTests: "质量门", statVersion:
+    "当前版本", statAdapters: "框架支持", statPlugins: "内置插件", feat1Title: "无损粘贴",
+    feat1Desc: "从 Word/WPS/Google Docs 导入时保留列表、表格、图片与格式细节。", feat2Title:
+    "多框架支持", feat2Desc: "支持 React、Vue 与 Web Components，不用重写现有编辑器外壳。",
+    feat3Title: "插件架构", feat3Desc: "先用内置清洗/解析插件快速上线，再按业务规则做最小扩展。",
+    feat4Title: "质量保证", feat4Desc: "通过回归基线与保真检查，持续保证导入行为稳定可预期。",
+    feat5Title: "深度语义", feat5Desc: "保留脚注、修订、书签、交叉引用等高级语义能力。", feat6Title:
+    "生产就绪", feat6Desc: "TypeScript 优先、Tree-shakeable、CSP 友好，可直接用于生产环境。",
+    ecoTitle: "重点推荐：@coding01/docsjs-markdown", ecoCardTitle: "下一步交付：Markdown
+    与编辑器桥接", ecoCardDesc: "用 docsjs-markdown 输出发布级 Markdown；用 docsjs-editor
+    在多编辑器间切换且保持同一内容源。", ecoBtn: "打开 @coding01/docsjs-markdown" } }; // State let
+    currentTab = "react"; let currentLang = "en"; // DOM elements const codeBlock =
+    document.getElementById("code-block"); const codeTabs = document.querySelectorAll(".code-tab");
+    const langBtns = document.querySelectorAll(".lang-btn"); const navLinks =
+    document.querySelectorAll(".nav-links a"); // Render code function renderCode(tab) { const
+    snippet = snippets[tab]; codeBlock.className = snippet.language; codeBlock.textContent =
+    snippet.code; if (window.Prism) { window.Prism.highlightElement(codeBlock); } } // Switch tab
+    codeTabs.forEach(tab => { tab.addEventListener("click", () => { codeTabs.forEach(t =>
+    t.classList.remove("active")); tab.classList.add("active"); currentTab = tab.dataset.tab;
+    renderCode(currentTab); }); }); // Switch language function switchLang(lang) { currentLang =
+    lang; langBtns.forEach(btn => { btn.classList.toggle("active", btn.dataset.lang === lang); });
+    // Update translations document.querySelectorAll("[data-i18n]").forEach(el => { const key =
+    el.dataset.i18n; if (i18n[lang][key]) { el.textContent = i18n[lang][key]; } }); }
+    langBtns.forEach(btn => { btn.addEventListener("click", () => switchLang(btn.dataset.lang)); });
+    // Smooth scroll - update URL hash navLinks.forEach(link => { link.addEventListener("click", (e)
+    => { const href = link.getAttribute("href"); const target = document.querySelector(href); if
+    (target) { // Update URL hash for browser history history.pushState(null, "", href);
+    target.scrollIntoView({ behavior: "smooth" }); } }); }); // Init renderCode(currentTab);
   </body>
 </html>

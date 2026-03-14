@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 function makeDocxWithEndnotes(): Promise<File> {
@@ -14,7 +14,7 @@ function makeDocxWithEndnotes(): Promise<File> {
           <w:r><w:endnoteReference w:id="3"/></w:r>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/endnotes.xml",
@@ -24,19 +24,19 @@ function makeDocxWithEndnotes(): Promise<File> {
       <w:endnote w:id="3">
         <w:p><w:r><w:t>Endnote content</w:t></w:r></w:p>
       </w:endnote>
-    </w:endnotes>`
+    </w:endnotes>`,
   );
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
   );
   return zip.generateAsync({ type: "uint8array" }).then((bytes) => {
     const start = bytes.byteOffset;
     const end = bytes.byteOffset + bytes.byteLength;
     return {
       name: "endnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(start, end)
+      arrayBuffer: async () => bytes.buffer.slice(start, end),
     } as unknown as File;
   });
 }
@@ -67,7 +67,7 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
             <w:r><w:endnoteReference w:id="2"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/endnotes.xml",
@@ -76,17 +76,18 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
         <w:endnote w:id="-1"><w:p><w:r><w:t>separator</w:t></w:r></w:p></w:endnote>
         <w:endnote w:id="1"><w:p><w:r><w:t>Note A</w:t></w:r></w:p></w:endnote>
         <w:endnote w:id="2"><w:p><w:r><w:t>Note B</w:t></w:r></w:p></w:endnote>
-      </w:endnotes>`
+      </w:endnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "multi-endnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -108,7 +109,7 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
             <w:r><w:endnoteReference w:id="1"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/endnotes.xml",
@@ -124,17 +125,18 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
             <w:r><w:t> endnote</w:t></w:r>
           </w:p>
         </w:endnote>
-      </w:endnotes>`
+      </w:endnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "formatted-endnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -154,7 +156,7 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
             <w:r><w:endnoteReference w:id="1" customMarkFollows="1"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/endnotes.xml",
@@ -162,17 +164,18 @@ describe("parseDocxToHtmlSnapshot endnotes", () => {
       <w:endnotes xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
         <w:endnote w:id="-1"><w:p><w:r><w:t>separator</w:t></w:r></w:p></w:endnote>
         <w:endnote w:id="1"><w:p><w:r><w:t>Custom note</w:t></w:r></w:p></w:endnote>
-      </w:endnotes>`
+      </w:endnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "custom-endnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);

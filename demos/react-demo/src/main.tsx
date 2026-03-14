@@ -23,7 +23,7 @@ const EMPTY_STATS: SemanticStats = {
   revisionDelCount: 0,
   pageBreakCount: 0,
   pageSpacerCount: 0,
-  textCharCount: 0
+  textCharCount: 0,
 };
 
 const TEXT: Record<Lang, Record<string, string>> = {
@@ -53,7 +53,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     pageSpacerCount: "分页占位",
     textCharCount: "文本字符",
     zh: "中文",
-    en: "English"
+    en: "English",
   },
   en: {
     subtitle: "Paste from Word/WPS/Google Docs or upload .docx to verify fidelity import.",
@@ -81,8 +81,8 @@ const TEXT: Record<Lang, Record<string, string>> = {
     pageSpacerCount: "Page Spacers",
     textCharCount: "Text Chars",
     zh: "中文",
-    en: "English"
-  }
+    en: "English",
+  },
 };
 
 function App() {
@@ -95,17 +95,28 @@ function App() {
   const t = TEXT[lang];
 
   return (
-    <div style={{ maxWidth: 1320, margin: "20px auto", padding: "0 16px", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+    <div
+      style={{
+        maxWidth: 1320,
+        margin: "20px auto",
+        padding: "0 16px",
+        fontFamily: "Inter, system-ui, sans-serif",
+      }}
+    >
+      <div
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}
+      >
         <h1 style={{ marginBottom: 8 }}>docsjs React Demo</h1>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setLang("zh")} disabled={lang === "zh"}>{t.zh}</button>
-          <button onClick={() => setLang("en")} disabled={lang === "en"}>{t.en}</button>
+          <button onClick={() => setLang("zh")} disabled={lang === "zh"}>
+            {t.zh}
+          </button>
+          <button onClick={() => setLang("en")} disabled={lang === "en"}>
+            {t.en}
+          </button>
         </div>
       </div>
-      <p style={{ marginTop: 0, color: "#5b6788" }}>
-        {t.subtitle}
-      </p>
+      <p style={{ marginTop: 0, color: "#5b6788" }}>{t.subtitle}</p>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <button onClick={() => editorRef.current?.clear()}>{t.clear}</button>
@@ -141,26 +152,70 @@ function App() {
       />
 
       <div style={{ marginTop: 10, color: "#5b6788", fontSize: 13 }}>
-        {t.source}: {source} | {t.snapshotLength}: {length} | strict | {t.parseElapsed}: {report?.elapsedMs ?? "-"}
+        {t.source}: {source} | {t.snapshotLength}: {length} | strict | {t.parseElapsed}:{" "}
+        {report?.elapsedMs ?? "-"}
       </div>
-      <div style={{ marginTop: 10, color: "#263356", fontSize: 13, display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 6 }}>
-        <div>{t.paragraphCount}: {stats.paragraphCount}</div>
-        <div>{t.headingCount}: {stats.headingCount}</div>
-        <div>{t.listParagraphCount}: {stats.listParagraphCount}</div>
-        <div>{t.tableCount}: {stats.tableCount}</div>
-        <div>{t.tableCellCount}: {stats.tableCellCount}</div>
-        <div>{t.imageCount}: {stats.imageCount}</div>
-        <div>{t.anchorImageCount}: {stats.anchorImageCount}</div>
-        <div>{t.wrappedImageCount}: {stats.wrappedImageCount}</div>
-        <div>{t.ommlCount}: {stats.ommlCount}</div>
-        <div>{t.chartCount}: {stats.chartCount}</div>
-        <div>{t.smartArtCount}: {stats.smartArtCount}</div>
-        <div>{t.commentRefCount}: {stats.commentRefCount}</div>
-        <div>{t.revisionInsCount}: {stats.revisionInsCount}</div>
-        <div>{t.revisionDelCount}: {stats.revisionDelCount}</div>
-        <div>{t.pageBreakCount}: {stats.pageBreakCount}</div>
-        <div>{t.pageSpacerCount}: {stats.pageSpacerCount}</div>
-        <div>{t.textCharCount}: {stats.textCharCount}</div>
+      <div
+        style={{
+          marginTop: 10,
+          color: "#263356",
+          fontSize: 13,
+          display: "grid",
+          gridTemplateColumns: "repeat(4,minmax(0,1fr))",
+          gap: 6,
+        }}
+      >
+        <div>
+          {t.paragraphCount}: {stats.paragraphCount}
+        </div>
+        <div>
+          {t.headingCount}: {stats.headingCount}
+        </div>
+        <div>
+          {t.listParagraphCount}: {stats.listParagraphCount}
+        </div>
+        <div>
+          {t.tableCount}: {stats.tableCount}
+        </div>
+        <div>
+          {t.tableCellCount}: {stats.tableCellCount}
+        </div>
+        <div>
+          {t.imageCount}: {stats.imageCount}
+        </div>
+        <div>
+          {t.anchorImageCount}: {stats.anchorImageCount}
+        </div>
+        <div>
+          {t.wrappedImageCount}: {stats.wrappedImageCount}
+        </div>
+        <div>
+          {t.ommlCount}: {stats.ommlCount}
+        </div>
+        <div>
+          {t.chartCount}: {stats.chartCount}
+        </div>
+        <div>
+          {t.smartArtCount}: {stats.smartArtCount}
+        </div>
+        <div>
+          {t.commentRefCount}: {stats.commentRefCount}
+        </div>
+        <div>
+          {t.revisionInsCount}: {stats.revisionInsCount}
+        </div>
+        <div>
+          {t.revisionDelCount}: {stats.revisionDelCount}
+        </div>
+        <div>
+          {t.pageBreakCount}: {stats.pageBreakCount}
+        </div>
+        <div>
+          {t.pageSpacerCount}: {stats.pageSpacerCount}
+        </div>
+        <div>
+          {t.textCharCount}: {stats.textCharCount}
+        </div>
       </div>
     </div>
   );

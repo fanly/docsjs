@@ -78,11 +78,21 @@ export async function buildDocxFile(options: DocxBuildOptions): Promise<File> {
   zip.file("word/_rels/document.xml.rels", options.relsXml ?? EMPTY_RELS);
 
   // 可选文件
-  if (options.stylesXml) {zip.file("word/styles.xml", options.stylesXml);}
-  if (options.numberingXml) {zip.file("word/numbering.xml", options.numberingXml);}
-  if (options.footnotesXml) {zip.file("word/footnotes.xml", options.footnotesXml);}
-  if (options.endnotesXml) {zip.file("word/endnotes.xml", options.endnotesXml);}
-  if (options.commentsXml) {zip.file("word/comments.xml", options.commentsXml);}
+  if (options.stylesXml) {
+    zip.file("word/styles.xml", options.stylesXml);
+  }
+  if (options.numberingXml) {
+    zip.file("word/numbering.xml", options.numberingXml);
+  }
+  if (options.footnotesXml) {
+    zip.file("word/footnotes.xml", options.footnotesXml);
+  }
+  if (options.endnotesXml) {
+    zip.file("word/endnotes.xml", options.endnotesXml);
+  }
+  if (options.commentsXml) {
+    zip.file("word/comments.xml", options.commentsXml);
+  }
 
   // 媒体文件
   for (const [path, bytes] of Object.entries(options.mediaFiles ?? {})) {
@@ -95,7 +105,7 @@ export async function buildDocxFile(options: DocxBuildOptions): Promise<File> {
 
   return {
     name: options.name ?? "fixture.docx",
-    arrayBuffer: async () => bytes.buffer.slice(start, end)
+    arrayBuffer: async () => bytes.buffer.slice(start, end),
   } as unknown as File;
 }
 
@@ -110,7 +120,7 @@ export async function createEmptyDocument(): Promise<File> {
     documentXml: `${XML_HEADER}
       <w:document ${WORD_NS}>
         <w:body></w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -125,7 +135,7 @@ export async function createSimpleParagraph(): Promise<File> {
         <w:body>
           <w:p><w:r><w:t>Hello, World!</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -144,7 +154,7 @@ export async function createMultiParagraphDocument(): Promise<File> {
           <w:p><w:r><w:t>Third paragraph to test multiple paragraphs.</w:t></w:r></w:p>
         </w:body>
       </w:document>`,
-    stylesXml: DEFAULT_STYLES
+    stylesXml: DEFAULT_STYLES,
   });
 }
 
@@ -162,7 +172,7 @@ export async function createMixedLanguageDocument(): Promise<File> {
           <w:p><w:r><w:t>特殊字符测试：© ® ™ € ¥ £ → ← ↑ ↓ ✓ ✗</w:t></w:r></w:p>
           <w:p><w:r><w:t>数字和日期：2024-01-15, 3.14159, 1,000,000</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -195,7 +205,7 @@ export async function createFormattedTextDocument(): Promise<File> {
             <w:r><w:rPr><w:vertAlign w:val="subscript"/></w:rPr><w:t>Sub</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -231,7 +241,7 @@ export async function createSimpleTable(): Promise<File> {
             </w:tr>
           </w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -274,7 +284,7 @@ export async function createMergedCellTable(): Promise<File> {
             </w:tr>
           </w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -301,7 +311,7 @@ export async function createNestedTable(): Promise<File> {
             </w:tr>
           </w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -348,7 +358,7 @@ export async function createSimpleNumberedList(): Promise<File> {
         <w:num w:numId="1">
           <w:abstractNumId w:val="0"/>
         </w:num>
-      </w:numbering>`
+      </w:numbering>`,
   });
 }
 
@@ -390,7 +400,7 @@ export async function createMultiLevelList(): Promise<File> {
         <w:num w:numId="1">
           <w:abstractNumId w:val="0"/>
         </w:num>
-      </w:numbering>`
+      </w:numbering>`,
   });
 }
 
@@ -418,7 +428,7 @@ export async function createDocumentWithComments(): Promise<File> {
         <w:comment w:id="0" w:author="Test User" w:date="2024-01-15T10:00:00Z">
           <w:p><w:r><w:t>This is a test comment</w:t></w:r></w:p>
         </w:comment>
-      </w:comments>`
+      </w:comments>`,
   });
 }
 
@@ -441,7 +451,7 @@ export async function createDocumentWithRevisions(): Promise<File> {
             </w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
   });
 }
 
@@ -467,7 +477,7 @@ export async function createDocumentWithFootnotes(): Promise<File> {
         <w:footnote w:id="1">
           <w:p><w:r><w:t>Footnote content here</w:t></w:r></w:p>
         </w:footnote>
-      </w:footnotes>`
+      </w:footnotes>`,
   });
 }
 
@@ -519,21 +529,24 @@ export async function createContractDocument(): Promise<File> {
           <w:p><w:r><w:t>签署日期：2024年1月15日</w:t></w:r></w:p>
         </w:body>
       </w:document>`,
-    stylesXml: DEFAULT_STYLES
+    stylesXml: DEFAULT_STYLES,
   });
 }
 
 // ==================== Fixture 注册表 ====================
 
-export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; config: FixtureConfig }> = {
-  "empty": {
+export const FIXTURE_REGISTRY: Record<
+  string,
+  { factory: () => Promise<File>; config: FixtureConfig }
+> = {
+  empty: {
     factory: createEmptyDocument,
     config: {
       name: "empty",
       description: "Empty document for boundary testing",
       category: "basic",
-      expectedStats: { paragraphCount: 0 }
-    }
+      expectedStats: { paragraphCount: 0 },
+    },
   },
   "simple-paragraph": {
     factory: createSimpleParagraph,
@@ -541,8 +554,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "simple-paragraph",
       description: "Single paragraph with plain text",
       category: "basic",
-      expectedStats: { paragraphCount: 1 }
-    }
+      expectedStats: { paragraphCount: 1 },
+    },
   },
   "multi-paragraph": {
     factory: createMultiParagraphDocument,
@@ -550,8 +563,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "multi-paragraph",
       description: "Multiple paragraphs with heading (h1 is not counted as p)",
       category: "basic",
-      expectedStats: { paragraphCount: 3 }
-    }
+      expectedStats: { paragraphCount: 3 },
+    },
   },
   "mixed-language": {
     factory: createMixedLanguageDocument,
@@ -559,8 +572,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "mixed-language",
       description: "Chinese and English mixed content",
       category: "basic",
-      expectedStats: { paragraphCount: 4 }
-    }
+      expectedStats: { paragraphCount: 4 },
+    },
   },
   "formatted-text": {
     factory: createFormattedTextDocument,
@@ -568,8 +581,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "formatted-text",
       description: "Rich text formatting (bold, italic, etc.)",
       category: "basic",
-      expectedStats: { paragraphCount: 3 }
-    }
+      expectedStats: { paragraphCount: 3 },
+    },
   },
   "simple-table": {
     factory: createSimpleTable,
@@ -577,8 +590,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "simple-table",
       description: "Basic 2x3 table",
       category: "table",
-      expectedStats: { paragraphCount: 6, tableCount: 1 }
-    }
+      expectedStats: { paragraphCount: 6, tableCount: 1 },
+    },
   },
   "merged-cell-table": {
     factory: createMergedCellTable,
@@ -586,8 +599,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "merged-cell-table",
       description: "Table with colspan and rowspan",
       category: "table",
-      expectedStats: { paragraphCount: 6, tableCount: 1 }
-    }
+      expectedStats: { paragraphCount: 6, tableCount: 1 },
+    },
   },
   "nested-table": {
     factory: createNestedTable,
@@ -595,8 +608,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "nested-table",
       description: "Table inside table cell",
       category: "table",
-      expectedStats: { paragraphCount: 3, tableCount: 2 }
-    }
+      expectedStats: { paragraphCount: 3, tableCount: 2 },
+    },
   },
   "simple-numbered-list": {
     factory: createSimpleNumberedList,
@@ -604,8 +617,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "simple-numbered-list",
       description: "Basic numbered list (1, 2, 3) - list markers added during rendering",
       category: "list",
-      expectedStats: { paragraphCount: 3, listParagraphCount: 0 }
-    }
+      expectedStats: { paragraphCount: 3, listParagraphCount: 0 },
+    },
   },
   "multi-level-list": {
     factory: createMultiLevelList,
@@ -613,8 +626,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "multi-level-list",
       description: "Multi-level nested list (1, 1.1, 1.1.1) - list markers added during rendering",
       category: "list",
-      expectedStats: { paragraphCount: 5, listParagraphCount: 0 }
-    }
+      expectedStats: { paragraphCount: 5, listParagraphCount: 0 },
+    },
   },
   "with-comments": {
     factory: createDocumentWithComments,
@@ -622,8 +635,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "with-comments",
       description: "Document with comments",
       category: "annotation",
-      expectedStats: { paragraphCount: 1 }
-    }
+      expectedStats: { paragraphCount: 1 },
+    },
   },
   "with-revisions": {
     factory: createDocumentWithRevisions,
@@ -631,8 +644,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "with-revisions",
       description: "Document with track changes (ins/del)",
       category: "revision",
-      expectedStats: { paragraphCount: 1 }
-    }
+      expectedStats: { paragraphCount: 1 },
+    },
   },
   "with-footnotes": {
     factory: createDocumentWithFootnotes,
@@ -640,8 +653,8 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "with-footnotes",
       description: "Document with footnotes",
       category: "annotation",
-      expectedStats: { paragraphCount: 1 }
-    }
+      expectedStats: { paragraphCount: 1 },
+    },
   },
   "contract-template": {
     factory: createContractDocument,
@@ -649,9 +662,9 @@ export const FIXTURE_REGISTRY: Record<string, { factory: () => Promise<File>; co
       name: "contract-template",
       description: "Complex contract document",
       category: "complex",
-      expectedStats: { paragraphCount: 14, tableCount: 1 }
-    }
-  }
+      expectedStats: { paragraphCount: 14, tableCount: 1 },
+    },
+  },
 };
 
 /**

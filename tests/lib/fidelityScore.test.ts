@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { calculateFidelityScore } from "../../src/lib/fidelityScore";
 import type { SemanticStats } from "../../src/lib/semanticStats";
 
@@ -21,7 +21,12 @@ function makeStats(overrides?: Partial<SemanticStats>): SemanticStats {
     pageBreakCount: 1,
     pageSpacerCount: 3,
     textCharCount: 1200,
-    ...overrides
+    bookmarkCount: 1,
+    footnoteCount: 1,
+    endnoteCount: 1,
+    hyperlinkCount: 1,
+    tableMergeCount: 1,
+    ...overrides,
   };
 }
 
@@ -42,7 +47,10 @@ describe("calculateFidelityScore", () => {
       paragraphCount: 6,
       tableCount: 0,
       tableCellCount: 0,
-      listParagraphCount: 1
+      listParagraphCount: 1,
+      bookmarkCount: 0,
+      footnoteCount: 0,
+      hyperlinkCount: 0,
     });
     const score = calculateFidelityScore(expected, actual);
     expect(score.structure).toBeLessThan(0.8);
@@ -67,7 +75,12 @@ describe("calculateFidelityScore", () => {
       revisionDelCount: 0,
       pageBreakCount: 0,
       pageSpacerCount: 0,
-      textCharCount: 0
+      textCharCount: 0,
+      bookmarkCount: 0,
+      footnoteCount: 0,
+      endnoteCount: 0,
+      hyperlinkCount: 0,
+      tableMergeCount: 0,
     });
     const actual = makeStats({
       paragraphCount: 0,
@@ -86,7 +99,12 @@ describe("calculateFidelityScore", () => {
       revisionDelCount: 0,
       pageBreakCount: 0,
       pageSpacerCount: 0,
-      textCharCount: 0
+      textCharCount: 0,
+      bookmarkCount: 0,
+      footnoteCount: 0,
+      endnoteCount: 0,
+      hyperlinkCount: 0,
+      tableMergeCount: 0,
     });
     const score = calculateFidelityScore(expected, actual);
     expect(Number.isFinite(score.overall)).toBe(true);

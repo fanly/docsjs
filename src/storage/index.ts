@@ -1,11 +1,11 @@
 /**
  * Storage Module
- * 
+ *
  * Provides Redis and PostgreSQL storage support for production deployment.
  */
 
 export interface StorageConfig {
-  type: 'memory' | 'redis' | 'postgres';
+  type: "memory" | "redis" | "postgres";
   redis?: RedisConfig;
   postgres?: PostgresConfig;
 }
@@ -28,7 +28,9 @@ class MemoryStorage {
 
   async get(key: string): Promise<unknown | null> {
     const item = this.store.get(key);
-    if (!item) {return null;}
+    if (!item) {
+      return null;
+    }
     if (item.expiry && item.expiry < Date.now()) {
       this.store.delete(key);
       return null;
@@ -39,7 +41,7 @@ class MemoryStorage {
   async set(key: string, value: unknown, ttl?: number): Promise<void> {
     this.store.set(key, {
       value,
-      expiry: ttl ? Date.now() + ttl : undefined
+      expiry: ttl ? Date.now() + ttl : undefined,
     });
   }
 
@@ -59,7 +61,7 @@ class RedisStorage {
   private ttl: number;
 
   constructor(config: RedisConfig) {
-    this.keyPrefix = config.keyPrefix || 'docsjs:';
+    this.keyPrefix = config.keyPrefix || "docsjs:";
     this.ttl = config.ttl || 3600;
   }
 
@@ -79,7 +81,7 @@ class RedisStorage {
   async set(key: string, value: unknown, ttl?: number): Promise<void> {
     try {
       const serialized = JSON.stringify(value);
-      await this.redis.set(this.getKey(key), serialized, 'EX', ttl || this.ttl);
+      await this.redis.set(this.getKey(key), serialized, "EX", ttl || this.ttl);
     } catch {
       // Fallback silently
     }
@@ -112,8 +114,8 @@ class PostgresStorage {
   async get(key: string): Promise<unknown | null> {
     try {
       const result = await this.pool.query(
-        'SELECT value FROM docsjs_storage WHERE key = $1 AND (expiry IS NULL OR expiry > NOW())',
-        [key]
+        "SELECT value FROM docsjs_storage WHERE key = $1 AND (expiry IS NULL OR expiry > NOW())",
+        [key],
       );
       return result.rows[0]?.value ? JSON.parse(result.rows[0].value) : null;
     } catch {
@@ -128,7 +130,7 @@ class PostgresStorage {
         `INSERT INTO docsjs_storage (key, value, expiry) 
          VALUES ($1, $2, $3) 
          ON CONFLICT (key) DO UPDATE SET value = $2, expiry = $3`,
-        [key, JSON.stringify(value), expiry]
+        [key, JSON.stringify(value), expiry],
       );
     } catch {
       // Fallback silently
@@ -137,7 +139,7 @@ class PostgresStorage {
 
   async delete(key: string): Promise<void> {
     try {
-      await this.pool.query('DELETE FROM docsjs_storage WHERE key = $1', [key]);
+      await this.pool.query("DELETE FROM docsjs_storage WHERE key = $1", [key]);
     } catch {
       // Fallback silently
     }
@@ -145,7 +147,7 @@ class PostgresStorage {
 
   async clear(): Promise<void> {
     try {
-      await this.pool.query('DELETE FROM docsjs_storage');
+      await this.pool.query("DELETE FROM docsjs_storage");
     } catch {
       // Fallback silently
     }
@@ -161,9 +163,9 @@ export interface Storage {
 
 export function createStorage(config: StorageConfig): Storage {
   switch (config.type) {
-    case 'redis':
+    case "redis":
       return new RedisStorage(config.redis!);
-    case 'postgres':
+    case "postgres":
       return new PostgresStorage();
     default:
       return new MemoryStorage();

@@ -16,21 +16,21 @@ export interface IntegrationConfig {
   settings?: Record<string, unknown>;
 }
 
-export type IntegrationType = 
-  | 'sap' 
-  | 'salesforce' 
-  | 'servicenow' 
-  | 'jira' 
-  | 'slack' 
-  | 'teams' 
-  | 'sharepoint'
-  | 'okta'
-  | 'aws-s3'
-  | 'azure-blob'
-  | 'google-drive';
+export type IntegrationType =
+  | "sap"
+  | "salesforce"
+  | "servicenow"
+  | "jira"
+  | "slack"
+  | "teams"
+  | "sharepoint"
+  | "okta"
+  | "aws-s3"
+  | "azure-blob"
+  | "google-drive";
 
 export interface IntegrationCredentials {
-  authType: 'api-key' | 'oauth2' | 'basic' | 'jwt';
+  authType: "api-key" | "oauth2" | "basic" | "jwt";
   credentials: Record<string, string>;
   tokenExpiry?: number;
 }
@@ -51,8 +51,8 @@ export interface IntegrationResult<T = unknown> {
 export interface SyncJob {
   id: string;
   integrationId: string;
-  type: 'full' | 'incremental';
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  type: "full" | "incremental";
+  status: "pending" | "running" | "completed" | "failed";
   startedAt?: number;
   completedAt?: number;
   progress: number;
@@ -94,23 +94,20 @@ export abstract class BaseIntegration {
     return { ...this.config };
   }
 
-  protected async withRetry<T>(
-    operation: () => Promise<T>,
-    maxRetries = 3
-  ): Promise<T> {
+  protected async withRetry<T>(operation: () => Promise<T>, maxRetries = 3): Promise<T> {
     let lastError: Error | null = null;
-    
+
     for (let i = 0; i < maxRetries; i++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error as Error;
         if (i < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
         }
       }
     }
-    
+
     throw lastError;
   }
 }
@@ -120,7 +117,7 @@ export abstract class BaseIntegration {
 // ============================================
 
 export interface SAPConfig extends IntegrationConfig {
-  type: 'sap';
+  type: "sap";
   settings: {
     systemId: string;
     clientNumber: string;
@@ -129,7 +126,7 @@ export interface SAPConfig extends IntegrationConfig {
 }
 
 export class SAPIntegration extends BaseIntegration {
-  protected declare config: SAPConfig;
+  declare protected config: SAPConfig;
 
   async connect(): Promise<boolean> {
     // SAP connection would use RFC/BAPI
@@ -149,13 +146,13 @@ export class SAPIntegration extends BaseIntegration {
       return {
         success: true,
         data: connected,
-        metadata: { duration: Date.now() - start, timestamp: Date.now() }
+        metadata: { duration: Date.now() - start, timestamp: Date.now() },
       };
     } catch (error) {
       return {
         success: false,
-        error: { code: 'SAP_ERROR', message: (error as Error).message },
-        metadata: { duration: Date.now() - start, timestamp: Date.now() }
+        error: { code: "SAP_ERROR", message: (error as Error).message },
+        metadata: { duration: Date.now() - start, timestamp: Date.now() },
       };
     }
   }
@@ -180,7 +177,7 @@ export class SAPIntegration extends BaseIntegration {
 // ============================================
 
 export interface SalesforceConfig extends IntegrationConfig {
-  type: 'salesforce';
+  type: "salesforce";
   settings: {
     instanceUrl: string;
     apiVersion: string;
@@ -188,7 +185,7 @@ export interface SalesforceConfig extends IntegrationConfig {
 }
 
 export class SalesforceIntegration extends BaseIntegration {
-  protected declare config: SalesforceConfig;
+  declare protected config: SalesforceConfig;
 
   async connect(): Promise<boolean> {
     // OAuth2 flow for Salesforce
@@ -205,7 +202,7 @@ export class SalesforceIntegration extends BaseIntegration {
     return {
       success: this.connected,
       data: this.connected,
-      metadata: { duration: Date.now() - start, timestamp: Date.now() }
+      metadata: { duration: Date.now() - start, timestamp: Date.now() },
     };
   }
 
@@ -216,13 +213,20 @@ export class SalesforceIntegration extends BaseIntegration {
     });
   }
 
-  async createRecord(object: string, data: Record<string, unknown>): Promise<IntegrationResult<unknown>> {
+  async createRecord(
+    object: string,
+    data: Record<string, unknown>,
+  ): Promise<IntegrationResult<unknown>> {
     return this.withRetry(async () => {
       return { success: true, data: { id: crypto.randomUUID(), ...data } };
     });
   }
 
-  async updateRecord(object: string, id: string, data: Record<string, unknown>): Promise<IntegrationResult<boolean>> {
+  async updateRecord(
+    object: string,
+    id: string,
+    data: Record<string, unknown>,
+  ): Promise<IntegrationResult<boolean>> {
     return this.withRetry(async () => {
       return { success: true, data: true };
     });
@@ -234,7 +238,7 @@ export class SalesforceIntegration extends BaseIntegration {
 // ============================================
 
 export interface ServiceNowConfig extends IntegrationConfig {
-  type: 'servicenow';
+  type: "servicenow";
   settings: {
     instanceUrl: string;
     tableName: string;
@@ -242,7 +246,7 @@ export interface ServiceNowConfig extends IntegrationConfig {
 }
 
 export class ServiceNowIntegration extends BaseIntegration {
-  protected declare config: ServiceNowConfig;
+  declare protected config: ServiceNowConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -258,7 +262,7 @@ export class ServiceNowIntegration extends BaseIntegration {
     return {
       success: this.connected,
       data: this.connected,
-      metadata: { duration: Date.now() - start, timestamp: Date.now() }
+      metadata: { duration: Date.now() - start, timestamp: Date.now() },
     };
   }
 
@@ -274,7 +278,10 @@ export class ServiceNowIntegration extends BaseIntegration {
     });
   }
 
-  async updateRecord(sysId: string, data: Record<string, unknown>): Promise<IntegrationResult<boolean>> {
+  async updateRecord(
+    sysId: string,
+    data: Record<string, unknown>,
+  ): Promise<IntegrationResult<boolean>> {
     return this.withRetry(async () => {
       return { success: true, data: true };
     });
@@ -286,7 +293,7 @@ export class ServiceNowIntegration extends BaseIntegration {
 // ============================================
 
 export interface JiraConfig extends IntegrationConfig {
-  type: 'jira';
+  type: "jira";
   settings: {
     domain: string;
     projectKey: string;
@@ -294,7 +301,7 @@ export interface JiraConfig extends IntegrationConfig {
 }
 
 export class JiraIntegration extends BaseIntegration {
-  protected declare config: JiraConfig;
+  declare protected config: JiraConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -310,26 +317,37 @@ export class JiraIntegration extends BaseIntegration {
     return {
       success: this.connected,
       data: this.connected,
-      metadata: { duration: Date.now() - start, timestamp: Date.now() }
+      metadata: { duration: Date.now() - start, timestamp: Date.now() },
     };
   }
 
-  async createIssue(summary: string, description: string, issueType = 'Task'): Promise<IntegrationResult<unknown>> {
+  async createIssue(
+    summary: string,
+    description: string,
+    issueType = "Task",
+  ): Promise<IntegrationResult<unknown>> {
     return this.withRetry(async () => {
       return {
         success: true,
-        data: { key: `${this.config.settings.projectKey}-${Date.now()}`, summary, description }
+        data: { key: `${this.config.settings.projectKey}-${Date.now()}`, summary, description },
       };
     });
   }
 
-  async addAttachment(issueKey: string, filename: string, content: Buffer): Promise<IntegrationResult<boolean>> {
+  async addAttachment(
+    issueKey: string,
+    filename: string,
+    content: Buffer,
+  ): Promise<IntegrationResult<boolean>> {
     return this.withRetry(async () => {
       return { success: true, data: true };
     });
   }
 
-  async transitionIssue(issueKey: string, transitionId: string): Promise<IntegrationResult<boolean>> {
+  async transitionIssue(
+    issueKey: string,
+    transitionId: string,
+  ): Promise<IntegrationResult<boolean>> {
     return this.withRetry(async () => {
       return { success: true, data: true };
     });
@@ -341,7 +359,7 @@ export class JiraIntegration extends BaseIntegration {
 // ============================================
 
 export interface SlackConfig extends IntegrationConfig {
-  type: 'slack';
+  type: "slack";
   settings: {
     channelId: string;
     botToken: string;
@@ -349,7 +367,7 @@ export interface SlackConfig extends IntegrationConfig {
 }
 
 export class SlackIntegration extends BaseIntegration {
-  protected declare config: SlackConfig;
+  declare protected config: SlackConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -365,7 +383,7 @@ export class SlackIntegration extends BaseIntegration {
     return {
       success: this.connected,
       data: this.connected,
-      metadata: { duration: Date.now() - start, timestamp: Date.now() }
+      metadata: { duration: Date.now() - start, timestamp: Date.now() },
     };
   }
 
@@ -373,12 +391,16 @@ export class SlackIntegration extends BaseIntegration {
     return this.withRetry(async () => {
       return {
         success: true,
-        data: { ts: Date.now().toString(), channel: this.config.settings.channelId }
+        data: { ts: Date.now().toString(), channel: this.config.settings.channelId },
       };
     });
   }
 
-  async uploadFile(channelId: string, filename: string, content: Buffer): Promise<IntegrationResult<unknown>> {
+  async uploadFile(
+    channelId: string,
+    filename: string,
+    content: Buffer,
+  ): Promise<IntegrationResult<unknown>> {
     return this.withRetry(async () => {
       return { success: true, data: { file: filename } };
     });
@@ -390,7 +412,7 @@ export class SlackIntegration extends BaseIntegration {
 // ============================================
 
 export interface TeamsConfig extends IntegrationConfig {
-  type: 'teams';
+  type: "teams";
   settings: {
     teamId: string;
     channelId: string;
@@ -399,7 +421,7 @@ export interface TeamsConfig extends IntegrationConfig {
 }
 
 export class TeamsIntegration extends BaseIntegration {
-  protected declare config: TeamsConfig;
+  declare protected config: TeamsConfig;
 
   async connect(): Promise<boolean> {
     this.connected = true;
@@ -415,7 +437,7 @@ export class TeamsIntegration extends BaseIntegration {
     return {
       success: this.connected,
       data: this.connected,
-      metadata: { duration: Date.now() - start, timestamp: Date.now() }
+      metadata: { duration: Date.now() - start, timestamp: Date.now() },
     };
   }
 
@@ -451,7 +473,7 @@ export class IntegrationHub {
     if (!integration) {
       return {
         success: false,
-        error: { code: 'NOT_FOUND', message: `Integration ${integrationId} not found` }
+        error: { code: "NOT_FOUND", message: `Integration ${integrationId} not found` },
       };
     }
 
@@ -461,7 +483,7 @@ export class IntegrationHub {
     } catch (error) {
       return {
         success: false,
-        error: { code: 'CONNECT_ERROR', message: (error as Error).message }
+        error: { code: "CONNECT_ERROR", message: (error as Error).message },
       };
     }
   }
@@ -469,7 +491,7 @@ export class IntegrationHub {
   async disconnect(integrationId: string): Promise<IntegrationResult<boolean>> {
     const integration = this.integrations.get(integrationId);
     if (!integration) {
-      return { success: false, error: { code: 'NOT_FOUND', message: 'Integration not found' } };
+      return { success: false, error: { code: "NOT_FOUND", message: "Integration not found" } };
     }
 
     await integration.disconnect();
@@ -479,7 +501,7 @@ export class IntegrationHub {
   async testConnection(integrationId: string): Promise<IntegrationResult<boolean>> {
     const integration = this.integrations.get(integrationId);
     if (!integration) {
-      return { success: false, error: { code: 'NOT_FOUND', message: 'Integration not found' } };
+      return { success: false, error: { code: "NOT_FOUND", message: "Integration not found" } };
     }
 
     return integration.test();
@@ -490,27 +512,27 @@ export class IntegrationHub {
   }
 
   listIntegrations(): IntegrationConfig[] {
-    return Array.from(this.integrations.values()).map(i => i.getConfig());
+    return Array.from(this.integrations.values()).map((i) => i.getConfig());
   }
 
   // Sync operations
-  async startSync(integrationId: string, type: 'full' | 'incremental'): Promise<SyncJob> {
+  async startSync(integrationId: string, type: "full" | "incremental"): Promise<SyncJob> {
     const job: SyncJob = {
       id: crypto.randomUUID(),
       integrationId,
       type,
-      status: 'running',
+      status: "running",
       startedAt: Date.now(),
       progress: 0,
       recordsProcessed: 0,
-      errors: []
+      errors: [],
     };
 
     this.syncJobs.set(job.id, job);
-    
+
     // Simulate sync (in production, this would do actual work)
-    this.runSyncJob(job);
-    
+    void this.runSyncJob(job);
+
     return job;
   }
 
@@ -519,9 +541,9 @@ export class IntegrationHub {
     const interval = setInterval(() => {
       job.progress += 10;
       job.recordsProcessed += 10;
-      
+
       if (job.progress >= 100) {
-        job.status = 'completed';
+        job.status = "completed";
         job.completedAt = Date.now();
         clearInterval(interval);
       }
@@ -540,11 +562,11 @@ export class IntegrationHub {
       eventType,
       payload,
       receivedAt: Date.now(),
-      processed: false
+      processed: false,
     };
 
     this.webhookEvents.push(event);
-    
+
     if (this.webhookEvents.length > this.MAX_EVENTS) {
       this.webhookEvents = this.webhookEvents.slice(-this.MAX_EVENTS);
     }
@@ -554,13 +576,13 @@ export class IntegrationHub {
 
   getWebhookEvents(integrationId?: string): WebhookEvent[] {
     if (integrationId) {
-      return this.webhookEvents.filter(e => e.integrationId === integrationId);
+      return this.webhookEvents.filter((e) => e.integrationId === integrationId);
     }
     return [...this.webhookEvents];
   }
 
   markEventProcessed(eventId: string): void {
-    const event = this.webhookEvents.find(e => e.id === eventId);
+    const event = this.webhookEvents.find((e) => e.id === eventId);
     if (event) {
       event.processed = true;
     }
@@ -573,17 +595,17 @@ export class IntegrationHub {
 
 export function createIntegration(config: IntegrationConfig): BaseIntegration {
   switch (config.type) {
-    case 'sap':
+    case "sap":
       return new SAPIntegration(config as SAPConfig);
-    case 'salesforce':
+    case "salesforce":
       return new SalesforceIntegration(config as SalesforceConfig);
-    case 'servicenow':
+    case "servicenow":
       return new ServiceNowIntegration(config as ServiceNowConfig);
-    case 'jira':
+    case "jira":
       return new JiraIntegration(config as JiraConfig);
-    case 'slack':
+    case "slack":
       return new SlackIntegration(config as SlackConfig);
-    case 'teams':
+    case "teams":
       return new TeamsIntegration(config as TeamsConfig);
     default:
       throw new Error(`Unknown integration type: ${(config as IntegrationConfig).type}`);

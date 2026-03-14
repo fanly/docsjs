@@ -1,10 +1,10 @@
 /**
  * HTML Renderer Tests
- * 
+ *
  * Tests for AST → HTML rendering
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vite-plus/test";
 import {
   createEmptyDocument,
   createTextNode,
@@ -43,20 +43,18 @@ describe("HTML Renderer", () => {
     it("should render an empty document", () => {
       const doc = createEmptyDocument("docx");
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toBe("");
     });
 
     it("should render a document with content", () => {
       const doc = createEmptyDocument("docx");
       doc.children.push(
-        createSectionNode([
-          createParagraphNode([createTextNode("Hello, World!")]),
-        ])
+        createSectionNode([createParagraphNode([createTextNode("Hello, World!")])]),
       );
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<p");
       expect(html).toContain("Hello, World!");
     });
@@ -67,9 +65,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([createTextNode("Test paragraph")]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<p");
       expect(html).toContain("Test paragraph");
       expect(html).toContain("</p>");
@@ -81,11 +79,11 @@ describe("HTML Renderer", () => {
         createSectionNode([
           createParagraphNode([createTextNode("First")]),
           createParagraphNode([createTextNode("Second")]),
-        ])
+        ]),
       );
-      
+
       const html = renderASTToHtml(doc, { ...defaultOptions, includeParagraphIndex: true });
-      
+
       expect(html).toContain('data-word-p-index="0"');
       expect(html).toContain('data-word-p-index="1"');
     });
@@ -94,9 +92,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<br/>");
     });
   });
@@ -104,12 +102,14 @@ describe("HTML Renderer", () => {
   describe("Heading Rendering", () => {
     it("should render h1-h6 correctly", () => {
       for (let level = 1; level <= 6; level++) {
-        const h = createHeadingNode(level as 1 | 2 | 3 | 4 | 5 | 6, [createTextNode(`Heading ${level}`)]);
+        const h = createHeadingNode(level as 1 | 2 | 3 | 4 | 5 | 6, [
+          createTextNode(`Heading ${level}`),
+        ]);
         const doc = createEmptyDocument("docx");
         doc.children.push(createSectionNode([h]));
-        
+
         const html = renderASTToHtml(doc, defaultOptions);
-        
+
         expect(html).toContain(`<h${level}`);
         expect(html).toContain(`Heading ${level}`);
         expect(html).toContain(`</h${level}>`);
@@ -123,9 +123,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<strong>");
       expect(html).toContain("</strong>");
     });
@@ -135,9 +135,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<em>");
       expect(html).toContain("</em>");
     });
@@ -147,9 +147,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<u>");
       expect(html).toContain("</u>");
     });
@@ -159,9 +159,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<s>");
       expect(html).toContain("</s>");
     });
@@ -171,9 +171,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<code>");
       expect(html).toContain("</code>");
     });
@@ -181,17 +181,12 @@ describe("HTML Renderer", () => {
     it("should render subscript and superscript", () => {
       const subText = createTextNode("2", [{ type: "subscript" }]);
       const supText = createTextNode("2", [{ type: "superscript" }]);
-      const p = createParagraphNode([
-        createTextNode("H"),
-        subText,
-        createTextNode("O"),
-        supText,
-      ]);
+      const p = createParagraphNode([createTextNode("H"), subText, createTextNode("O"), supText]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<sub>");
       expect(html).toContain("<sup>");
     });
@@ -201,9 +196,9 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([text]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<strong>");
       expect(html).toContain("<em>");
     });
@@ -217,9 +212,9 @@ describe("HTML Renderer", () => {
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([list]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<ul");
       expect(html).toContain("<li>");
       expect(html).toContain("Item 1");
@@ -234,9 +229,9 @@ describe("HTML Renderer", () => {
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([list]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<ol");
       expect(html).toContain("First");
       expect(html).toContain("Second");
@@ -253,14 +248,14 @@ describe("HTML Renderer", () => {
               createListItemNode([createParagraphNode([createTextNode("Level 1")])], 1),
             ]),
           ],
-          0
+          0,
         ),
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([list]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('data-list-level="1"');
     });
   });
@@ -275,9 +270,9 @@ describe("HTML Renderer", () => {
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([table]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<table");
       expect(html).toContain("<tr>");
       expect(html).toContain("<td");
@@ -289,16 +284,18 @@ describe("HTML Renderer", () => {
       const table = createTableNode([
         createTableRowNode(
           [
-            createTableCellNode([createParagraphNode([createTextNode("Header")])], { isHeader: true }),
+            createTableCellNode([createParagraphNode([createTextNode("Header")])], {
+              isHeader: true,
+            }),
           ],
-          true
+          true,
         ),
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([table]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("<th");
       expect(html).toContain("Header");
     });
@@ -309,14 +306,16 @@ describe("HTML Renderer", () => {
           createTableCellNode([createParagraphNode([createTextNode("Span 2")])], { colspan: 2 }),
         ]),
         createTableRowNode([
-          createTableCellNode([createParagraphNode([createTextNode("Span 2 rows")])], { rowspan: 2 }),
+          createTableCellNode([createParagraphNode([createTextNode("Span 2 rows")])], {
+            rowspan: 2,
+          }),
         ]),
       ]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([table]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('colspan="2"');
       expect(html).toContain('rowspan="2"');
     });
@@ -328,10 +327,10 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([img]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
-      expect(html).toContain('<img');
+
+      expect(html).toContain("<img");
       expect(html).toContain('src="image.png"');
       expect(html).toContain('alt="An image"');
     });
@@ -343,11 +342,11 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([img]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
-      expect(html).toContain('width:200px');
-      expect(html).toContain('height:100px');
+
+      expect(html).toContain("width:200px");
+      expect(html).toContain("height:100px");
     });
 
     it("should render floating image with positioning", () => {
@@ -364,46 +363,42 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([img]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
-      expect(html).toContain('position:absolute');
-      expect(html).toContain('left:100px');
-      expect(html).toContain('top:50px');
+
+      expect(html).toContain("position:absolute");
+      expect(html).toContain("left:100px");
+      expect(html).toContain("top:50px");
       expect(html).toContain('data-word-anchor="1"');
     });
   });
 
   describe("Hyperlink Rendering", () => {
     it("should render a hyperlink", () => {
-      const link = createHyperlinkNode(
-        "https://example.com",
-        [createTextNode("Example")],
-        { title: "Example Site" }
-      );
+      const link = createHyperlinkNode("https://example.com", [createTextNode("Example")], {
+        title: "Example Site",
+      });
       const p = createParagraphNode([link]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('<a href="https://example.com"');
       expect(html).toContain('title="Example Site"');
       expect(html).toContain(">Example</a>");
     });
 
     it("should render external link with target blank", () => {
-      const link = createHyperlinkNode(
-        "https://external.com",
-        [createTextNode("External")],
-        { target: "_blank" }
-      );
+      const link = createHyperlinkNode("https://external.com", [createTextNode("External")], {
+        target: "_blank",
+      });
       const p = createParagraphNode([link]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('target="_blank"');
       expect(html).toContain('rel="noopener noreferrer"');
     });
@@ -414,9 +409,9 @@ describe("HTML Renderer", () => {
       const doc = createEmptyDocument("docx");
       doc.auxiliary = createAuxiliaryContent();
       addFootnote(doc.auxiliary, "fn1", [createParagraphNode([createTextNode("Footnote 1")])], 1);
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('data-word-footnotes="1"');
       expect(html).toContain('data-word-footnote-id="fn1"');
       expect(html).toContain("Footnote 1");
@@ -426,9 +421,9 @@ describe("HTML Renderer", () => {
       const doc = createEmptyDocument("docx");
       doc.auxiliary = createAuxiliaryContent();
       addEndnote(doc.auxiliary, "en1", [createParagraphNode([createTextNode("Endnote 1")])], 1);
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('data-word-endnotes="1"');
       expect(html).toContain("Endnote 1");
     });
@@ -439,9 +434,9 @@ describe("HTML Renderer", () => {
       addComment(doc.auxiliary, "c1", [createParagraphNode([createTextNode("Comment")])], {
         author: "Test User",
       });
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain('data-word-comments="1"');
       expect(html).toContain("Comment");
       expect(html).toContain("Test User");
@@ -456,9 +451,9 @@ describe("HTML Renderer", () => {
       });
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, { mode: "fidelity" });
-      
+
       expect(html).toContain("text-align:center");
       expect(html).toContain("margin-left:20pt");
     });
@@ -469,9 +464,9 @@ describe("HTML Renderer", () => {
       });
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, { mode: "semantic", includeDataAttrs: false });
-      
+
       // Semantic mode should not include style attributes
       expect(html).not.toContain("text-align");
     });
@@ -481,9 +476,9 @@ describe("HTML Renderer", () => {
     it("should wrap in full HTML document when requested", () => {
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([createParagraphNode([createTextNode("Test")])]));
-      
+
       const html = renderASTToHtml(doc, { wrapAsDocument: true });
-      
+
       expect(html).toContain("<!DOCTYPE html>");
       expect(html).toContain("<html>");
       expect(html).toContain("<head>");
@@ -496,25 +491,23 @@ describe("HTML Renderer", () => {
       const p = createParagraphNode([createTextNode("<script>alert('xss')</script>")]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("&lt;script&gt;");
       expect(html).not.toContain("<script>");
     });
 
     it("should escape HTML in attributes", () => {
-      const link = createHyperlinkNode(
-        'https://example.com?q="test"',
-        [createTextNode("Link")],
-        { title: 'Title with "quotes"' }
-      );
+      const link = createHyperlinkNode('https://example.com?q="test"', [createTextNode("Link")], {
+        title: 'Title with "quotes"',
+      });
       const p = createParagraphNode([link]);
       const doc = createEmptyDocument("docx");
       doc.children.push(createSectionNode([p]));
-      
+
       const html = renderASTToHtml(doc, defaultOptions);
-      
+
       expect(html).toContain("&quot;");
     });
   });
@@ -524,19 +517,16 @@ describe("HTML Renderer", () => {
       const doc = createEmptyDocument("docx");
       doc.children.push(
         createSectionNode([
-          createParagraphNode([
-            createTextNode("Hello"),
-            createImageNode("img.png"),
-          ]),
+          createParagraphNode([createTextNode("Hello"), createImageNode("img.png")]),
           createParagraphNode([
             createHyperlinkNode("https://example.com", [createTextNode("Link")]),
           ]),
-        ])
+        ]),
       );
-      
+
       const renderer = new HtmlRenderer(defaultOptions);
       const result = renderer.render(doc);
-      
+
       expect(result.metadata.imageCount).toBe(1);
       expect(result.metadata.linkCount).toBe(1);
       expect(result.metadata.nodeCount).toBeGreaterThan(0);

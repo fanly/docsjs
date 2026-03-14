@@ -1,8 +1,8 @@
 /**
  * HTML Parser
- * 
+ *
  * Parses HTML strings and outputs DocumentAST.
- * 
+ *
  * Architecture:
  * - HTML string → DOM parsing → AST nodes
  * - Clean separation from rendering
@@ -120,7 +120,7 @@ export class HtmlParser {
     if (typeof DOMParser !== "undefined") {
       const parser = new DOMParser();
       this.document = parser.parseFromString(html, "text/html");
-      
+
       // Check for parsing errors
       const parseError = this.document.getElementsByTagName("parsererror")[0];
       if (parseError) {
@@ -154,11 +154,13 @@ export class HtmlParser {
     // Very basic HTML parsing for Node.js environment
     // Creates a minimal DOM-like structure
     const bodyContent = this.extractBodyContent(html);
-    
+
     return {
       body: this.createSimpleElement("body", bodyContent),
       querySelector: (selector: string) => {
-        if (selector === "body") {return this.createSimpleElement("body", bodyContent);}
+        if (selector === "body") {
+          return this.createSimpleElement("body", bodyContent);
+        }
         if (selector.startsWith("meta[name=")) {
           const match = html.match(/<meta name="([^"]+)" content="([^"]*)"/);
           if (match) {
@@ -167,26 +169,34 @@ export class HtmlParser {
               nodeName: "META",
               tagName: "meta",
               getAttribute: (name: string) => {
-                if (name === "name") {return match[1];}
-                if (name === "content") {return match[2];}
+                if (name === "name") {
+                  return match[1];
+                }
+                if (name === "content") {
+                  return match[2];
+                }
                 return null;
-              }
+              },
             } as unknown as Element;
           }
         }
         return null;
       },
-      getElementsByTagName: () => []
+      getElementsByTagName: () => [],
     } as unknown as Document;
   }
 
   private extractBodyContent(html: string): string {
     const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-    if (bodyMatch) {return bodyMatch[1];}
-    
+    if (bodyMatch) {
+      return bodyMatch[1];
+    }
+
     const htmlMatch = html.match(/<html[^>]*>([\s\S]*)<\/html>/i);
-    if (htmlMatch) {return htmlMatch[1];}
-    
+    if (htmlMatch) {
+      return htmlMatch[1];
+    }
+
     return html;
   }
 
@@ -199,7 +209,7 @@ export class HtmlParser {
       childNodes: [],
       querySelectorAll: () => [],
       querySelector: () => null,
-      getAttribute: () => null
+      getAttribute: () => null,
     };
   }
 
@@ -261,7 +271,7 @@ export class HtmlParser {
             properties.subject = content;
             break;
           case "keywords":
-            properties.keywords = content.split(",").map(k => k.trim());
+            properties.keywords = content.split(",").map((k) => k.trim());
             break;
           case "language":
             properties.language = content;
@@ -291,7 +301,9 @@ export class HtmlParser {
     for (const child of children) {
       if (child.nodeType === Node.ELEMENT_NODE) {
         const block = this.parseElement(child as Element);
-        if (block) {blocks.push(block);}
+        if (block) {
+          blocks.push(block);
+        }
       } else if (child.nodeType === Node.TEXT_NODE) {
         const text = (child as Text).textContent?.trim();
         if (text) {
@@ -377,7 +389,7 @@ export class HtmlParser {
 
   private parseDiv(element: Element): BlockNode {
     const blocks = this.parseChildBlocks(element);
-    
+
     if (blocks.length === 1) {
       return blocks[0];
     }
@@ -390,19 +402,18 @@ export class HtmlParser {
     const listType = tagName === "ol" ? "ordered" : "unordered";
 
     const items: ListItemNode[] = [];
-    const listItems = Array.from(element.querySelectorAll?.(":scope > li") || element.childNodes || []);
+    const listItems = Array.from(
+      element.querySelectorAll?.(":scope > li") || element.childNodes || [],
+    );
 
     for (let i = 0; i < listItems.length; i++) {
       const li = listItems[i];
       if (li.nodeType === Node.ELEMENT_NODE) {
         const itemBlocks = this.parseListItemContent(li as Element);
 
-        items.push(createListItemNode(
-          itemBlocks,
-          0,
-          undefined,
-          listType === "ordered" ? i + 1 : undefined
-        ));
+        items.push(
+          createListItemNode(itemBlocks, 0, undefined, listType === "ordered" ? i + 1 : undefined),
+        );
       }
     }
 
@@ -418,23 +429,27 @@ export class HtmlParser {
       if (child.nodeType === Node.ELEMENT_NODE) {
         const el = child as Element;
         const tagName = (el.tagName || "").toLowerCase();
-        
+
         if (tagName === "ul" || tagName === "ol") {
           if (childBlocks.length > 0) {
-            blocks.push(createParagraphNode(childBlocks.flatMap(b => this.blockToInlines(b))));
+            blocks.push(createParagraphNode(childBlocks.flatMap((b) => this.blockToInlines(b))));
             childBlocks.length = 0;
           }
           const listBlock = this.parseElement(el);
-          if (listBlock) {blocks.push(listBlock);}
+          if (listBlock) {
+            blocks.push(listBlock);
+          }
         } else {
           const block = this.parseElement(el);
-          if (block) {childBlocks.push(block);}
+          if (block) {
+            childBlocks.push(block);
+          }
         }
       }
     }
 
     if (childBlocks.length > 0) {
-      blocks.push(createParagraphNode(childBlocks.flatMap(b => this.blockToInlines(b))));
+      blocks.push(createParagraphNode(childBlocks.flatMap((b) => this.blockToInlines(b))));
     }
 
     return blocks;
@@ -451,7 +466,7 @@ export class HtmlParser {
 
   private parseTable(element: Element): TableNode {
     const rows: TableRowNode[] = [];
-    
+
     const thead = element.querySelector?.("thead");
     if (thead) {
       const headerRows = this.parseTableRows(thead, true);
@@ -484,10 +499,11 @@ export class HtmlParser {
         const isHeaderCell = (cell.tagName || "").toLowerCase() === "th";
         const children = this.parseInlineContent(cell);
 
-        cells.push(createTableCellNode(
-          [createParagraphNode(children)],
-          { isHeader: isHeaderCell || isHeader }
-        ));
+        cells.push(
+          createTableCellNode([createParagraphNode(children)], {
+            isHeader: isHeaderCell || isHeader,
+          }),
+        );
       }
 
       if (cells.length > 0) {
@@ -526,10 +542,7 @@ export class HtmlParser {
     const alt = element.getAttribute?.("alt") || "";
     const title = element.getAttribute?.("title") || undefined;
 
-    return createImageNode(
-      this.resolveUrl(src),
-      { alt, title }
-    );
+    return createImageNode(this.resolveUrl(src), { alt, title });
   }
 
   private parseThematicBreak(): ThematicBreakNode {
@@ -564,7 +577,9 @@ export class HtmlParser {
         }
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         const inline = this.parseInlineElement(child as Element);
-        if (inline) {inlines.push(inline);}
+        if (inline) {
+          inlines.push(inline);
+        }
       }
     }
 
@@ -631,25 +646,21 @@ export class HtmlParser {
     const title = element.getAttribute?.("title") || undefined;
     const children = this.parseInlineContent(element);
 
-    return createHyperlinkNode(
-      this.resolveUrl(href),
-      children,
-      { title }
-    );
+    return createHyperlinkNode(this.resolveUrl(href), children, { title });
   }
 
   private parseMarkedInline(element: Element, markType: TextMark["type"]): TextNode {
     const children = this.parseInlineContent(element);
-    
-    const text = children
-      .map(c => c.type === "text" ? c.text : "")
-      .join("");
+
+    const text = children.map((c) => (c.type === "text" ? c.text : "")).join("");
 
     return createTextNode(text, [{ type: markType }]);
   }
 
   private mergeAdjacentTextNodes(inlines: InlineNode[]): InlineNode[] {
-    if (inlines.length <= 1) {return inlines;}
+    if (inlines.length <= 1) {
+      return inlines;
+    }
 
     const result: InlineNode[] = [];
     let currentText: TextNode | null = null;
@@ -682,17 +693,20 @@ export class HtmlParser {
     return result;
   }
 
-  private mergeMarks(
-    marks1?: TextMark[], 
-    marks2?: TextMark[]
-  ): TextMark[] | undefined {
-    if (!marks1) {return marks2;}
-    if (!marks2) {return marks1;}
+  private mergeMarks(marks1?: TextMark[], marks2?: TextMark[]): TextMark[] | undefined {
+    if (!marks1) {
+      return marks2;
+    }
+    if (!marks2) {
+      return marks1;
+    }
     return [...marks1, ...marks2];
   }
 
   private resolveUrl(url: string): string {
-    if (!url) {return "";}
+    if (!url) {
+      return "";
+    }
     if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
       return url;
     }

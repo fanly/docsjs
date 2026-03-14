@@ -15,9 +15,18 @@
       <button @click="onExportSnapshot">{{ t.exportSnapshot }}</button>
     </div>
 
-    <WordFidelityEditorVue ref="editor" :lang="lang" @change="onChange" @error="onError" @ready="onReady" />
+    <WordFidelityEditorVue
+      ref="editor"
+      :lang="lang"
+      @change="onChange"
+      @error="onError"
+      @ready="onReady"
+    />
 
-    <div class="meta">{{ t.source }}: {{ source }} | {{ t.snapshotLength }}: {{ length }} | strict | {{ t.parseElapsed }}: {{ report?.elapsedMs ?? "-" }}</div>
+    <div class="meta">
+      {{ t.source }}: {{ source }} | {{ t.snapshotLength }}: {{ length }} | strict |
+      {{ t.parseElapsed }}: {{ report?.elapsedMs ?? "-" }}
+    </div>
     <div class="stats">
       <div>{{ t.paragraphCount }}: {{ stats.paragraphCount }}</div>
       <div>{{ t.headingCount }}: {{ stats.headingCount }}</div>
@@ -42,9 +51,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import {
-  WordFidelityEditorVue
-} from "@coding01/docsjs/vue";
+import { WordFidelityEditorVue } from "@coding01/docsjs/vue";
 import { collectSemanticStatsFromHtml } from "@coding01/docsjs";
 import type { DocsWordEditorElementApi, SemanticStats, DocxParseReport } from "@coding01/docsjs";
 
@@ -77,7 +84,7 @@ const text: Record<Lang, Record<string, string>> = {
     pageSpacerCount: "分页占位",
     textCharCount: "文本字符",
     zh: "中文",
-    en: "English"
+    en: "English",
   },
   en: {
     subtitle: "Paste from Word/WPS/Google Docs or upload .docx to verify fidelity import.",
@@ -105,8 +112,8 @@ const text: Record<Lang, Record<string, string>> = {
     pageSpacerCount: "Page Spacers",
     textCharCount: "Text Chars",
     zh: "中文",
-    en: "English"
-  }
+    en: "English",
+  },
 };
 const t = computed(() => text[lang.value]);
 
@@ -130,7 +137,7 @@ const stats = ref<SemanticStats>({
   revisionDelCount: 0,
   pageBreakCount: 0,
   pageSpacerCount: 0,
-  textCharCount: 0
+  textCharCount: 0,
 });
 const report = ref<DocxParseReport | null>(null);
 
@@ -138,7 +145,11 @@ const onReady = (payload: { version: string }) => {
   console.log("ready", payload.version);
 };
 
-const onChange = (payload: { source: string; htmlSnapshot: string; parseReport?: DocxParseReport }) => {
+const onChange = (payload: {
+  source: string;
+  htmlSnapshot: string;
+  parseReport?: DocxParseReport;
+}) => {
   source.value = payload.source;
   length.value = payload.htmlSnapshot.length;
   stats.value = collectSemanticStatsFromHtml(payload.htmlSnapshot);
@@ -173,7 +184,13 @@ const onExportSnapshot = async () => {
   max-width: 1320px;
   margin: 20px auto;
   padding: 0 16px;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
 }
 .top {
   display: flex;

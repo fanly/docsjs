@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 async function makeDocxWithRevisions(): Promise<File> {
@@ -18,12 +18,12 @@ async function makeDocxWithRevisions(): Promise<File> {
           </w:del>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
   );
 
   const bytes = await zip.generateAsync({ type: "uint8array" });
@@ -31,7 +31,7 @@ async function makeDocxWithRevisions(): Promise<File> {
   const end = bytes.byteOffset + bytes.byteLength;
   return {
     name: "revisions.docx",
-    arrayBuffer: async () => bytes.buffer.slice(start, end)
+    arrayBuffer: async () => bytes.buffer.slice(start, end),
   } as unknown as File;
 }
 
@@ -56,17 +56,18 @@ describe("parseDocxToHtmlSnapshot revisions", () => {
             <w:ins w:id="1"><w:r><w:rPr><w:b/></w:rPr><w:t>BoldIns</w:t></w:r></w:ins>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "revisions-style.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-revision="ins"`);
@@ -89,17 +90,18 @@ describe("parseDocxToHtmlSnapshot revisions", () => {
             </w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "revisions-meta.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -127,17 +129,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             <w:ins w:id="2"><w:r><w:t>Second</w:t></w:r></w:ins>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "multi-ins.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -162,17 +165,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             <w:del w:id="2"><w:r><w:delText>Old2</w:delText></w:r></w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "multi-del.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -196,17 +200,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             <w:r><w:t> unchanged</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "mixed-rev.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -234,17 +239,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             </w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "formatted-del.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -268,17 +274,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             </w:ins>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "color-rev.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -300,17 +307,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             <w:del w:id="2"><w:r><w:delText>Para2Del</w:delText></w:r></w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "para-rev.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -340,17 +348,18 @@ describe("parseDocxToHtmlSnapshot revision advanced features", () => {
             </w:del>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "styled-rev.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);

@@ -1,6 +1,6 @@
 /**
  * Parser Interface
- * 
+ *
  * Defines the contract for all document parsers.
  * Each parser converts a specific input format to DocumentAST.
  */
@@ -42,12 +42,12 @@ export interface IParser<T extends ParseOptions = ParseOptions> {
    * Parse input and return AST
    */
   parse(input: T): Promise<ParseResult>;
-  
+
   /**
    * Get the supported input format
    */
   getSupportedFormat(): string;
-  
+
   /**
    * Validate input before parsing
    */
@@ -62,12 +62,12 @@ export interface ParserFactory {
    * Create a parser for the given format
    */
   createParser(format: string): IParser | null;
-  
+
   /**
    * Get list of supported formats
    */
   getSupportedFormats(): string[];
-  
+
   /**
    * Register a custom parser
    */

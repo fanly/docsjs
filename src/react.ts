@@ -4,5 +4,5 @@ export type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
-  DocsWordEditorReadyDetail
+  DocsWordEditorReadyDetail,
 } from "./core/types";

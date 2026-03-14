@@ -1,8 +1,8 @@
 /**
  * Markdown Renderer
- * 
+ *
  * Renders DocumentAST to Markdown output.
- * 
+ *
  * Design Principles:
  * 1. Pure rendering - no modification to AST
  * 2. GitHub Flavored Markdown (GFM) by default
@@ -45,28 +45,28 @@ import type {
 export interface MarkdownRenderOptions {
   /** Render mode - affects output style */
   mode: "gfm" | "standard" | "strict";
-  
+
   /** Include frontmatter YAML block */
   includeFrontmatter: boolean;
-  
+
   /** Include table of contents */
   includeTOC: boolean;
-  
+
   /** Maximum heading level to include in TOC */
   tocMaxLevel: number;
-  
+
   /** Image handling */
   imageHandling: "reference" | "placeholder" | "base64";
-  
+
   /** Math rendering format */
   mathFormat: "katex" | "latex" | "text";
-  
+
   /** Code block language */
   codeLanguage: string;
-  
+
   /** Use thematic breaks instead of multiple newlines */
   useThematicBreaks: boolean;
-  
+
   /** Preserve soft breaks in paragraphs */
   preserveSoftBreaks: boolean;
 }
@@ -147,13 +147,17 @@ export class MarkdownRenderer {
 
     for (const section of doc.children) {
       const rendered = this.renderSection(section);
-      if (rendered) {parts.push(rendered);}
+      if (rendered) {
+        parts.push(rendered);
+      }
     }
 
     // Render auxiliary sections (footnotes, etc.)
     if (doc.auxiliary) {
       const auxMarkdown = this.renderAuxiliarySections(doc.auxiliary);
-      if (auxMarkdown) {parts.push(auxMarkdown);}
+      if (auxMarkdown) {
+        parts.push(auxMarkdown);
+      }
     }
 
     return parts.join("\n\n");
@@ -161,7 +165,7 @@ export class MarkdownRenderer {
 
   private renderFrontmatter(doc: DocumentNode): string {
     const meta: Record<string, string> = {};
-    
+
     if (doc.properties?.title) {
       meta.title = doc.properties.title;
     }
@@ -191,7 +195,9 @@ export class MarkdownRenderer {
 
     for (const block of section.children) {
       const markdown = this.renderBlock(block);
-      if (markdown) {parts.push(markdown);}
+      if (markdown) {
+        parts.push(markdown);
+      }
     }
 
     return parts.join("\n\n");
@@ -233,7 +239,7 @@ export class MarkdownRenderer {
   private renderHeading(h: HeadingNode): string {
     const prefix = "#".repeat(h.level);
     const text = this.renderInlines(h.children);
-    
+
     // Track for TOC
     const anchor = this.generateAnchor(text);
     this.headingItems.push({ level: h.level, text, anchor });
@@ -247,40 +253,43 @@ export class MarkdownRenderer {
   }
 
   private renderListItem(item: ListItemNode, index: number, listType?: string): string {
-    const prefix = listType === "ordered" 
-      ? `${item.number || index + 1}.` 
-      : "-";
-    
+    const prefix = listType === "ordered" ? `${item.number || index + 1}.` : "-";
+
     const content = item.children.map((b) => this.renderBlock(b)).join("\n");
-    
+
     // Handle nested items with indentation
-    if (item.children.some(c => c.type === "list")) {
+    if (item.children.some((c) => c.type === "list")) {
       const lines = content.split("\n");
-      return `${prefix} ${lines[0]}\n${lines.slice(1).map(l => "  " + l).join("\n")}`;
+      return `${prefix} ${lines[0]}\n${lines
+        .slice(1)
+        .map((l) => "  " + l)
+        .join("\n")}`;
     }
-    
+
     return `${prefix} ${content}`;
   }
 
   private renderTable(table: TableNode): string {
-    if (!table.rows || table.rows.length === 0) {return "";}
+    if (!table.rows || table.rows.length === 0) {
+      return "";
+    }
 
     const parts: string[] = [];
-    
+
     // Header row
     if (table.rows[0]) {
-      const headerCells = table.rows[0].cells.map(cell => this.renderTableCellContent(cell));
+      const headerCells = table.rows[0].cells.map((cell) => this.renderTableCellContent(cell));
       parts.push("| " + headerCells.join(" | ") + " |");
-      
+
       // Separator row
       const separators = headerCells.map(() => "---");
       parts.push("| " + separators.join(" | ") + " |");
     }
-    
+
     // Body rows
     for (let i = 1; i < table.rows.length; i++) {
       const row = table.rows[i];
-      const cells = row.cells.map(cell => this.renderTableCellContent(cell));
+      const cells = row.cells.map((cell) => this.renderTableCellContent(cell));
       parts.push("| " + cells.join(" | ") + " |");
     }
 
@@ -288,13 +297,15 @@ export class MarkdownRenderer {
   }
 
   private renderTableCellContent(cell: TableCellNode): string {
-    const content = cell.children.map((block) => {
-      if (block.type === "paragraph") {
-        return this.renderInlines((block as ParagraphNode).children);
-      }
-      return this.renderBlock(block);
-    }).join(" ");
-    
+    const content = cell.children
+      .map((block) => {
+        if (block.type === "paragraph") {
+          return this.renderInlines((block as ParagraphNode).children);
+        }
+        return this.renderBlock(block);
+      })
+      .join(" ");
+
     return content || " ";
   }
 
@@ -311,26 +322,26 @@ export class MarkdownRenderer {
           return this.renderCustomBlock(figure.content as CustomBlockNode);
       }
     }
-    
+
     // Fallback: render caption if exists
     if (figure.caption) {
       return this.renderInlines(figure.caption.children);
     }
-    
+
     return "";
   }
 
   private renderCodeBlock(code: CodeBlockNode): string {
     const lang = code.language || this.options.codeLanguage || "";
     const fences = "```";
-    
+
     return `${fences}${lang}\n${code.code || ""}\n${fences}`;
   }
 
   private renderBlockquote(block: BlockquoteNode): string {
     const content = block.children.map((b) => this.renderBlock(b)).join("\n");
     const lines = content.split("\n");
-    return lines.map(line => `> ${line}`).join("\n");
+    return lines.map((line) => `> ${line}`).join("\n");
   }
 
   private renderThematicBreak(): string {
@@ -345,7 +356,7 @@ export class MarkdownRenderer {
   // ---- INLINE RENDERING ----
 
   private renderInlines(nodes: InlineNode[]): string {
-    return nodes.map(node => this.renderInline(node)).join("");
+    return nodes.map((node) => this.renderInline(node)).join("");
   }
 
   private renderInline(node: InlineNode): string {
@@ -373,14 +384,14 @@ export class MarkdownRenderer {
 
   private renderText(text: TextNode): string {
     let content = text.text || "";
-    
+
     // Process marks
     if (text.marks) {
       for (const mark of text.marks) {
         content = this.applyMark(content, mark);
       }
     }
-    
+
     return content;
   }
 
@@ -414,7 +425,7 @@ export class MarkdownRenderer {
     const text = this.renderInlines(link.children);
     const href = link.href || "";
     const title = link.title ? ` "${link.title}"` : "";
-    
+
     return `[${text}](${href}${title})`;
   }
 
@@ -422,7 +433,7 @@ export class MarkdownRenderer {
     this.imageCount++;
     const alt = image.alt || "";
     const src = image.src || "";
-    
+
     switch (this.options.imageHandling) {
       case "placeholder":
         return `![${alt}](${src})`;
@@ -465,7 +476,7 @@ export class MarkdownRenderer {
       parts.push("## References\n");
       const footnoteArray = Array.from(aux.footnotes.entries());
       for (const [id, fn] of footnoteArray) {
-        const content = fn.children.map(b => this.renderBlock(b)).join("\n");
+        const content = fn.children.map((b) => this.renderBlock(b)).join("\n");
         parts.push(`[^${id}]: ${content}`);
       }
     }
@@ -476,11 +487,13 @@ export class MarkdownRenderer {
   // ---- UTILITIES ----
 
   private generateTOC(): string {
-    const items = this.headingItems.filter(h => h.level <= this.options.tocMaxLevel);
-    if (items.length === 0) {return "";}
+    const items = this.headingItems.filter((h) => h.level <= this.options.tocMaxLevel);
+    if (items.length === 0) {
+      return "";
+    }
 
     const lines: string[] = ["## Table of Contents\n"];
-    
+
     for (const item of items) {
       const indent = "  ".repeat(item.level - 1);
       lines.push(`${indent}- [${item.text}](#${item.anchor})`);

@@ -16,6 +16,8 @@ export default defineConfig({
       "node_modules/**",
       "demos/**",
       "coverage/**",
+      "docs/**",
+      "infrastructure/**",
       "test-basic.ts",
       "scripts/**",
       "bin/**",
@@ -101,7 +103,7 @@ export default defineConfig({
       "@typescript-eslint/prefer-namespace-keyword": "error",
       "@typescript-eslint/triple-slash-reference": "error",
     },
-  overrides: [
+    overrides: [
       {
         files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
         rules: {

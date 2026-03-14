@@ -1,7 +1,6 @@
-export { 
-  CMSAdapter, 
-  CMSImportOptions, 
-  CMSContent,
+// Re-export type-only interfaces from adapters to avoid runtime exports
+export type { CMSAdapter, CMSImportOptions, CMSContent } from "./adapters";
+export type {
   WordPressOptions,
   ContentfulOptions,
   StrapiOptions,
@@ -9,41 +8,63 @@ export {
   NotionOptions,
   ConfluenceOptions,
   GitBookOptions,
+} from "./adapters";
+// Re-export value-direct exports from adapters
+export {
   createWordPressAdapter,
   createContentfulAdapter,
   createStrapiAdapter,
-  createCMSAdapter
-} from './adapters';
+  createCMSAdapter,
+} from "./adapters";
 
-export { GhostAdapter, createGhostAdapter } from './ghost';
-export type { GhostPost } from './ghost';
+export { GhostAdapter, createGhostAdapter } from "./ghost";
+export type { GhostPost } from "./ghost";
 
-export { NotionAdapter, createNotionAdapter } from './notion';
-export type { NotionPage, NotionBlock, NotionDatabase } from './notion';
+export { NotionAdapter, createNotionAdapter } from "./notion";
+export type { NotionPage, NotionBlock, NotionDatabase } from "./notion";
 
-export { ConfluenceAdapter, createConfluenceAdapter } from './confluence';
-export type { ConfluencePage, ConfluenceSpace, ConfluenceAttachment } from './confluence';
+export { ConfluenceAdapter, createConfluenceAdapter } from "./confluence";
+export type { ConfluencePage, ConfluenceSpace, ConfluenceAttachment } from "./confluence";
 
-export { GitBookAdapter, createGitBookAdapter } from './gitbook';
-export type { GitBookPage, GitBookContent, GitBookSpace, GitBookVersion } from './gitbook';
+export { GitBookAdapter, createGitBookAdapter } from "./gitbook";
+export type { GitBookPage, GitBookContent, GitBookSpace, GitBookVersion } from "./gitbook";
 
-export { BlackboardAdapter, createBlackboardAdapter } from './lms';
-export type { BlackboardOptions, BlackboardCourse, BlackboardContent, BlackboardAttachment } from './lms';
+export { BlackboardAdapter, createBlackboardAdapter } from "./lms";
+export type {
+  BlackboardOptions,
+  BlackboardCourse,
+  BlackboardContent,
+  BlackboardAttachment,
+} from "./lms";
 
-export { MoodleAdapter, createMoodleAdapter } from './lms';
-export type { MoodleOptions, MoodleCourse, MoodleSection, MoodleModule, MoodleFile } from './lms';
+export { MoodleAdapter, createMoodleAdapter } from "./lms";
+export type { MoodleOptions, MoodleCourse, MoodleSection, MoodleModule, MoodleFile } from "./lms";
 
-export { SharePointAdapter, createSharePointAdapter } from './enterprise';
-export type { SharePointOptions, SharePointSite, SharePointDrive, SharePointItem } from './enterprise';
+export { SharePointAdapter, createSharePointAdapter } from "./enterprise";
+export type {
+  SharePointOptions,
+  SharePointSite,
+  SharePointDrive,
+  SharePointItem,
+} from "./enterprise";
 
-export { BoxAdapter, createBoxAdapter } from './enterprise';
-export type { BoxOptions, BoxItem, BoxFile } from './enterprise';
+export { BoxAdapter, createBoxAdapter } from "./enterprise";
+export type { BoxOptions, BoxItem, BoxFile } from "./enterprise";
 
-export { OneDriveAdapter, createOneDriveAdapter } from './enterprise';
-export type { OneDriveOptions, OneDriveItem } from './enterprise';
-export type { GoogleDriveOptions, GoogleDriveFile } from './enterprise';
+export { OneDriveAdapter, createOneDriveAdapter } from "./enterprise";
+export type { OneDriveOptions, OneDriveItem } from "./enterprise";
+export type { GoogleDriveOptions, GoogleDriveFile } from "./enterprise";
 
 // Academic exports
-export { ExamQuestionExtractor } from '../lms/academic';
-export type { ExamQuestion, QuestionBank, ExtractionResult, GradeBook, GradeEntry, GradeStatistics, StudentPerformance, AcademicAnalytics } from '../lms/academic';
-export { GradeBookManager } from '../lms/gradebook';
+export { ExamQuestionExtractor } from "../lms/academic";
+export type {
+  ExamQuestion,
+  QuestionBank,
+  ExtractionResult,
+  GradeBook,
+  GradeEntry,
+  GradeStatistics,
+  StudentPerformance,
+  AcademicAnalytics,
+} from "../lms/academic";
+export { GradeBookManager } from "../lms/gradebook";

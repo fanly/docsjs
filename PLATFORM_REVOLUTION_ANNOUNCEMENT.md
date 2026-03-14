@@ -5,29 +5,33 @@ Today marks a pivotal transformation in the DocsJS project. We're proud to annou
 ## 🚀 The Strategic Transformation
 
 ### Before: Utility Grade Architecture
+
 ```
 Input (DOCX) → [Simple Parser] → Output (HTML)
                 (1-way transformation)
 ```
+
 - **Limited Use Cases**: Word → HTML for basic web publishing
 - **Static Behavior**: One-size-fits-all processing
 - **No Extension**: Fixed feature set determined by core team
 - **Basic Security**: File processing with minimal safeguards
 
-### After: Platform Grade Architecture  
+### After: Platform Grade Architecture
+
 ```
   ┌─────────────────────────────────────────────────────┐
   │                PLATFORM LAYER                       │
   │  Profiles + Plugins + Config + Marketplace + CLI  │
   ├─────────────────────────────────────────────────────┤
-  │                 ADAPTER LAYER                       │ 
+  │                 ADAPTER LAYER                       │
   │  Parsers ← → DocumentAST ← → Renderers (Multi-Format) │
   ├─────────────────────────────────────────────────────┤
   │                  CORE ENGINE                        │
   │  Pipeline + Plugins + Security + Metrics + Diagnostics │
   └─────────────────────────────────────────────────────┘
 ```
-- **Scalable Architecture**: Layered design enabling growth  
+
+- **Scalable Architecture**: Layered design enabling growth
 - **Extensible by Design**: Full plugin ecosystem ready
 - **Configurable by Use Case**: Knowledge Base, Exam Paper, Enterprise profiles
 - **Secure by Default**: Complete permission and isolation model
@@ -35,31 +39,36 @@ Input (DOCX) → [Simple Parser] → Output (HTML)
 ## 🎯 Key Achievements
 
 ### ✅ Core Engine Platform Architecture
+
 - **Three-Tier Architecture** (Platform + Adapters + Core) matching industry standards
-- **PicGo-Inspired Plugin System**: 8 lifecycle hooks for deep integration  
+- **PicGo-Inspired Plugin System**: 8 lifecycle hooks for deep integration
 - **Security-First Model**: Plugin sandboxing with granular permissions
 - **Performance Optimized**: Under 50ms for typical operations
 
 ### ✅ Configurable Processing Profiles
+
 - **Knowledge Base Profile**: High-fidelity for documentation/academic publishing
-- **Exam Paper Profile**: Question-focused for educational content processing  
+- **Exam Paper Profile**: Question-focused for educational content processing
 - **Enterprise Profile**: Security and compliance-optimized
 - **Custom Profile System**: Create your own processing configurations
 
 ### ✅ Plugin Ecosystem Ready
+
 - **8 Lifecycle Hooks**: beforeParse → afterParse → beforeTransform → afterTransform → beforeRender → afterRender → beforeExport → afterExport
 - **Security Permissions**: File/network/compute limits enforcement
-- **Dependency Management**: Plugin ordering and dependency resolution  
+- **Dependency Management**: Plugin ordering and dependency resolution
 - **Priority Execution**: Order-sensitive plugin coordination
 
 ### ✅ Backward Compatible API
+
 - **Zero Breaking Changes**: All existing code continues to work unchanged
-- **Incremental Adoption**: New features available while old APIs preserved  
+- **Incremental Adoption**: New features available while old APIs preserved
 - **Drop-in Replacement**: Works with existing integrations
 
 ## 🔋 Platform Capabilities Activated
 
 ### Immediately Available:
+
 - **Multi-Format Processing**: Foundation for DOCX → HTML | Markdown | JSON | PDF (future)
 - **Plugin Marketplace Ready**: Infrastructure for community contributions
 - **Editor Integrations**: Architecture prepared for TipTap/Slate/ProseMirror
@@ -67,53 +76,59 @@ Input (DOCX) → [Simple Parser] → Output (HTML)
 - **Enterprise Controls**: Security and compliance features enabled
 
 ### Coming Soon:
+
 - **Official Plugin Gallery**: Vetted plugins for common use cases
 - **Cloud Conversion APIs**: Hosted document transformation service
-- **Advanced Security Features**: Compliance scanning and audit trails  
+- **Advanced Security Features**: Compliance scanning and audit trails
 - **Editor Deep Integrations**: Native TipTap/Slate components
 - **Community Extensions**: Growing collection of contributed plugins
 
 ## 🧪 Quality Validation
 
 The Core Engine v2 has undergone comprehensive validation:
+
 - **300+ Automated Tests**: 100% passing across all architectural components
-- **Performance Baselines**: Maintains speed while dramatically expanding capabilities  
+- **Performance Baselines**: Maintains speed while dramatically expanding capabilities
 - **Security Validation**: Sandboxed execution with permission controls tested
 - **Compatibility Verification**: All existing APIs function identically
 - **Integration Confirmed**: Works seamlessly with existing ecosystem partners
 
-## 🛠️  For Developers
+## 🛠️ For Developers
 
 ### New Capabilities:
+
 ```typescript
-// Enhanced engine with platform features  
+// Enhanced engine with platform features
 import { CoreEngine, SYSTEM_PROFILES } from "@coding01/docsjs";
 
 const engine = new CoreEngine();
-engine.applyProfile('knowledge-base'); // Different processing for different needs
+engine.applyProfile("knowledge-base"); // Different processing for different needs
 
 // Plugin system waiting for your custom logic
 const myCustomPlugin = {
-  name: 'my-company-processor',
-  availableHooks: ['beforeRender'], // Hook at precise lifecycle moments
-  permissions: { 
-    network: false,        // Security by default
-    compute: { maxMemoryMB: 8 } // Resource bounds  
+  name: "my-company-processor",
+  availableHooks: ["beforeRender"], // Hook at precise lifecycle moments
+  permissions: {
+    network: false, // Security by default
+    compute: { maxMemoryMB: 8 }, // Resource bounds
   },
   beforeRender: (context) => {
     // Inject your custom behavior at precise moments
-    context.pipeline.state.enhancedContent = myCompanySpecificProcessing(context.pipeline.state.ast);
+    context.pipeline.state.enhancedContent = myCompanySpecificProcessing(
+      context.pipeline.state.ast,
+    );
     return context;
-  }
+  },
 };
 
 engine.registerPlugin(myCustomPlugin);
 
-const result = await engine.transformDocument(file); 
+const result = await engine.transformDocument(file);
 // Rich diagnostics and metrics automatically available
 ```
 
 ### Maintaining Backward Compatibility:
+
 ```typescript
 // All existing code works as before
 import { parseDocxToHtmlSnapshot } from "@coding01/docsjs";
@@ -123,18 +138,21 @@ const html = await parseDocxToHtmlSnapshot(file); // Identical behavior preserve
 ## 💡 Impact for Users
 
 ### For Current Users:
-- **Zero Disruption Path**: Continue using existing code without changes 
+
+- **Zero Disruption Path**: Continue using existing code without changes
 - **Performance Maintained**: Sub-50ms typical operations preserved
 - **Quality Enhanced**: Higher fidelity conversion under the hood
 - **Reliability Improved**: Better error handling and resource management
 
 ### For Power Users:
+
 - **Custom Processing**: Shape document transformation to your specific needs
-- **Security First**: Enterprise-grade security for sensitive documents  
+- **Security First**: Enterprise-grade security for sensitive documents
 - **Scalability Ready**: Handles large documents and concurrent processing
 - **Diagnostic Rich**: Full insight into processing results
 
 ### For Integrators:
+
 - **Multiple Entry Points**: Ready for web component, React, Vue, server integrations
 - **Plugin Infrastructure**: Ecosystem to build upon
 - **Configurable Pipelines**: Optimize for your specific content types
@@ -143,15 +161,17 @@ const html = await parseDocxToHtmlSnapshot(file); // Identical behavior preserve
 ## 📊 Strategic Value
 
 ### Technical Excellence Achieved:
+
 - [x] **Semantic Preservation**: Document meaning and structure maintained
-- [x] **Performance Targets**: Sub-50ms operations under full security  
+- [x] **Performance Targets**: Sub-50ms operations under full security
 - [x] **Architectural Integrity**: Proper layering and component separation
 - [x] **Security Standards**: Sandboxed execution with permission controls
 - [x] **Scalability Prepared**: Resource management and thread pooling
 
 ### Platform Foundation Delivered:
+
 - [x] **Plugin Ecosystem**: Ready for community development
-- [x] **Profile System**: Configurable processing for business cases  
+- [x] **Profile System**: Configurable processing for business cases
 - [x] **API Extensibility**: Forward-compatible component interfaces
 - [x] **Integration Architecture**: Prepared for editor and CMS integration
 - [x] **Monitoring & Diagnostics**: Operational visibility foundation
@@ -159,13 +179,15 @@ const html = await parseDocxToHtmlSnapshot(file); // Identical behavior preserve
 ## 🚀 What's Next
 
 ### Coming Quarter:
+
 1. **Plugin Showcase**: Featured plugins for common document processing tasks
 2. **Editor Integrations**: Deeper TipTap and Slate component support
-3. **API Service Beta**: Cloud-hosted document conversion API 
+3. **API Service Beta**: Cloud-hosted document conversion API
 4. **Performance Optimizations**: Advanced caching and streaming capabilities
 
-### Long Term: 
-- Community-driven plugin marketplace  
+### Long Term:
+
+- Community-driven plugin marketplace
 - AI-assisted document analysis and transformation
 - CMS integrations (WordPress, Ghost, Notion)
 - Educational platform integration (LMS systems)

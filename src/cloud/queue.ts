@@ -1,10 +1,10 @@
 /**
  * Distributed Queue System
- * 
+ *
  * Queue management for bulk document processing with priority support.
  */
 
-import type { QueueMessage, BatchJob } from './types';
+import type { QueueMessage, BatchJob } from "./types";
 
 /**
  * Queue implementation
@@ -22,7 +22,7 @@ export class DistributedQueue {
       visibilityTimeout: 30,
       defaultPriority: 0,
       concurrency: 5,
-      ...config
+      ...config,
     };
   }
 
@@ -32,10 +32,10 @@ export class DistributedQueue {
   async enqueue(
     queueName: string,
     payload: unknown,
-    options: Partial<EnqueueOptions> = {}
+    options: Partial<EnqueueOptions> = {},
   ): Promise<string> {
     const queue = this.getOrCreateQueue(queueName);
-    
+
     const message: Message = {
       id: this.generateId(),
       payload,
@@ -45,14 +45,14 @@ export class DistributedQueue {
       visibilityTimeout: options.visibilityTimeout ?? this.config.visibilityTimeout,
       delaySeconds: options.delaySeconds ?? 0,
       attributes: options.attributes,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     queue.enqueue(message, message.priority);
-    
+
     // Trigger processing if not already running
-    this.processQueue(queueName);
-    
+    void this.processQueue(queueName);
+
     return message.id;
   }
 
@@ -85,7 +85,9 @@ export class DistributedQueue {
     const processLoop = async () => {
       while (!queue.isEmpty()) {
         const message = queue.dequeue();
-        if (!message) {break;}
+        if (!message) {
+          break;
+        }
 
         try {
           await handler(message.payload);
@@ -94,7 +96,7 @@ export class DistributedQueue {
           message.retryCount++;
           if (message.retryCount < message.maxRetries) {
             // Re-queue with delay
-            message.timestamp = Date.now() + (message.retryCount * 1000);
+            message.timestamp = Date.now() + message.retryCount * 1000;
             queue.enqueue(message, message.priority - message.retryCount);
           } else {
             // Send to dead letter queue
@@ -106,7 +108,6 @@ export class DistributedQueue {
     };
 
     this.processing.set(queueName, processLoop());
-    processLoop();
   }
 
   /**
@@ -120,19 +121,18 @@ export class DistributedQueue {
 
     const messages = queue.toArray();
     const now = Date.now();
-    const oldestMessageAge = messages.length > 0 
-      ? Math.max(...messages.map(m => now - m.timestamp))
-      : 0;
+    const oldestMessageAge =
+      messages.length > 0 ? Math.max(...messages.map((m) => now - m.timestamp)) : 0;
 
     const priorityDistribution: Record<number, number> = {};
-    messages.forEach(m => {
+    messages.forEach((m) => {
       priorityDistribution[m.priority] = (priorityDistribution[m.priority] || 0) + 1;
     });
 
     return {
       size: messages.length,
       oldestMessageAge,
-      priorityDistribution
+      priorityDistribution,
     };
   }
 
@@ -183,7 +183,7 @@ class Queue<T> {
   }
 
   toArray(): T[] {
-    return this.items.map(item => item.value);
+    return this.items.map((item) => item.value);
   }
 }
 
@@ -230,7 +230,7 @@ export class BatchProcessor {
   }
 
   private setupHandlers(): void {
-    this.queue.registerHandler('batch', async (payload) => {
+    this.queue.registerHandler("batch", async (payload) => {
       const job = payload as BatchJob;
       await this.processJob(job);
     });
@@ -240,28 +240,28 @@ export class BatchProcessor {
    * Submit a batch job
    */
   async submitBatch(
-    type: BatchJob['type'],
+    type: BatchJob["type"],
     inputFiles: string[],
     outputFormat: string,
-    options: Partial<BatchJobOptions> = {}
+    options: Partial<BatchJobOptions> = {},
   ): Promise<string> {
     const job: BatchJob = {
       id: this.generateJobId(),
       type,
-      status: 'pending',
+      status: "pending",
       inputFiles,
       outputFormat,
       progress: 0,
       createdAt: Date.now(),
       callbackUrl: options.callbackUrl,
-      metadata: options.metadata
+      metadata: options.metadata,
     };
 
     this.jobs.set(job.id, job);
 
-    await this.queue.enqueue('batch', job, {
+    await this.queue.enqueue("batch", job, {
       priority: options.priority ?? 0,
-      attributes: { jobId: job.id }
+      attributes: { jobId: job.id },
     });
 
     return job.id;
@@ -279,18 +279,18 @@ export class BatchProcessor {
    */
   listJobs(filter?: Partial<JobFilter>): BatchJob[] {
     let jobs = Array.from(this.jobs.values());
-    
+
     if (filter?.status) {
-      jobs = jobs.filter(j => j.status === filter.status);
+      jobs = jobs.filter((j) => j.status === filter.status);
     }
     if (filter?.type) {
-      jobs = jobs.filter(j => j.type === filter.type);
+      jobs = jobs.filter((j) => j.type === filter.type);
     }
     if (filter?.createdAfter) {
-      jobs = jobs.filter(j => j.createdAt >= filter.createdAfter!);
+      jobs = jobs.filter((j) => j.createdAt >= filter.createdAfter!);
     }
     if (filter?.createdBefore) {
-      jobs = jobs.filter(j => j.createdAt <= filter.createdBefore!);
+      jobs = jobs.filter((j) => j.createdAt <= filter.createdBefore!);
     }
 
     return jobs.sort((a, b) => b.createdAt - a.createdAt);
@@ -301,25 +301,27 @@ export class BatchProcessor {
    */
   async cancelJob(jobId: string): Promise<boolean> {
     const job = this.jobs.get(jobId);
-    if (!job) {return false;}
-    if (job.status === 'completed' || job.status === 'failed') {
+    if (!job) {
+      return false;
+    }
+    if (job.status === "completed" || job.status === "failed") {
       return false;
     }
 
-    job.status = 'cancelled';
+    job.status = "cancelled";
     job.completedAt = Date.now();
     return true;
   }
 
   private async processJob(job: BatchJob): Promise<void> {
-    job.status = 'processing';
+    job.status = "processing";
     job.startedAt = Date.now();
 
     try {
       const totalFiles = job.inputFiles.length;
-      
+
       for (let i = 0; i < totalFiles; i++) {
-        if ((job.status as string) === 'cancelled') {
+        if ((job.status as string) === "cancelled") {
           break;
         }
 
@@ -328,12 +330,12 @@ export class BatchProcessor {
         job.progress = Math.round(((i + 1) / totalFiles) * 100);
       }
 
-      if ((job.status as string) !== 'cancelled') {
-        job.status = 'completed';
+      if ((job.status as string) !== "cancelled") {
+        job.status = "completed";
         job.resultUrl = `/results/${job.id}`;
       }
     } catch (error) {
-      job.status = 'failed';
+      job.status = "failed";
       job.error = error instanceof Error ? error.message : String(error);
     }
 
@@ -341,22 +343,22 @@ export class BatchProcessor {
 
     // Trigger callback if specified
     if (job.callbackUrl) {
-      this.triggerCallback(job);
+      void this.triggerCallback(job);
     }
   }
 
   private async triggerCallback(job: BatchJob): Promise<void> {
     try {
       const response = await fetch(job.callbackUrl!, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobId: job.id,
           status: job.status,
           progress: job.progress,
           resultUrl: job.resultUrl,
-          error: job.error
-        })
+          error: job.error,
+        }),
       });
       if (!response.ok) {
         console.error(`Callback failed for job ${job.id}: ${response.status}`);
@@ -382,8 +384,8 @@ interface BatchJobOptions {
 }
 
 interface JobFilter {
-  status: BatchJob['status'];
-  type: BatchJob['type'];
+  status: BatchJob["status"];
+  type: BatchJob["type"];
   createdAfter: number;
   createdBefore: number;
 }

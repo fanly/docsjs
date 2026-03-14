@@ -1,6 +1,6 @@
 export interface LicenseInfo {
   licenseKey: string;
-  plan: 'starter' | 'professional' | 'enterprise';
+  plan: "starter" | "professional" | "enterprise";
   customerId: string;
   customerEmail: string;
   allowedDomains: string[];
@@ -26,7 +26,7 @@ export interface ComplianceAuditLog {
   userId: string;
   action: string;
   resource: string;
-  result: 'success' | 'failure';
+  result: "success" | "failure";
   metadata?: Record<string, unknown>;
 }
 
@@ -48,7 +48,7 @@ export interface SecurityConfig {
 export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
   enableAuditLog: true,
   requireHttps: true,
-  allowedUploadTypes: ['.docx', '.doc'],
+  allowedUploadTypes: [".docx", ".doc"],
   maxFileSizeMB: 50,
   enableDlp: false,
 };
@@ -73,19 +73,26 @@ export class LicenseManager {
 
   async validate(licenseKey: string, domain?: string): Promise<LicenseValidationResult> {
     const now = Date.now();
-    
+
     if (this.licenseInfo && this.cacheExpiry > now) {
       return this.checkDomain(this.licenseInfo, domain);
     }
 
-    return { valid: false, error: { code: 'NOT_IMPLEMENTED', message: 'License server not configured' } };
+    return {
+      valid: false,
+      error: { code: "NOT_IMPLEMENTED", message: "License server not configured" },
+    };
   }
 
   async validateOffline(licenseKey: string, domain: string): Promise<LicenseValidationResult> {
     if (!this.licenseInfo) {
-      return { valid: false, error: { code: 'NO_LICENSE', message: 'No cached license' }, offline: true };
+      return {
+        valid: false,
+        error: { code: "NO_LICENSE", message: "No cached license" },
+        offline: true,
+      };
     }
-    
+
     return this.checkDomain(this.licenseInfo, domain);
   }
 
@@ -94,8 +101,8 @@ export class LicenseManager {
       return { valid: true, license };
     }
 
-    const allowed = license.allowedDomains.some(d => {
-      if (d.startsWith('*.')) {
+    const allowed = license.allowedDomains.some((d) => {
+      if (d.startsWith("*.")) {
         const base = d.slice(2);
         return domain.endsWith(base);
       }
@@ -103,7 +110,10 @@ export class LicenseManager {
     });
 
     if (!allowed) {
-      return { valid: false, error: { code: 'DOMAIN_NOT_ALLOWED', message: `Domain ${domain} not in whitelist` } };
+      return {
+        valid: false,
+        error: { code: "DOMAIN_NOT_ALLOWED", message: `Domain ${domain} not in whitelist` },
+      };
     }
 
     return { valid: true, license };
@@ -127,15 +137,15 @@ export class AuditLogger {
   private logs: ComplianceAuditLog[] = [];
   private maxLogs = 10000;
 
-  log(entry: Omit<ComplianceAuditLog, 'id' | 'timestamp'>): void {
+  log(entry: Omit<ComplianceAuditLog, "id" | "timestamp">): void {
     const log: ComplianceAuditLog = {
       ...entry,
       id: crypto.randomUUID(),
       timestamp: Date.now(),
     };
-    
+
     this.logs.push(log);
-    
+
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(-this.maxLogs);
     }
@@ -147,11 +157,19 @@ export class AuditLogger {
     startTime?: number;
     endTime?: number;
   }): ComplianceAuditLog[] {
-    return this.logs.filter(log => {
-      if (filters.userId && log.userId !== filters.userId) {return false;}
-      if (filters.action && log.action !== filters.action) {return false;}
-      if (filters.startTime && log.timestamp < filters.startTime) {return false;}
-      if (filters.endTime && log.timestamp > filters.endTime) {return false;}
+    return this.logs.filter((log) => {
+      if (filters.userId && log.userId !== filters.userId) {
+        return false;
+      }
+      if (filters.action && log.action !== filters.action) {
+        return false;
+      }
+      if (filters.startTime && log.timestamp < filters.startTime) {
+        return false;
+      }
+      if (filters.endTime && log.timestamp > filters.endTime) {
+        return false;
+      }
       return true;
     });
   }
@@ -172,9 +190,12 @@ export class SecurityManager {
     this.config = { ...DEFAULT_SECURITY_CONFIG, ...config };
   }
 
-  validateFile(file: { name: string; size: number; type?: string }): { valid: boolean; error?: string } {
-    const ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
-    
+  validateFile(file: { name: string; size: number; type?: string }): {
+    valid: boolean;
+    error?: string;
+  } {
+    const ext = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
+
     if (!this.config.allowedUploadTypes.includes(ext)) {
       return { valid: false, error: `File type ${ext} not allowed` };
     }
@@ -194,7 +215,7 @@ export class SecurityManager {
 
     const matches: string[] = [];
     for (const pattern of this.config.dlpPatterns) {
-      const regex = new RegExp(pattern, 'gi');
+      const regex = new RegExp(pattern, "gi");
       const found = content.match(regex);
       if (found) {
         matches.push(...found);
@@ -221,7 +242,7 @@ export class ComplianceManager {
   constructor(
     licenseManager: LicenseManager,
     auditLogger: AuditLogger,
-    retentionPolicy: Partial<DataRetentionPolicy> = {}
+    retentionPolicy: Partial<DataRetentionPolicy> = {},
   ) {
     this.licenseManager = licenseManager;
     this.auditLogger = auditLogger;
@@ -237,8 +258,10 @@ export class ComplianceManager {
   }
 
   shouldDelete(timestamp: number): boolean {
-    if (!this.retentionPolicy.autoDelete) {return false;}
-    
+    if (!this.retentionPolicy.autoDelete) {
+      return false;
+    }
+
     const ageMs = Date.now() - timestamp;
     const ageDays = ageMs / (1000 * 60 * 60 * 24);
     return ageDays > this.retentionPolicy.retentionDays;
@@ -254,7 +277,7 @@ export class ComplianceManager {
 
 export function createEnterpriseFeatures(
   securityConfig?: Partial<SecurityConfig>,
-  retentionPolicy?: Partial<DataRetentionPolicy>
+  retentionPolicy?: Partial<DataRetentionPolicy>,
 ): EnterpriseFeatures {
   const licenseManager = new LicenseManager();
   const auditLogger = new AuditLogger();
@@ -269,7 +292,6 @@ export function createEnterpriseFeatures(
   };
 }
 
-
 // Integration Hub
 export {
   BaseIntegration,
@@ -280,8 +302,8 @@ export {
   JiraIntegration,
   SlackIntegration,
   TeamsIntegration,
-  createIntegration
-} from './integration';
+  createIntegration,
+} from "./integration";
 export type {
   IntegrationConfig,
   IntegrationType,
@@ -294,44 +316,19 @@ export type {
   ServiceNowConfig,
   JiraConfig,
   SlackConfig,
-  TeamsConfig
-} from './integration';
+  TeamsConfig,
+} from "./integration";
 
 // Compliance exports
-export {
-  ComplianceFramework,
-  ComplianceFeature,
-  ComplianceProfileConfig,
-  COMPLIANCE_PROFILES
-} from './compliance';
+export { ComplianceFramework, ComplianceFeature, COMPLIANCE_PROFILES } from "./compliance";
 export type {
+  ComplianceProfileConfig,
   DataHandlingRules,
   RetentionRequirements,
   AccessControlRules,
-  EncryptionRequirements
-} from './compliance';
-
-
-
-
-
-
+  EncryptionRequirements,
+} from "./compliance";
 
 // Deployment exports
-export { OnPremisesDeploymentManager } from './deployment';
-export type {
-  DockerConfig,
-  DockerComposeConfig,
-  KubernetesConfig,
-  K8sSpec
-} from './deployment';
-
-
-
-
-
-
-
-
-
-
+export { OnPremisesDeploymentManager } from "./deployment";
+export type { DockerConfig, DockerComposeConfig, KubernetesConfig, K8sSpec } from "./deployment";

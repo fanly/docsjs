@@ -1,5 +1,10 @@
 import { applyWordHtmlCompatibility } from "./htmlCompat";
-import { createFallbackWordStyleProfile, type ParagraphStyleProfile, type RunStyleProfile, type WordStyleProfile } from "./styleProfile";
+import {
+  createFallbackWordStyleProfile,
+  type ParagraphStyleProfile,
+  type RunStyleProfile,
+  type WordStyleProfile,
+} from "./styleProfile";
 
 interface ApplyWordRenderOptions {
   doc: Document;
@@ -24,22 +29,52 @@ function escapeHtml(text: string): string {
 
 function runStyleToCss(run: RunStyleProfile): string {
   const declarations: string[] = [];
-  if (run.fontSizePx !== null) {declarations.push(`font-size:${run.fontSizePx.toFixed(2)}px`);}
-  if (run.color) {declarations.push(`color:${run.color}`);}
-  if (run.highlightColor) {declarations.push(`background-color:${run.highlightColor}`);}
-  if (run.shadingColor) {declarations.push(`background-color:${run.shadingColor}`);}
-  if (run.charSpacingPx !== null) {declarations.push(`letter-spacing:${run.charSpacingPx.toFixed(2)}px`);}
-  if (run.shadow) {declarations.push("text-shadow:0.5px 0.5px 0 rgba(0,0,0,0.28)");}
-  if (run.bold) {declarations.push("font-weight:700");}
-  if (run.italic) {declarations.push("font-style:italic");}
+  if (run.fontSizePx !== null) {
+    declarations.push(`font-size:${run.fontSizePx.toFixed(2)}px`);
+  }
+  if (run.color) {
+    declarations.push(`color:${run.color}`);
+  }
+  if (run.highlightColor) {
+    declarations.push(`background-color:${run.highlightColor}`);
+  }
+  if (run.shadingColor) {
+    declarations.push(`background-color:${run.shadingColor}`);
+  }
+  if (run.charSpacingPx !== null) {
+    declarations.push(`letter-spacing:${run.charSpacingPx.toFixed(2)}px`);
+  }
+  if (run.shadow) {
+    declarations.push("text-shadow:0.5px 0.5px 0 rgba(0,0,0,0.28)");
+  }
+  if (run.bold) {
+    declarations.push("font-weight:700");
+  }
+  if (run.italic) {
+    declarations.push("font-style:italic");
+  }
   const textDecorations: string[] = [];
-  if (run.underline) {textDecorations.push("underline");}
-  if (run.strike) {textDecorations.push("line-through");}
-  if (textDecorations.length > 0) {declarations.push(`text-decoration:${textDecorations.join(" ")}`);}
-  if (run.superscript) {declarations.push("vertical-align:super");}
-  if (run.subscript) {declarations.push("vertical-align:sub");}
-  if (run.superscript || run.subscript) {declarations.push("font-size:0.83em");}
-  if (run.fontFamily) {declarations.push(`font-family:${run.fontFamily}`);}
+  if (run.underline) {
+    textDecorations.push("underline");
+  }
+  if (run.strike) {
+    textDecorations.push("line-through");
+  }
+  if (textDecorations.length > 0) {
+    declarations.push(`text-decoration:${textDecorations.join(" ")}`);
+  }
+  if (run.superscript) {
+    declarations.push("vertical-align:super");
+  }
+  if (run.subscript) {
+    declarations.push("vertical-align:sub");
+  }
+  if (run.superscript || run.subscript) {
+    declarations.push("font-size:0.83em");
+  }
+  if (run.fontFamily) {
+    declarations.push(`font-family:${run.fontFamily}`);
+  }
   return declarations.join(";");
 }
 
@@ -49,7 +84,9 @@ function paragraphToRunHtml(runs: RunStyleProfile[]): string {
       const css = runStyleToCss(run);
       const parts = run.text.split("\n");
       const html = parts.map((part) => escapeHtml(part)).join("<br/>");
-      if (!css) {return html;}
+      if (!css) {
+        return html;
+      }
       return `<span style="${css}">${html}</span>`;
     })
     .join("");
@@ -57,7 +94,9 @@ function paragraphToRunHtml(runs: RunStyleProfile[]): string {
 
 function toLowerLetter(n: number): string {
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
-  if (n <= 0) {return "a";}
+  if (n <= 0) {
+    return "a";
+  }
   let x = n;
   let out = "";
   while (x > 0) {
@@ -69,11 +108,23 @@ function toLowerLetter(n: number): string {
 }
 
 function toRoman(num: number): string {
-  if (num <= 0) {return "I";}
+  if (num <= 0) {
+    return "I";
+  }
   const map: Array<[number, string]> = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
   ];
   let n = num;
   let result = "";
@@ -108,7 +159,7 @@ function formatListMarkerByPattern(
   pattern: string | null,
   currentLevel: number,
   countersByLevel: number[],
-  currentFormat: string | null
+  currentFormat: string | null,
 ): string {
   if (!pattern || pattern.trim().length === 0) {
     return formatListMarker(currentFormat, countersByLevel[currentLevel] ?? 1);
@@ -116,10 +167,14 @@ function formatListMarkerByPattern(
 
   const replaced = pattern.replace(/%(\d+)/g, (_, g1: string) => {
     const level1Based = Number.parseInt(g1, 10);
-    if (!Number.isFinite(level1Based) || level1Based <= 0) {return "";}
+    if (!Number.isFinite(level1Based) || level1Based <= 0) {
+      return "";
+    }
     const levelIdx = level1Based - 1;
     const n = countersByLevel[levelIdx] ?? 0;
-    if (n <= 0) {return "";}
+    if (n <= 0) {
+      return "";
+    }
     if (levelIdx === currentLevel) {
       return formatListMarker(currentFormat, n).replace(/\.$/, "");
     }
@@ -212,15 +267,21 @@ function applyInlineLayoutGuards(doc: Document, styleProfile: WordStyleProfile):
   setImportantStyle(body, "font-family", styleProfile.bodyFontFamily);
 
   for (const child of Array.from(body.children)) {
-    if (!(child instanceof HTMLElement)) {continue;}
+    if (!(child instanceof HTMLElement)) {
+      continue;
+    }
     const tag = child.tagName.toLowerCase();
-    if (tag === "script" || tag === "style") {continue;}
+    if (tag === "script" || tag === "style") {
+      continue;
+    }
     setImportantStyle(child, "box-sizing", "border-box");
     setImportantStyle(child, "max-width", "100%");
   }
 
   for (const img of Array.from(doc.body.querySelectorAll("img"))) {
-    if (!(img instanceof HTMLElement)) {continue;}
+    if (!(img instanceof HTMLElement)) {
+      continue;
+    }
     setImportantStyle(img, "max-width", "100%");
     setImportantStyle(img, "height", "auto");
   }
@@ -228,7 +289,8 @@ function applyInlineLayoutGuards(doc: Document, styleProfile: WordStyleProfile):
 
 function normalizeEmptyParagraphMarkers(paragraphs: HTMLElement[]): void {
   for (const p of paragraphs) {
-    const hasVisualContent = (p.textContent ?? "").trim().length > 0 || p.querySelector("img,table,svg,canvas") !== null;
+    const hasVisualContent =
+      (p.textContent ?? "").trim().length > 0 || p.querySelector("img,table,svg,canvas") !== null;
     if (!hasVisualContent) {
       p.setAttribute("data-word-empty", "1");
       if (p.innerHTML.trim().length === 0) {
@@ -245,12 +307,18 @@ function hasMeaningfulParagraphAfter(paragraphs: HTMLElement[], index: number): 
     const p = paragraphs[i];
     const hasText = (p.textContent ?? "").trim().length > 0;
     const hasVisual = p.querySelector("img,table,svg,canvas") !== null;
-    if (hasText || hasVisual) {return true;}
+    if (hasText || hasVisual) {
+      return true;
+    }
   }
   return false;
 }
 
-function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, listNumbering?: ApplyWordRenderOptions["listNumbering"]): HTMLElement[] {
+function applyParagraphProfiles(
+  doc: Document,
+  styleProfile: WordStyleProfile,
+  listNumbering?: ApplyWordRenderOptions["listNumbering"],
+): HTMLElement[] {
   const fallbackParagraphs = Array.from(doc.body.querySelectorAll("p")) as HTMLElement[];
   fallbackParagraphs.forEach((p) => {
     p.classList.remove("__word-date-anchor");
@@ -259,11 +327,12 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
 
   const resolvedTargets = styleProfile.paragraphProfiles.map((profile, index) => {
     const byIndex =
-      (doc.body.querySelector(`[data-word-p-index="${profile.index}"]`) as HTMLElement | null) ?? null;
+      (doc.body.querySelector(`[data-word-p-index="${profile.index}"]`) as HTMLElement | null) ??
+      null;
     const fallback = fallbackParagraphs[index] ?? null;
     return {
       profile,
-      node: byIndex ?? fallback
+      node: byIndex ?? fallback,
     };
   });
 
@@ -275,7 +344,7 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
     ) {
       dateParagraph =
         (doc.body.querySelector(
-          `[data-word-p-index="${styleProfile.trailingDateParagraphIndex}"]`
+          `[data-word-p-index="${styleProfile.trailingDateParagraphIndex}"]`,
         ) as HTMLElement | null) ??
         fallbackParagraphs[styleProfile.trailingDateParagraphIndex] ??
         null;
@@ -292,17 +361,25 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
     }
 
     const dateIndex = dateParagraph ? fallbackParagraphs.indexOf(dateParagraph) : -1;
-    const hasContentAfterDate = dateIndex >= 0 ? hasMeaningfulParagraphAfter(fallbackParagraphs, dateIndex) : false;
+    const hasContentAfterDate =
+      dateIndex >= 0 ? hasMeaningfulParagraphAfter(fallbackParagraphs, dateIndex) : false;
 
     if (dateParagraph && !hasContentAfterDate) {
       let existingEmptyCount = 0;
       let cursor = dateParagraph.previousElementSibling;
-      while (cursor && cursor.tagName.toLowerCase() === "p" && (cursor.textContent ?? "").trim().length === 0) {
+      while (
+        cursor &&
+        cursor.tagName.toLowerCase() === "p" &&
+        (cursor.textContent ?? "").trim().length === 0
+      ) {
         existingEmptyCount += 1;
         cursor = cursor.previousElementSibling;
       }
 
-      const needed = Math.max(0, styleProfile.trailingEmptyParagraphCountBeforeDate - existingEmptyCount);
+      const needed = Math.max(
+        0,
+        styleProfile.trailingEmptyParagraphCountBeforeDate - existingEmptyCount,
+      );
       for (let i = 0; i < needed; i += 1) {
         const spacer = doc.createElement("p");
         spacer.innerHTML = "<br/>";
@@ -318,26 +395,46 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
   for (const target of resolvedTargets) {
     const para = target.node;
     const profile = target.profile;
-    if (!para) {continue;}
+    if (!para) {
+      continue;
+    }
     orderedTargets.push(para);
     para.removeAttribute("data-word-list");
 
     para.style.textAlign = profile.align;
-    if (profile.beforePx !== null) {para.style.marginTop = `${profile.beforePx.toFixed(2)}px`;}
-    if (profile.afterPx !== null) {para.style.marginBottom = `${profile.afterPx.toFixed(2)}px`;}
+    if (profile.beforePx !== null) {
+      para.style.marginTop = `${profile.beforePx.toFixed(2)}px`;
+    }
+    if (profile.afterPx !== null) {
+      para.style.marginBottom = `${profile.afterPx.toFixed(2)}px`;
+    }
     if (profile.lineHeightRule === "auto" && profile.lineHeightRatio !== null) {
       para.style.lineHeight = profile.lineHeightRatio.toFixed(6);
-    } else if ((profile.lineHeightRule === "exact" || profile.lineHeightRule === "atLeast") && profile.lineHeightPx !== null) {
+    } else if (
+      (profile.lineHeightRule === "exact" || profile.lineHeightRule === "atLeast") &&
+      profile.lineHeightPx !== null
+    ) {
       para.style.lineHeight = `${profile.lineHeightPx.toFixed(2)}px`;
     }
-    if (profile.indentLeftPx !== null) {para.style.marginLeft = `${profile.indentLeftPx.toFixed(2)}px`;}
-    if (profile.indentRightPx !== null) {para.style.marginRight = `${profile.indentRightPx.toFixed(2)}px`;}
-    if (profile.firstLinePx !== null) {para.style.textIndent = `${profile.firstLinePx.toFixed(2)}px`;}
-    if (profile.hangingPx !== null) {para.style.textIndent = `${(-profile.hangingPx).toFixed(2)}px`;}
+    if (profile.indentLeftPx !== null) {
+      para.style.marginLeft = `${profile.indentLeftPx.toFixed(2)}px`;
+    }
+    if (profile.indentRightPx !== null) {
+      para.style.marginRight = `${profile.indentRightPx.toFixed(2)}px`;
+    }
+    if (profile.firstLinePx !== null) {
+      para.style.textIndent = `${profile.firstLinePx.toFixed(2)}px`;
+    }
+    if (profile.hangingPx !== null) {
+      para.style.textIndent = `${(-profile.hangingPx).toFixed(2)}px`;
+    }
 
     if (profile.runs.length > 0 && para.querySelector("img,table,svg,canvas") === null) {
       const currentTextNormalized = (para.textContent ?? "").replace(/\s+/g, "");
-      const runTextNormalized = profile.runs.map((run) => run.text).join("").replace(/\s+/g, "");
+      const runTextNormalized = profile.runs
+        .map((run) => run.text)
+        .join("")
+        .replace(/\s+/g, "");
       if (runTextNormalized.length > 0 && currentTextNormalized === runTextNormalized) {
         para.innerHTML = paragraphToRunHtml(profile.runs);
       }
@@ -350,7 +447,7 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
       }
       const currentLevel = Math.max(0, profile.listLevel);
       const levels = listCounters.get(profile.listNumId) ?? [];
-      const prevValue = levels[currentLevel] ?? (profile.listStartAt - 1);
+      const prevValue = levels[currentLevel] ?? profile.listStartAt - 1;
       const nextValue = prevValue + 1;
       levels[currentLevel] = nextValue;
       for (let lv = currentLevel + 1; lv < levels.length; lv += 1) {
@@ -358,7 +455,12 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
       }
       listCounters.set(profile.listNumId, levels);
 
-      const markerText = formatListMarkerByPattern(profile.listTextPattern, currentLevel, levels, profile.listFormat);
+      const markerText = formatListMarkerByPattern(
+        profile.listTextPattern,
+        currentLevel,
+        levels,
+        profile.listFormat,
+      );
       const plainText = (para.textContent ?? "").replace(/\s+/g, " ").trim();
       const alreadyHasMarker = plainText.startsWith(markerText);
       if (!alreadyHasMarker) {
@@ -385,14 +487,20 @@ function applyParagraphProfiles(doc: Document, styleProfile: WordStyleProfile, l
 
 function paragraphHeightPx(paragraph: HTMLElement): number {
   const rect = paragraph.getBoundingClientRect();
-  if (rect.height > 0) {return rect.height;}
+  if (rect.height > 0) {
+    return rect.height;
+  }
   const lh = Number.parseFloat(getComputedStyle(paragraph).lineHeight || "0");
-  if (Number.isFinite(lh) && lh > 0) {return lh;}
+  if (Number.isFinite(lh) && lh > 0) {
+    return lh;
+  }
   return 16;
 }
 
 function insertPageSpacerBefore(doc: Document, paragraph: HTMLElement, heightPx: number): void {
-  if (heightPx <= 0.5) {return;}
+  if (heightPx <= 0.5) {
+    return;
+  }
   const spacer = doc.createElement("div");
   spacer.dataset.wordPageSpacer = "1";
   spacer.style.height = `${heightPx.toFixed(2)}px`;
@@ -406,21 +514,39 @@ function removePaginationSpacers(doc: Document): void {
   doc.querySelectorAll("[data-word-page-spacer='1']").forEach((node) => node.remove());
 }
 
-function estimateGroupHeight(paragraphs: HTMLElement[], idx: number, profile: ParagraphStyleProfile, contentHeight: number): number {
+function estimateGroupHeight(
+  paragraphs: HTMLElement[],
+  idx: number,
+  profile: ParagraphStyleProfile,
+  contentHeight: number,
+): number {
   const currentH = paragraphHeightPx(paragraphs[idx]);
-  if (!profile.keepNext) {return currentH;}
+  if (!profile.keepNext) {
+    return currentH;
+  }
   const next = paragraphs[idx + 1];
-  if (!next) {return currentH;}
+  if (!next) {
+    return currentH;
+  }
   const nextH = paragraphHeightPx(next);
   const sum = currentH + nextH;
-  if (sum > contentHeight) {return currentH;}
+  if (sum > contentHeight) {
+    return currentH;
+  }
   return sum;
 }
 
-function applyKeepPagination(doc: Document, styleProfile: WordStyleProfile, paragraphs: HTMLElement[]): void {
+function applyKeepPagination(
+  doc: Document,
+  styleProfile: WordStyleProfile,
+  paragraphs: HTMLElement[],
+): void {
   removePaginationSpacers(doc);
 
-  const contentHeight = Math.max(120, styleProfile.pageHeightPx - styleProfile.pageMarginTopPx - styleProfile.pageMarginBottomPx);
+  const contentHeight = Math.max(
+    120,
+    styleProfile.pageHeightPx - styleProfile.pageMarginTopPx - styleProfile.pageMarginBottomPx,
+  );
   const count = Math.min(styleProfile.paragraphProfiles.length, paragraphs.length);
   let used = 0;
 
@@ -457,7 +583,9 @@ function applyFormattingMarks(doc: Document, showFormattingMarks: boolean): void
   const styleEl = ensureStyleTag(doc, "__word_view_options__");
   styleEl.textContent = `
     p[data-word-empty="1"]::before { content: "\\00a0"; }
-    ${showFormattingMarks ? `
+    ${
+      showFormattingMarks
+        ? `
     p::after {
       content: "↵";
       color: #66aef9;
@@ -468,16 +596,23 @@ function applyFormattingMarks(doc: Document, showFormattingMarks: boolean): void
       content: "↵";
       color: #66aef9;
     }
-    ` : ""}
+    `
+        : ""
+    }
   `;
 }
 
-export function applyWordRenderModel({ doc, styleProfile, showFormattingMarks, listNumbering }: ApplyWordRenderOptions): void {
+export function applyWordRenderModel({
+  doc,
+  styleProfile,
+  showFormattingMarks,
+  listNumbering,
+}: ApplyWordRenderOptions): void {
   const effectiveProfile = styleProfile ?? createFallbackWordStyleProfile("__default_a4__");
 
   applyWordHtmlCompatibility(doc, {
     forceBodyFontFamily: effectiveProfile.bodyFontFamily,
-    forceHeadingFontFamily: effectiveProfile.titleFontFamily
+    forceHeadingFontFamily: effectiveProfile.titleFontFamily,
   });
 
   let paragraphs = Array.from(doc.body.querySelectorAll("p")) as HTMLElement[];

@@ -6,7 +6,7 @@ export enum PluginPhase {
   PARSE = "parse",
   TRANSFORM = "transform",
   RENDER = "render",
-  CLEANUP = "cleanup"
+  CLEANUP = "cleanup",
 }
 
 export enum PluginPriority {
@@ -14,7 +14,7 @@ export enum PluginPriority {
   LOW = 25,
   NORMAL = 50,
   HIGH = 75,
-  HIGHEST = 100
+  HIGHEST = 100,
 }
 
 export interface PluginContext {
@@ -47,14 +47,14 @@ export const defaultPluginConfig: PluginConfig = {
   cleanup: {
     googleDocs: true,
     wps: true,
-    word: true
+    word: true,
   },
   features: {
     mathML: true,
     shapes: true,
     oleObjects: false,
-    anchors: true
-  }
+    anchors: true,
+  },
 };
 
 export interface DocxPlugin {

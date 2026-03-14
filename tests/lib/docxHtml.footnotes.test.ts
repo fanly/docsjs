@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 function makeDocxWithFootnotes(): Promise<File> {
@@ -14,7 +14,7 @@ function makeDocxWithFootnotes(): Promise<File> {
           <w:r><w:footnoteReference w:id="2"/></w:r>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/footnotes.xml",
@@ -24,19 +24,19 @@ function makeDocxWithFootnotes(): Promise<File> {
       <w:footnote w:id="2">
         <w:p><w:r><w:t>Footnote content</w:t></w:r></w:p>
       </w:footnote>
-    </w:footnotes>`
+    </w:footnotes>`,
   );
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
   );
   return zip.generateAsync({ type: "uint8array" }).then((bytes) => {
     const start = bytes.byteOffset;
     const end = bytes.byteOffset + bytes.byteLength;
     return {
       name: "footnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(start, end)
+      arrayBuffer: async () => bytes.buffer.slice(start, end),
     } as unknown as File;
   });
 }
@@ -66,7 +66,7 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
             <w:r><w:footnoteReference w:id="2"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/footnotes.xml",
@@ -75,17 +75,18 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
         <w:footnote w:id="-1"><w:p><w:r><w:t>separator</w:t></w:r></w:p></w:footnote>
         <w:footnote w:id="1"><w:p><w:r><w:t>Note one</w:t></w:r></w:p></w:footnote>
         <w:footnote w:id="2"><w:p><w:r><w:t>Note two</w:t></w:r></w:p></w:footnote>
-      </w:footnotes>`
+      </w:footnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "multi-footnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -107,7 +108,7 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
             <w:r><w:footnoteReference w:id="1"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/footnotes.xml",
@@ -123,17 +124,18 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
             <w:r><w:t> footnote</w:t></w:r>
           </w:p>
         </w:footnote>
-      </w:footnotes>`
+      </w:footnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "formatted-footnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -153,7 +155,7 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
             <w:r><w:footnoteReference w:id="1"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/footnotes.xml",
@@ -164,17 +166,18 @@ describe("parseDocxToHtmlSnapshot footnotes", () => {
           <w:p><w:r><w:t>First paragraph</w:t></w:r></w:p>
           <w:p><w:r><w:t>Second paragraph</w:t></w:r></w:p>
         </w:footnote>
-      </w:footnotes>`
+      </w:footnotes>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "multi-para-footnote.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);

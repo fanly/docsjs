@@ -11,7 +11,7 @@ export const DOCX_HTML_BASELINES: DocxHtmlBaselineCase[] = [
     <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
       <w:body><w:p><w:r><w:t>Hello</w:t></w:r></w:p></w:body>
     </w:document>`,
-    expects: ["<p", ">Hello</p>"]
+    expects: ["<p", ">Hello</p>"],
   },
   {
     name: "heading-map",
@@ -19,7 +19,7 @@ export const DOCX_HTML_BASELINES: DocxHtmlBaselineCase[] = [
     <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
       <w:body><w:p><w:pPr><w:pStyle w:val="Heading2"/></w:pPr><w:r><w:t>H2</w:t></w:r></w:p></w:body>
     </w:document>`,
-    expects: ["<h2", ">H2</h2>"]
+    expects: ["<h2", ">H2</h2>"],
   },
   {
     name: "table-basic",
@@ -27,6 +27,6 @@ export const DOCX_HTML_BASELINES: DocxHtmlBaselineCase[] = [
     <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
       <w:body><w:tbl><w:tr><w:tc><w:p><w:r><w:t>A</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body>
     </w:document>`,
-    expects: ["<table", ">A<"]
-  }
+    expects: ["<table", ">A<"],
+  },
 ];

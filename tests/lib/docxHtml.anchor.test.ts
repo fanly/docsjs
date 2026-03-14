@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 async function makeDocx(anchor = true): Promise<File> {
@@ -43,14 +43,14 @@ async function makeDocx(anchor = true): Promise<File> {
           </w:r>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
       <Relationship Id="rId1" Target="media/image1.png" />
-    </Relationships>`
+    </Relationships>`,
   );
   zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
 
@@ -59,7 +59,7 @@ async function makeDocx(anchor = true): Promise<File> {
   const end = bytes.byteOffset + bytes.byteLength;
   return {
     name: "anchor.docx",
-    arrayBuffer: async () => bytes.buffer.slice(start, end)
+    arrayBuffer: async () => bytes.buffer.slice(start, end),
   } as unknown as File;
 }
 
@@ -93,20 +93,21 @@ describe("parseDocxToHtmlSnapshot anchor image", () => {
         xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
         xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
         <w:body><w:p><w:r><w:drawing><wp:anchor><wp:wrapTopAndBottom/><wp:positionH><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="914400" cy="457200"/><a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-wrap.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-wrap="topAndBottom"`);
@@ -132,20 +133,21 @@ describe("parseDocxToHtmlSnapshot anchor image", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-meta.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -183,20 +185,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-tight.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -223,20 +226,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-through.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -262,20 +266,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-nowrap.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -302,20 +307,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-column.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -342,20 +348,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-center.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);
@@ -389,20 +396,21 @@ describe("parseDocxToHtmlSnapshot anchor advanced wrap modes", () => {
             <a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rId1"/></pic:blipFill></pic:pic></a:graphicData></a:graphic>
           </wp:anchor>
         </w:drawing></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
-      </Relationships>`
+      </Relationships>`,
     );
     zip.file("word/media/image1.png", new Uint8Array([137, 80, 78, 71, 1, 2, 3]));
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "anchor-z.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);

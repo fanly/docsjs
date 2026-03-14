@@ -40,7 +40,7 @@ function collectSemanticStatsFromHtml(rawHtml) {
     revisionDelCount: countElements(doc, '[data-word-revision="del"]'),
     pageBreakCount: countElements(doc, "[data-word-page-break='1']"),
     pageSpacerCount: countElements(doc, "[data-word-page-spacer='1']"),
-    textCharCount
+    textCharCount,
   };
 }
 
@@ -60,8 +60,7 @@ function clamp01(v) {
 
 function calculateFidelityScore(expected, actual) {
   const structure = clamp01(
-    (
-      ratioScore(actual.paragraphCount, expected.paragraphCount) +
+    (ratioScore(actual.paragraphCount, expected.paragraphCount) +
       ratioScore(actual.headingCount, expected.headingCount) +
       ratioScore(actual.tableCount, expected.tableCount) +
       ratioScore(actual.tableCellCount, expected.tableCellCount) +
@@ -69,8 +68,8 @@ function calculateFidelityScore(expected, actual) {
       ratioScore(actual.ommlCount, expected.ommlCount) +
       ratioScore(actual.chartCount, expected.chartCount) +
       ratioScore(actual.smartArtCount, expected.smartArtCount) +
-      ratioScore(actual.listParagraphCount, expected.listParagraphCount)
-    ) / 9
+      ratioScore(actual.listParagraphCount, expected.listParagraphCount)) /
+      9,
   );
 
   const styleProxy = clamp01(ratioScore(actual.textCharCount, expected.textCharCount));
@@ -90,7 +89,7 @@ function parseArgs() {
   }
   return {
     reportOut: byKey.get("report-out") ?? join(ROOT, "artifacts/fidelity-report.md"),
-    trendOut: byKey.get("trend-out") ?? join(ROOT, "artifacts/fidelity-trend.json")
+    trendOut: byKey.get("trend-out") ?? join(ROOT, "artifacts/fidelity-trend.json"),
   };
 }
 
@@ -112,7 +111,8 @@ function main() {
     return { id: c.id, expected: c.expected, actual, score };
   });
 
-  const overall = caseRows.reduce((sum, row) => sum + row.score.overall, 0) / Math.max(1, caseRows.length);
+  const overall =
+    caseRows.reduce((sum, row) => sum + row.score.overall, 0) / Math.max(1, caseRows.length);
   const threshold = 0.95;
 
   const reportLines = [
@@ -125,7 +125,10 @@ function main() {
     "",
     "| case | structure | styleProxy | pagination | overall |",
     "| --- | ---: | ---: | ---: | ---: |",
-    ...caseRows.map((row) => `| ${row.id} | ${fmt(row.score.structure)} | ${fmt(row.score.styleProxy)} | ${fmt(row.score.pagination)} | ${fmt(row.score.overall)} |`)
+    ...caseRows.map(
+      (row) =>
+        `| ${row.id} | ${fmt(row.score.structure)} | ${fmt(row.score.styleProxy)} | ${fmt(row.score.pagination)} | ${fmt(row.score.overall)} |`,
+    ),
   ];
 
   ensureDirFor(reportOut);
@@ -134,7 +137,7 @@ function main() {
   const trendEntry = {
     date: new Date().toISOString(),
     overallMean: overall,
-    cases: caseRows.map((row) => ({ id: row.id, overall: row.score.overall }))
+    cases: caseRows.map((row) => ({ id: row.id, overall: row.score.overall })),
   };
   const history = existsSync(trendOut) ? JSON.parse(readFileSync(trendOut, "utf8")) : [];
   const nextHistory = [...history, trendEntry].slice(-100);

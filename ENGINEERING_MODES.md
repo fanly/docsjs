@@ -5,8 +5,8 @@ This project follows a strict-only parsing policy to keep the product goal consi
 ## Runtime Policy
 
 1. `Strict Only`  
-Goal: preserve as many Word semantics as possible.  
-Code expectations: explicit metadata output, no silent drops, deterministic snapshots.
+   Goal: preserve as many Word semantics as possible.  
+   Code expectations: explicit metadata output, no silent drops, deterministic snapshots.
 
 ## Parsing Contract
 

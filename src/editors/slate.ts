@@ -1,11 +1,22 @@
 /**
  * Slate Editor Adapter
- * 
+ *
  * Converts DocumentAST to/from Slate JSON format.
  * Slate is a customizable rich text editor framework.
  */
 
-import type { DocumentNode, BlockNode, InlineNode, ParagraphNode, HeadingNode, TextNode, ImageNode, HyperlinkNode, ListNode, TableNode } from "../ast/types";
+import type {
+  DocumentNode,
+  BlockNode,
+  InlineNode,
+  ParagraphNode,
+  HeadingNode,
+  TextNode,
+  ImageNode,
+  HyperlinkNode,
+  ListNode,
+  TableNode,
+} from "../ast/types";
 
 export interface SlateNode {
   type?: string;
@@ -32,8 +43,8 @@ export interface SlateDocument {
  */
 export function astToSlate(doc: DocumentNode): SlateDocument {
   return {
-    children: doc.children.flatMap(section =>
-      section.children.map(block => blockToSlate(block))
+    children: doc.children.flatMap((section) =>
+      section.children.map((block) => blockToSlate(block)),
     ),
   };
 }
@@ -155,7 +166,7 @@ function textToSlate(text: TextNode): SlateText {
 
 function marksToSlate(marks: any[]): Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  
+
   for (const mark of marks) {
     switch (mark.type) {
       case "bold":
@@ -175,13 +186,13 @@ function marksToSlate(marks: any[]): Record<string, unknown> {
         break;
     }
   }
-  
+
   return result;
 }
 
 function hyperlinkToSlate(link: HyperlinkNode): SlateText {
   return {
-    text: link.children.map(c => c.type === "text" ? c.text : "").join(""),
+    text: link.children.map((c) => (c.type === "text" ? c.text : "")).join(""),
     url: link.href,
     title: link.title,
   };
@@ -204,7 +215,7 @@ export function slateToAst(slate: SlateDocument): DocumentNode {
       {
         type: "section",
         id: generateId(),
-        children: slate.children?.map(slateToBlock).filter(Boolean) as BlockNode[] || [],
+        children: (slate.children?.map(slateToBlock).filter(Boolean) as BlockNode[]) || [],
       },
     ],
   };
@@ -212,7 +223,7 @@ export function slateToAst(slate: SlateDocument): DocumentNode {
 
 function slateToBlock(node: SlateNode): BlockNode | null {
   const element = node as SlateElement;
-  
+
   switch (element.type) {
     case "paragraph":
       return slateToParagraph(element);
@@ -230,7 +241,7 @@ function slateToParagraph(node: SlateElement): ParagraphNode {
   return {
     type: "paragraph",
     id: generateId(),
-    children: node.children?.map(slateToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.children?.map(slateToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -239,7 +250,7 @@ function slateToHeading(node: SlateElement): HeadingNode {
     type: "heading",
     id: generateId(),
     level: (node.level || 1) as 1 | 2 | 3 | 4 | 5 | 6,
-    children: node.children?.map(slateToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.children?.map(slateToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -248,17 +259,18 @@ function slateToList(node: SlateElement): ListNode {
     type: "list",
     id: generateId(),
     listType: node.type === "numbered-list" ? "ordered" : "unordered",
-    items: node.children?.map((item: any) => ({
-      type: "listItem",
-      id: generateId(),
-      children: item.children?.map(slateToBlock).filter(Boolean) || [],
-    })) || [],
+    items:
+      node.children?.map((item: any) => ({
+        type: "listItem",
+        id: generateId(),
+        children: item.children?.map(slateToBlock).filter(Boolean) || [],
+      })) || [],
   };
 }
 
 function slateToInline(node: SlateNode): InlineNode | null {
   const textNode = node as SlateText;
-  
+
   if (textNode.text !== undefined) {
     return {
       type: "text",
@@ -272,13 +284,23 @@ function slateToInline(node: SlateNode): InlineNode | null {
 
 function slateToMarks(node: SlateText): any[] {
   const marks: any[] = [];
-  
-  if (node.bold) {marks.push({ type: "bold" });}
-  if (node.italic) {marks.push({ type: "italic" });}
-  if (node.underline) {marks.push({ type: "underline" });}
-  if (node.strikethrough) {marks.push({ type: "strikethrough" });}
-  if (node.code) {marks.push({ type: "code" });}
-  
+
+  if (node.bold) {
+    marks.push({ type: "bold" });
+  }
+  if (node.italic) {
+    marks.push({ type: "italic" });
+  }
+  if (node.underline) {
+    marks.push({ type: "underline" });
+  }
+  if (node.strikethrough) {
+    marks.push({ type: "strikethrough" });
+  }
+  if (node.code) {
+    marks.push({ type: "code" });
+  }
+
   return marks;
 }
 

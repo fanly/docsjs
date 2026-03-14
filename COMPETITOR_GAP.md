@@ -15,21 +15,21 @@ Last updated: 2026-02-14
 - ⏳ = partial / MVP
 - ❌ = not implemented
 
-| Capability | docsjs | docxjs/docx-preview | mammoth.js | CKEditor/TinyMCE (office paste) | Gap Priority |
-|---|---|---|---|---|---|
-| Paste HTML import | ✅ | n/a | n/a | ✅ | - |
-| DOCX upload parse | ✅ | ✅ | ✅ | ❌ | - |
-| Paragraph/run basic style | ✅ | ✅ | ⏳ | ✅ | - |
-| Numbering override (`lvlOverride/startOverride`) | ✅ | ✅ | ⏳ | ⏳ | - |
-| Table merged cells / nested table | ✅ | ✅ | ⏳ | ⏳ | - |
-| Inline image + size mapping | ✅ | ✅ | ⏳ | ✅ | - |
-| Anchor image positioning (`wp:anchor`) | ✅ (MVP) | ✅ | ❌ | ⏳ | P1 |
-| Wrap mode semantics | ✅ (marker-level) | ✅ | ❌ | ⏳ | P1 |
-| Footnotes / Endnotes | ✅ (read-only) | ✅ | ⏳ | ⏳ | P1 |
-| Comments | ✅ (read-only) | ✅ | ❌ | ✅ | P1 |
-| Revisions (ins/del) | ✅ (read-only) | ✅ | ❌ | ✅ | P1 |
-| Visual regression harness | ⏳ (baseline framework) | varies | n/a | vendor internal | P0 |
-| True screenshot diff CI | ❌ | varies | n/a | vendor internal | P0 |
+| Capability                                       | docsjs                  | docxjs/docx-preview | mammoth.js | CKEditor/TinyMCE (office paste) | Gap Priority |
+| ------------------------------------------------ | ----------------------- | ------------------- | ---------- | ------------------------------- | ------------ |
+| Paste HTML import                                | ✅                      | n/a                 | n/a        | ✅                              | -            |
+| DOCX upload parse                                | ✅                      | ✅                  | ✅         | ❌                              | -            |
+| Paragraph/run basic style                        | ✅                      | ✅                  | ⏳         | ✅                              | -            |
+| Numbering override (`lvlOverride/startOverride`) | ✅                      | ✅                  | ⏳         | ⏳                              | -            |
+| Table merged cells / nested table                | ✅                      | ✅                  | ⏳         | ⏳                              | -            |
+| Inline image + size mapping                      | ✅                      | ✅                  | ⏳         | ✅                              | -            |
+| Anchor image positioning (`wp:anchor`)           | ✅ (MVP)                | ✅                  | ❌         | ⏳                              | P1           |
+| Wrap mode semantics                              | ✅ (marker-level)       | ✅                  | ❌         | ⏳                              | P1           |
+| Footnotes / Endnotes                             | ✅ (read-only)          | ✅                  | ⏳         | ⏳                              | P1           |
+| Comments                                         | ✅ (read-only)          | ✅                  | ❌         | ✅                              | P1           |
+| Revisions (ins/del)                              | ✅ (read-only)          | ✅                  | ❌         | ✅                              | P1           |
+| Visual regression harness                        | ⏳ (baseline framework) | varies              | n/a        | vendor internal                 | P0           |
+| True screenshot diff CI                          | ❌                      | varies              | n/a        | vendor internal                 | P0           |
 
 ## Priority Backlog (Auto-Execution Order)
 

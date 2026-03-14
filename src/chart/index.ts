@@ -1,6 +1,6 @@
 /**
  * Chart Parsing Module
- * 
+ *
  * Parses Word charts and converts them to visualization formats.
  */
 
@@ -11,16 +11,16 @@ export interface ChartData {
   series: ChartSeries[];
 }
 
-export type ChartType = 
-  | 'bar' 
-  | 'column' 
-  | 'line' 
-  | 'pie' 
-  | 'doughnut'
-  | 'area'
-  | 'scatter'
-  | 'radar'
-  | 'stock';
+export type ChartType =
+  | "bar"
+  | "column"
+  | "line"
+  | "pie"
+  | "doughnut"
+  | "area"
+  | "scatter"
+  | "radar"
+  | "stock";
 
 export interface ChartSeries {
   name: string;
@@ -52,20 +52,20 @@ class ChartParser {
     try {
       const chartData = this.extractChartData(xml);
       if (!chartData) {
-        return { success: false, error: 'No chart data found' };
+        return { success: false, error: "No chart data found" };
       }
 
       const echartsOption = this.toECharts(chartData);
-      
+
       return {
         success: true,
         chartData,
-        echartsOption
+        echartsOption,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Parse error'
+        error: error instanceof Error ? error.message : "Parse error",
       };
     }
   }
@@ -75,11 +75,13 @@ class ChartParser {
    */
   private extractChartData(xml: string): ChartData | null {
     // Check if this is a chart
-    if (!xml.includes('<c:chart') && !xml.includes('Chart')) {return null;}
+    if (!xml.includes("<c:chart") && !xml.includes("Chart")) {
+      return null;
+    }
 
     // Extract chart type
     const typeMatch = xml.match(/<c:type>([^<]+)<\/c:type>/);
-    const type = this.mapChartType(typeMatch?.[1] || 'bar');
+    const type = this.mapChartType(typeMatch?.[1] || "bar");
 
     // Extract title
     const titleMatch = xml.match(/<c:title[^>]*>[^<]*<c:t>([^<]+)<\/c:t>/);
@@ -99,7 +101,7 @@ class ChartParser {
       title,
       type,
       categories,
-      series
+      series,
     };
   }
 
@@ -108,10 +110,12 @@ class ChartParser {
    */
   private extractCategories(xml: string): string[] {
     const categories: string[] = [];
-    const catStart = xml.indexOf('<c:cat>');
-    if (catStart === -1) {return categories;}
+    const catStart = xml.indexOf("<c:cat>");
+    if (catStart === -1) {
+      return categories;
+    }
 
-    const catEnd = xml.indexOf('</c:cat>', catStart);
+    const catEnd = xml.indexOf("</c:cat>", catStart);
     const catSection = xml.slice(catStart, catEnd + 7);
 
     const ptMatches = catSection.matchAll(/<c:pt[^>]*><c:v>([^<]+)<\/c:v>/g);
@@ -127,15 +131,17 @@ class ChartParser {
    */
   private extractSeries(xml: string): ChartSeries[] {
     const series: ChartSeries[] = [];
-    
+
     // Find all series sections
-    let serStart = xml.indexOf('<c:ser>');
+    let serStart = xml.indexOf("<c:ser>");
     while (serStart !== -1) {
-      const serEnd = xml.indexOf('</c:ser>', serStart);
-      if (serEnd === -1) {break;}
-      
+      const serEnd = xml.indexOf("</c:ser>", serStart);
+      if (serEnd === -1) {
+        break;
+      }
+
       const serXml = xml.slice(serStart, serEnd + 8);
-      
+
       // Get series name
       const nameMatch = serXml.match(/<c:tx[^>]*>(?:[^<]*<c:v>([^<]+)<\/c:v>)?/);
       const name = nameMatch?.[1] || `Series ${series.length + 1}`;
@@ -143,7 +149,7 @@ class ChartParser {
       // Get values
       const values: number[] = [];
       const valMatches = serXml.matchAll(/<c:pt[^>]*idx="(\d+)"[^>]*>[^<]*<c:v>([^<]+)<\/c:v>/g);
-      
+
       for (const match of valMatches) {
         const idx = parseInt(match[1]);
         const value = parseFloat(match[2]);
@@ -153,10 +159,10 @@ class ChartParser {
       }
 
       if (values.length > 0) {
-        series.push({ name, values: values.filter(v => v !== undefined) });
+        series.push({ name, values: values.filter((v) => v !== undefined) });
       }
 
-      serStart = xml.indexOf('<c:ser>', serEnd);
+      serStart = xml.indexOf("<c:ser>", serEnd);
     }
 
     return series;
@@ -167,26 +173,26 @@ class ChartParser {
    */
   private mapChartType(wordType: string): ChartType {
     const mapping: Record<string, ChartType> = {
-      'bar': 'bar',
-      'barClustered': 'bar',
-      'barStacked': 'bar',
-      'col': 'column',
-      'colClustered': 'column',
-      'colStacked': 'column',
-      'line': 'line',
-      'lineMarkers': 'line',
-      'pie': 'pie',
-      'pie3d': 'pie',
-      'doughnut': 'doughnut',
-      'area': 'area',
-      'areaStacked': 'area',
-      'scatter': 'scatter',
-      'scatterMarker': 'scatter',
-      'radar': 'radar',
-      'radarMarkers': 'radar'
+      bar: "bar",
+      barClustered: "bar",
+      barStacked: "bar",
+      col: "column",
+      colClustered: "column",
+      colStacked: "column",
+      line: "line",
+      lineMarkers: "line",
+      pie: "pie",
+      pie3d: "pie",
+      doughnut: "doughnut",
+      area: "area",
+      areaStacked: "area",
+      scatter: "scatter",
+      scatterMarker: "scatter",
+      radar: "radar",
+      radarMarkers: "radar",
     };
 
-    return mapping[wordType.toLowerCase()] || 'bar';
+    return mapping[wordType.toLowerCase()] || "bar";
   }
 
   /**
@@ -194,29 +200,29 @@ class ChartParser {
    */
   toECharts(chartData: ChartData): EChartsOption {
     const { title, type, categories, series } = chartData;
-    
+
     const option: EChartsOption = {
-      title: title ? { text: title, left: 'center' } : undefined,
-      tooltip: { trigger: 'axis' },
+      title: title ? { text: title, left: "center" } : undefined,
+      tooltip: { trigger: "axis" },
       legend: { bottom: 0 },
-      series: series.map(s => ({
+      series: series.map((s) => ({
         name: s.name,
         type: this.toEChartsType(type),
         data: s.values,
-        emphasis: { focus: 'series' }
-      }))
+        emphasis: { focus: "series" },
+      })),
     };
 
     // Add X axis for appropriate chart types
-    if (['bar', 'column', 'line', 'area'].includes(type)) {
-      option.xAxis = { type: 'category', data: categories };
-      option.yAxis = { type: 'value' };
-    } else if (type === 'pie' || type === 'doughnut') {
-      option.series = series.map(s => ({
+    if (["bar", "column", "line", "area"].includes(type)) {
+      option.xAxis = { type: "category", data: categories };
+      option.yAxis = { type: "value" };
+    } else if (type === "pie" || type === "doughnut") {
+      option.series = series.map((s) => ({
         name: s.name,
-        type: 'pie',
+        type: "pie",
         data: categories.map((c, i) => ({ name: c, value: s.values[i] })),
-        radius: type === 'doughnut' ? ['40%', '70%'] : '50%'
+        radius: type === "doughnut" ? ["40%", "70%"] : "50%",
       }));
       delete option.xAxis;
       delete option.yAxis;
@@ -230,17 +236,17 @@ class ChartParser {
    */
   private toEChartsType(type: ChartType): string {
     const mapping: Record<string, string> = {
-      'bar': 'bar',
-      'column': 'bar',
-      'line': 'line',
-      'pie': 'pie',
-      'doughnut': 'pie',
-      'area': 'line',
-      'scatter': 'scatter',
-      'radar': 'radar',
-      'stock': 'line'
+      bar: "bar",
+      column: "bar",
+      line: "line",
+      pie: "pie",
+      doughnut: "pie",
+      area: "line",
+      scatter: "scatter",
+      radar: "radar",
+      stock: "line",
     };
-    return mapping[type] || 'bar';
+    return mapping[type] || "bar";
   }
 
   /**
@@ -248,26 +254,26 @@ class ChartParser {
    */
   toChartJS(chartData: ChartData): Record<string, unknown> {
     const { type, categories, series } = chartData;
-    
+
     return {
       type: this.toChartJSType(type),
       data: {
         labels: categories,
-        datasets: series.map(s => ({
+        datasets: series.map((s) => ({
           label: s.name,
           data: s.values,
           backgroundColor: this.generateColors(s.values.length),
           borderColor: this.generateColors(s.values.length, 1),
-          borderWidth: 1
-        }))
+          borderWidth: 1,
+        })),
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { position: 'top' },
-          title: { display: !!chartData.title, text: chartData.title }
-        }
-      }
+          legend: { position: "top" },
+          title: { display: !!chartData.title, text: chartData.title },
+        },
+      },
     };
   }
 
@@ -276,16 +282,16 @@ class ChartParser {
    */
   private toChartJSType(type: ChartType): string {
     const mapping: Record<string, string> = {
-      'bar': 'bar',
-      'column': 'bar',
-      'line': 'line',
-      'pie': 'pie',
-      'doughnut': 'doughnut',
-      'area': 'line',
-      'scatter': 'scatter',
-      'radar': 'radar'
+      bar: "bar",
+      column: "bar",
+      line: "line",
+      pie: "pie",
+      doughnut: "doughnut",
+      area: "line",
+      scatter: "scatter",
+      radar: "radar",
     };
-    return mapping[type] || 'bar';
+    return mapping[type] || "bar";
   }
 
   /**
@@ -293,25 +299,29 @@ class ChartParser {
    */
   private generateColors(count: number, alpha?: number): string | string[] {
     const baseColors = [
-      'rgb(255, 99, 132)',
-      'rgb(54, 162, 235)',
-      'rgb(255, 206, 86)',
-      'rgb(75, 192, 192)',
-      'rgb(153, 102, 255)',
-      'rgb(255, 159, 64)',
-      'rgb(199, 199, 199)',
-      'rgb(83, 102, 255)',
-      'rgb(40, 159, 64)',
-      'rgb(210, 99, 132)'
+      "rgb(255, 99, 132)",
+      "rgb(54, 162, 235)",
+      "rgb(255, 206, 86)",
+      "rgb(75, 192, 192)",
+      "rgb(153, 102, 255)",
+      "rgb(255, 159, 64)",
+      "rgb(199, 199, 199)",
+      "rgb(83, 102, 255)",
+      "rgb(40, 159, 64)",
+      "rgb(210, 99, 132)",
     ];
-    
+
     const suffix = alpha !== undefined ? alpha : 0.2;
-    const actualColors = baseColors.map(c => {
-      if (suffix === 0.2) {return c.replace('rgb', 'rgba').replace(')', ', 0.2)');}
-      if (suffix === 1) {return c;}
-      return c.replace('rgb', 'rgba').replace(')', `, ${suffix})`);
+    const actualColors = baseColors.map((c) => {
+      if (suffix === 0.2) {
+        return c.replace("rgb", "rgba").replace(")", ", 0.2)");
+      }
+      if (suffix === 1) {
+        return c;
+      }
+      return c.replace("rgb", "rgba").replace(")", `, ${suffix})`);
     });
-    
+
     return count === 1 ? actualColors[0] : actualColors.slice(0, count);
   }
 }

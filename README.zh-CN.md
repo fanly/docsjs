@@ -106,6 +106,7 @@ document.body.appendChild(el);
 ## 功能清单
 
 <!-- GENERATED:FEATURE_CHECKLIST_ZH:START -->
+
 ### 核心
 
 - ✅ Web Component 内核（`docs-word-editor`）

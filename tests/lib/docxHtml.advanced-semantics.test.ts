@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -17,7 +17,7 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-omml="1"`);
@@ -38,7 +38,7 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-omml="1"`);
@@ -59,7 +59,7 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-omml="1"`);
@@ -79,7 +79,7 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-omml="1"`);
@@ -111,8 +111,8 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
               </c:barChart>
             </c:plotArea>
           </c:chart>
-        </c:chartSpace>`
-      }
+        </c:chartSpace>`,
+      },
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-chart="1"`);
@@ -149,8 +149,8 @@ describe("parseDocxToHtmlSnapshot advanced semantics", () => {
             <dgm:pt><dgm:t><a:r><a:t>Plan</a:t></a:r></dgm:t></dgm:pt>
             <dgm:pt><dgm:t><a:r><a:t>Build</a:t></a:r></dgm:t></dgm:pt>
           </dgm:ptLst>
-        </dgm:dataModel>`
-      }
+        </dgm:dataModel>`,
+      },
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
     expect(snapshot).toContain(`data-word-smartart="1"`);

@@ -1,75 +1,71 @@
 /**
  * Enhanced Entry Point for DocsJS Core Engine v2
- * 
+ *
  * Exports the new engine with improved architecture.
  */
 
 // Main Engine Classes
-export { CoreEngine, getGlobalEngine } from './engine/core';
-export type { EngineInterface, EngineConfig, TransformationProfile } from './types/engine';
+export { CoreEngine, getGlobalEngine } from "./engine/core";
+export type { EngineInterface, EngineConfig, TransformationProfile } from "./types/engine";
 
-// Pipeline Components  
-export { PipelineManager } from './pipeline/manager';
-export type { 
-  PipelineContext, 
-  PipelineState, 
-  ExportResult, 
+// Pipeline Components
+export { PipelineManager } from "./pipeline/manager";
+export type {
+  PipelineContext,
+  PipelineState,
+  ExportResult,
   PipelinePhase,
   PipelineHooks,
-  PipelineMetrics
-} from './pipeline/types';
+  PipelineMetrics,
+} from "./pipeline/types";
 
 // Plugin System
-export { PluginManagerImpl as PluginManager } from './plugins-v2/manager';
-export type { 
-  EnginePlugin, 
-  PluginHooks, 
-  PluginContext, 
+export { PluginManagerImpl as PluginManager } from "./plugins-v2/manager";
+export type {
+  EnginePlugin,
+  PluginHooks,
+  PluginContext,
   PluginPermissions,
   PluginHook,
   ParsePlugin,
-  TransformPlugin, 
+  TransformPlugin,
   RenderPlugin,
-  SanitizePlugin
-} from './plugins-v2/types';
+  SanitizePlugin,
+} from "./plugins-v2/types";
 
 // Profile Management
-export { ProfileManager, SYSTEM_PROFILES } from './profiles/profile-manager';
-export type { ProfileManagerOptions } from './profiles/profile-manager';
+export { ProfileManager, SYSTEM_PROFILES } from "./profiles/profile-manager";
+export type { ProfileManagerOptions } from "./profiles/profile-manager";
 
 // AST Components
-export type { 
+export type {
   DocumentAST,
   DocumentNode,
   SectionNode,
-  BlockNode, 
+  BlockNode,
   InlineNode,
   ParagraphNode,
   HeadingNode,
   ListNode,
   TableNode,
   // ... include all AST types as needed
-} from './ast/types';
+} from "./ast/types";
 
 // Parsers
-export { DocxParser as DOCXParser } from './parsers/docx/parser';
-export type { 
-  DocxParseOptions, 
-  DocxParseResult, 
+export { DocxParser as DOCXParser } from "./parsers/docx/parser";
+export type {
+  DocxParseOptions,
+  DocxParseResult,
   DocxParseReport,
-  DocxFeatureCounts
-} from './parsers';
+  DocxFeatureCounts,
+} from "./parsers";
 
-// Renderers  
-export { HtmlRenderer as HTMLRenderer } from './renderers/html/renderer';
-export type { 
-  HtmlRenderOptions, 
-  HtmlRenderResult,
-  RenderContext
-} from './renderers';
+// Renderers
+export { HtmlRenderer as HTMLRenderer } from "./renderers/html/renderer";
+export type { HtmlRenderOptions, HtmlRenderResult, RenderContext } from "./renderers";
 
 // Core Utilities
-export { 
+export {
   // AST utilities
   generateId,
   // generateId deduped
@@ -83,7 +79,7 @@ export {
   cloneAST,
   validateAST,
   // ... other utilities
-} from './ast/utils';
+} from "./ast/utils";
 
 // Plugin Adapters
-export { PluginASTAdapter as PluginAdapter } from './ast/pluginAdapter';
+export { PluginASTAdapter as PluginAdapter } from "./ast/pluginAdapter";

@@ -23,7 +23,6 @@ The new engine implements the following three-tier architecture:
    - Permission and security model
    - Dependency management
    - Priority-based execution
-   
 2. **Profile Management**:
    - Predefined profiles (Knowledge Base, Exam Paper, Enterprise)
    - Custom profile creation and sharing
@@ -62,18 +61,22 @@ src/
 ## ✨ Key Features
 
 ### 1. Flexible Processing Profiles
+
 Choose from predefined profiles for:
+
 - Knowledge Base: High-fidelity, SEO-optimized
 - Exam Paper: Clean formatting, question extraction
 - Enterprise: Security & compliance focus
 
 ### 2. Extensible Plugin System
+
 - 8 lifecycle hooks for deep integration points
 - Secure sandbox execution for safety
 - Permissions system for access control
 - Dependency management
 
 ### 3. Performance Optimizations
+
 - Streaming processing for large files
 - Web Worker thread management
 - Granular metrics and diagnostics
@@ -82,6 +85,7 @@ Choose from predefined profiles for:
 ## 🚧 Status & Roadmap
 
 ### Implemented ✅
+
 - [x] Core engine foundation with configuration system
 - [x] Complete plugin lifecycle and permission system
 - [x] Profile management and system profiles
@@ -89,6 +93,7 @@ Choose from predefined profiles for:
 - [x] Type definitions for all major components
 
 ### Next Steps 🔜
+
 - [ ] Full AST migration with backwards compatibility
 - [ ] Integration with existing parsers (docx, html, md)
 - [ ] Full renderer implementations (html, markdown)
@@ -99,33 +104,30 @@ Choose from predefined profiles for:
 Example of the planned usage pattern:
 
 ```typescript
-import { CoreEngine, SYSTEM_PROFILES } from '@coding01/docsjs-v2';
+import { CoreEngine, SYSTEM_PROFILES } from "@coding01/docsjs-v2";
 
 // Initialize engine
 const engine = new CoreEngine({
   performance: { maxMemoryMB: 1024 },
-  security: { enableSandboxes: true }
+  security: { enableSandboxes: true },
 });
 
 // Register profiles
-engine.registerProfile(SYSTEM_PROFILES['knowledge-base']);
-engine.applyProfile('knowledge-base');
+engine.registerProfile(SYSTEM_PROFILES["knowledge-base"]);
+engine.applyProfile("knowledge-base");
 
 // Add plugins with lifecycle hooks
 engine.registerPlugin({
-  name: 'image-enrichment',
-  availableHooks: ['afterParse', 'beforeRender'],
+  name: "image-enrichment",
+  availableHooks: ["afterParse", "beforeRender"],
   afterParse: async (ctx) => {
     // Process images extracted during parsing
-  }
+  },
   // ... implementation
 });
 
 // Transform document
-const result = await engine.transformDocument(
-  inputFile, 
-  'knowledge-base'
-);
+const result = await engine.transformDocument(inputFile, "knowledge-base");
 
 console.log(result.diagnostics);
 ```
@@ -133,8 +135,9 @@ console.log(result.diagnostics);
 ## 🤝 Contributing
 
 This branch represents the next major version of DocsJS. Contributions focused on:
+
 - Plugin system enhancements
-- Performance optimizations  
+- Performance optimizations
 - Additional format support
 - Profile creation and tuning
 

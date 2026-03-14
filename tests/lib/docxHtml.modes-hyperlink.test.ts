@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot, parseDocxToHtmlSnapshotWithReport } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -18,7 +18,7 @@ describe("parseDocxToHtmlSnapshot modes and hyperlink", () => {
       relsXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId9" Target="https://example.com/docs" />
-      </Relationships>`
+      </Relationships>`,
     });
 
     const html = await parseDocxToHtmlSnapshot(file);
@@ -36,7 +36,7 @@ describe("parseDocxToHtmlSnapshot modes and hyperlink", () => {
             <w:hyperlink w:anchor="chapter_2"><w:r><w:t>Jump</w:t></w:r></w:hyperlink>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
 
     const html = await parseDocxToHtmlSnapshot(file);
@@ -65,8 +65,8 @@ describe("parseDocxToHtmlSnapshot modes and hyperlink", () => {
       </Relationships>`,
       files: {
         "word/charts/chart1.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart><c:plotArea><c:barChart/></c:plotArea></c:chart></c:chartSpace>`
-      }
+        <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart><c:plotArea><c:barChart/></c:plotArea></c:chart></c:chartSpace>`,
+      },
     });
 
     const result = await parseDocxToHtmlSnapshotWithReport(file);

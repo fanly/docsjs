@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { applyWordRenderModel } from "../../src/lib/renderApply";
 import type { ParagraphStyleProfile, WordStyleProfile } from "../../src/lib/styleProfile";
 
-function makeParagraphProfile(index: number, text: string, overrides?: Partial<ParagraphStyleProfile>): ParagraphStyleProfile {
+function makeParagraphProfile(
+  index: number,
+  text: string,
+  overrides?: Partial<ParagraphStyleProfile>,
+): ParagraphStyleProfile {
   return {
     index,
     text,
@@ -27,7 +31,7 @@ function makeParagraphProfile(index: number, text: string, overrides?: Partial<P
     pageBreakBefore: false,
     sectionBreakBefore: false,
     runs: [],
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -46,7 +50,7 @@ function makeProfile(paragraphProfiles: ParagraphStyleProfile[]): WordStyleProfi
     titleFontPx: 32,
     titleColor: "#0F4761",
     titleAlign: "center",
-    bodyFontFamily: "\"Times New Roman\", serif",
+    bodyFontFamily: '"Times New Roman", serif',
     titleFontFamily: "DengXian, sans-serif",
     discoveredFonts: [],
     tableCellPaddingTopPx: 0,
@@ -57,7 +61,7 @@ function makeProfile(paragraphProfiles: ParagraphStyleProfile[]): WordStyleProfi
     trailingDateText: null,
     trailingDateAlignedRight: false,
     trailingDateParagraphIndex: null,
-    trailingEmptyParagraphCountBeforeDate: 0
+    trailingEmptyParagraphCountBeforeDate: 0,
   };
 }
 
@@ -69,14 +73,14 @@ describe("applyWordRenderModel - list markers", () => {
         listNumId: 1,
         listLevel: 0,
         listFormat: "decimal",
-        listTextPattern: "%1."
+        listTextPattern: "%1.",
       }),
       makeParagraphProfile(1, "二级列表", {
         listNumId: 1,
         listLevel: 1,
         listFormat: "lowerLetter",
-        listTextPattern: "%1.%2."
-      })
+        listTextPattern: "%1.%2.",
+      }),
     ]);
 
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
@@ -90,8 +94,18 @@ describe("applyWordRenderModel - list markers", () => {
   it("formats decimal markers correctly", () => {
     document.body.innerHTML = `<p id="p1">Item 1</p><p id="p2">Item 2</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "Item 1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "Item 2", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." })
+      makeParagraphProfile(0, "Item 1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "Item 2", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
@@ -101,19 +115,41 @@ describe("applyWordRenderModel - list markers", () => {
   it("formats upperRoman markers correctly", () => {
     document.body.innerHTML = `<p id="p1">Item I</p><p id="p2">Item II</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "Item I", { listNumId: 1, listLevel: 0, listFormat: "upperRoman", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "Item II", { listNumId: 1, listLevel: 0, listFormat: "upperRoman", listTextPattern: "%1." })
+      makeParagraphProfile(0, "Item I", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "upperRoman",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "Item II", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "upperRoman",
+        listTextPattern: "%1.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("I.");
-    expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe("II.");
+    expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe(
+      "II.",
+    );
   });
 
   it("formats lowerLetter markers correctly", () => {
     document.body.innerHTML = `<p id="p1">Item a</p><p id="p2">Item b</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "Item a", { listNumId: 1, listLevel: 0, listFormat: "lowerLetter", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "Item b", { listNumId: 1, listLevel: 0, listFormat: "lowerLetter", listTextPattern: "%1." })
+      makeParagraphProfile(0, "Item a", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "lowerLetter",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "Item b", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "lowerLetter",
+        listTextPattern: "%1.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("a.");
@@ -123,21 +159,50 @@ describe("applyWordRenderModel - list markers", () => {
   it("formats multi-level pattern (%1.%2) correctly", () => {
     document.body.innerHTML = `<p id="p1">L1</p><p id="p2">L2</p><p id="p3">L1 again</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "L1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "L2", { listNumId: 1, listLevel: 1, listFormat: "decimal", listTextPattern: "%1.%2." }),
-      makeParagraphProfile(2, "L1 again", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." })
+      makeParagraphProfile(0, "L1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "L2", {
+        listNumId: 1,
+        listLevel: 1,
+        listFormat: "decimal",
+        listTextPattern: "%1.%2.",
+      }),
+      makeParagraphProfile(2, "L1 again", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
-    expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe("1.1.");
+    expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe(
+      "1.1.",
+    );
     expect(document.querySelector("#p3 > span.__word-list-marker")?.textContent?.trim()).toBe("2.");
   });
 
   it("respects listStartAt for custom starting number", () => {
     document.body.innerHTML = `<p id="p1">Item 5</p><p id="p2">Item 6</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "Item 5", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.", listStartAt: 5 }),
-      makeParagraphProfile(1, "Item 6", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.", listStartAt: 5 })
+      makeParagraphProfile(0, "Item 5", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+        listStartAt: 5,
+      }),
+      makeParagraphProfile(1, "Item 6", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+        listStartAt: 5,
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("5.");
@@ -147,9 +212,25 @@ describe("applyWordRenderModel - list markers", () => {
   it("resets counters when sectionBreakBefore is true", () => {
     document.body.innerHTML = `<p id="p1">S1-1</p><p id="p2">S1-2</p><p id="p3">S2-1</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "S1-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "S1-2", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(2, "S2-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.", sectionBreakBefore: true })
+      makeParagraphProfile(0, "S1-1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "S1-2", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(2, "S2-1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+        sectionBreakBefore: true,
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
@@ -160,11 +241,32 @@ describe("applyWordRenderModel - list markers", () => {
   it("continues numbering across section breaks when continuous option is true", () => {
     document.body.innerHTML = `<p id="p1">S1-1</p><p id="p2">S1-2</p><p id="p3">S2-1</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "S1-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "S1-2", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(2, "S2-1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.", sectionBreakBefore: true })
+      makeParagraphProfile(0, "S1-1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "S1-2", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(2, "S2-1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+        sectionBreakBefore: true,
+      }),
     ]);
-    applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false, listNumbering: { continuous: true } });
+    applyWordRenderModel({
+      doc: document,
+      styleProfile: profile,
+      showFormattingMarks: false,
+      listNumbering: { continuous: true },
+    });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
     expect(document.querySelector("#p2 > span.__word-list-marker")?.textContent?.trim()).toBe("2.");
     expect(document.querySelector("#p3 > span.__word-list-marker")?.textContent?.trim()).toBe("3.");
@@ -173,7 +275,12 @@ describe("applyWordRenderModel - list markers", () => {
   it("handles multi-level pattern (%1.%2.%3) with missing higher levels", () => {
     document.body.innerHTML = `<p id="p1">L1</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "L1", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1.%2.%3." })
+      makeParagraphProfile(0, "L1", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.%2.%3.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     expect(document.querySelector("#p1 > span.__word-list-marker")?.textContent?.trim()).toBe("1.");
@@ -182,8 +289,18 @@ describe("applyWordRenderModel - list markers", () => {
   it("indents nested levels appropriately", () => {
     document.body.innerHTML = `<p id="p1">L0</p><p id="p2">L1</p>`;
     const profile = makeProfile([
-      makeParagraphProfile(0, "L0", { listNumId: 1, listLevel: 0, listFormat: "decimal", listTextPattern: "%1." }),
-      makeParagraphProfile(1, "L1", { listNumId: 1, listLevel: 1, listFormat: "decimal", listTextPattern: "%1.%2." })
+      makeParagraphProfile(0, "L0", {
+        listNumId: 1,
+        listLevel: 0,
+        listFormat: "decimal",
+        listTextPattern: "%1.",
+      }),
+      makeParagraphProfile(1, "L1", {
+        listNumId: 1,
+        listLevel: 1,
+        listFormat: "decimal",
+        listTextPattern: "%1.%2.",
+      }),
     ]);
     applyWordRenderModel({ doc: document, styleProfile: profile, showFormattingMarks: false });
     const marker0 = document.querySelector("#p1 > span.__word-list-marker") as HTMLElement;
@@ -198,7 +315,7 @@ describe("applyWordRenderModel - pagination", () => {
     document.body.innerHTML = `<p id="a">A</p><p id="b">B</p>`;
     const profile = makeProfile([
       makeParagraphProfile(0, "A", { afterPx: 0 }),
-      makeParagraphProfile(1, "B", { pageBreakBefore: true, afterPx: 0 })
+      makeParagraphProfile(1, "B", { pageBreakBefore: true, afterPx: 0 }),
     ]);
     profile.pageHeightPx = 200;
     profile.pageMarginTopPx = 10;

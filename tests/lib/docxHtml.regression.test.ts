@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -10,7 +10,7 @@ describe("docxHtml regression baselines", () => {
         <w:body>
           <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>T</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("<h1");
@@ -24,7 +24,7 @@ describe("docxHtml regression baselines", () => {
         <w:body>
           <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:t>C</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain(`style="text-align:center;`);
@@ -42,7 +42,7 @@ describe("docxHtml regression baselines", () => {
             </w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("font-weight:700");
@@ -57,7 +57,7 @@ describe("docxHtml regression baselines", () => {
         <w:body>
           <w:p><w:r><w:t>A</w:t><w:br/><w:t>B</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("A");
@@ -72,7 +72,7 @@ describe("docxHtml regression baselines", () => {
         <w:body>
           <w:tbl><w:tr><w:tc><w:r><w:t>X</w:t></w:r></w:tc></w:tr></w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain(">X<");
@@ -83,7 +83,7 @@ describe("docxHtml regression baselines", () => {
       documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
         <w:body><w:p><w:r><w:commentReference w:id="999"/></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).not.toContain("data-word-comment-ref");
@@ -94,7 +94,7 @@ describe("docxHtml regression baselines", () => {
       documentXml: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
         <w:body><w:p><w:r><w:footnoteReference w:id="100"/></w:r></w:p></w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).not.toContain("data-word-footnote-ref");
@@ -116,7 +116,7 @@ describe("docxHtml regression baselines", () => {
       <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
         <Relationship Id="rId1" Target="media/image1.png" />
       </Relationships>`,
-      media: { "media/image1.png": new Uint8Array([137, 80, 78, 71, 1, 2, 3]) }
+      media: { "media/image1.png": new Uint8Array([137, 80, 78, 71, 1, 2, 3]) },
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("data:image/png;base64");

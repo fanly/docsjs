@@ -44,7 +44,7 @@ function comparePng(baselinePath, currentPath, diffPath) {
     diff.data,
     baseline.width,
     baseline.height,
-    { threshold: 0.1 }
+    { threshold: 0.1 },
   );
   writeFileSync(diffPath, PNG.sync.write(diff));
   return mismatch;

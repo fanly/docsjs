@@ -320,8 +320,8 @@ export class SemanticSimilarityEngine {
     }
 
     const maxLen = Math.max(a.length, b.length);
-    const vecA = [...a, ...new Array(maxLen - a.length).fill(0)];
-    const vecB = [...b, ...new Array(maxLen - b.length).fill(0)];
+    const vecA = [...a, ...Array.from({ length: maxLen - a.length }, () => 0)];
+    const vecB = [...b, ...Array.from({ length: maxLen - b.length }, () => 0)];
 
     const dotProduct = vecA.reduce((sum, v, i) => sum + v * vecB[i], 0);
     const magA = Math.sqrt(vecA.reduce((sum, v) => sum + v * v, 0));

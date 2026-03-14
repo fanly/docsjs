@@ -5,7 +5,7 @@ import type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
-  DocsWordEditorReadyDetail
+  DocsWordEditorReadyDetail,
 } from "../index";
 
 defineDocsWordElement();
@@ -23,13 +23,15 @@ export function WordFidelityEditorReact({
   onChange,
   onError,
   onReady,
-  editorRef
+  editorRef,
 }: WordFidelityEditorReactProps) {
   const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) {return;}
+    if (!node) {
+      return;
+    }
 
     const onChangeEvent = (event: Event) => {
       const detail = (event as CustomEvent<DocsWordEditorChangeDetail>).detail;
@@ -58,6 +60,6 @@ export function WordFidelityEditorReact({
 
   return React.createElement("docs-word-editor", {
     ref: ref as unknown as Ref<HTMLElement>,
-    lang
+    lang,
   });
 }

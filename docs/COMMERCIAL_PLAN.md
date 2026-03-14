@@ -2,12 +2,12 @@
 
 ## 仓库架构
 
-| 仓库 | 可见性 | 用途 |
-|------|--------|------|
-| `fanly/docsjs` | 公开 | 核心库 (MIT) |
-| `fanly/docsjs-md` | 公开 | Markdown 转换器 (MIT) |
-| `fanly/docsjs-pro` | 私有 | 商业 SDK + License 验证 |
-| `fanly/docsjs-cloud` | 私有 | 云端服务 + License Server |
+| 仓库                 | 可见性 | 用途                      |
+| -------------------- | ------ | ------------------------- |
+| `fanly/docsjs`       | 公开   | 核心库 (MIT)              |
+| `fanly/docsjs-md`    | 公开   | Markdown 转换器 (MIT)     |
+| `fanly/docsjs-pro`   | 私有   | 商业 SDK + License 验证   |
+| `fanly/docsjs-cloud` | 私有   | 云端服务 + License Server |
 
 ---
 
@@ -37,7 +37,7 @@ docsjs-pro/
 
 1. **License 验证**
    - 在线验证 + 离线缓存 (24h)
-   - 域名白名单 (*.example.com)
+   - 域名白名单 (\*.example.com)
    - Plan 分级 (starter/professional/enterprise)
    - 泄露检测 (key 缩短、domain 校验)
 
@@ -53,11 +53,11 @@ docsjs-pro/
 
 ### 定价策略
 
-| Plan | 价格 | 功能 |
-|------|------|------|
-| Starter | ¥99/月 | 基本转换 + 1域名 |
+| Plan         | 价格    | 功能                   |
+| ------------ | ------- | ---------------------- |
+| Starter      | ¥99/月  | 基本转换 + 1域名       |
 | Professional | ¥299/月 | 所有编辑器插件 + 5域名 |
-| Enterprise | 定制 | 私有部署 + 无限域名 |
+| Enterprise   | 定制    | 私有部署 + 无限域名    |
 
 ---
 
@@ -107,21 +107,21 @@ GET  /api/v1/license/:key        # 查询 License 信息
 ### Webhook 事件
 
 ```typescript
-type WebhookEvent = 
-  | { event: 'conversion.started'; data: { jobId: string } }
-  | { event: 'conversion.completed'; data: { jobId: string; result: ConvertResult } }
-  | { event: 'conversion.failed'; data: { jobId: string; error: string } }
-  | { event: 'license.expiring'; data: { licenseKey: string; daysLeft: number } }
+type WebhookEvent =
+  | { event: "conversion.started"; data: { jobId: string } }
+  | { event: "conversion.completed"; data: { jobId: string; result: ConvertResult } }
+  | { event: "conversion.failed"; data: { jobId: string; error: string } }
+  | { event: "license.expiring"; data: { licenseKey: string; daysLeft: number } };
 ```
 
 ### 定价策略
 
-| Tier | 请求/月 | 价格 |
-|------|---------|------|
-| Free | 100 | ¥0 |
-| Pro | 10,000 | ¥99/月 |
-| Business | 100,000 | ¥399/月 |
-| Enterprise | 无限 | 定制 |
+| Tier       | 请求/月 | 价格    |
+| ---------- | ------- | ------- |
+| Free       | 100     | ¥0      |
+| Pro        | 10,000  | ¥99/月  |
+| Business   | 100,000 | ¥399/月 |
+| Enterprise | 无限    | 定制    |
 
 ---
 
@@ -174,7 +174,7 @@ type WebhookEvent =
    - 自动吊销泄露的 Key
 
 2. **域名绑定**
-   - 支持通配符 (*.example.com)
+   - 支持通配符 (\*.example.com)
    - 检测 Referer / Origin
 
 3. **请求限流**
@@ -189,7 +189,7 @@ type WebhookEvent =
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 services:
   docsjs-api:
     image: fanly/docsjs-cloud:latest

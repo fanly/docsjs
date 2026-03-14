@@ -5,31 +5,35 @@ This document outlines the development process for the new DocsJS Core Engine v2
 ## 🎯 Goals for Core Engine v2
 
 1. **Enhanced Plugin System**: Implement a PicGo-inspired plugin lifecycle with 8+ hook points
-2. **Profile Management**: Configuration profiles for different use cases 
+2. **Profile Management**: Configuration profiles for different use cases
 3. **Improved Pipeline**: Streaming, chunked, with better metrics and error handling
 4. **Security & Scaling**: Plugin sandboxes, permission management, performance controls
 
 ## 🏗️ Components Implemented
 
 ### 1. Core Engine (`src/engine/core.ts`)
+
 - Main engine class with plugin, profile, and pipeline management
 - Configuration system with performance and security settings
 - Lifecycle methods for init/destroy
 - Performance metric collection
 
 ### 2. Pipeline System (`src/pipeline/manager.ts`)
+
 - 5-phase transformation pipeline (init, parse, transform, render, export)
 - Hook system supporting before/after each major phase
 - Metrics tracking for all operations
 - Error accumulation and handling
 
 ### 3. Plugin System (`src/plugins-v2/manager.ts`)
+
 - Enhanced plugin interface with lifecycle hooks
 - Permission and security system
 - Priority-based execution
 - Dependency management
 
 ### 4. Profile System (`src/profiles/profile-manager.ts`)
+
 - System profiles (knowledge-base, exam-paper, enterprise)
 - CRUD operations for custom profiles
 - Storage synchronization
@@ -37,15 +41,15 @@ This document outlines the development process for the new DocsJS Core Engine v2
 
 ## 📊 Progress Tracking
 
-| Component | Status | Coverage |
-|-----------|--------|----------|
-| Engine Core | ✅ | 90% |
-| Pipeline | ✅ | 85% |  
-| Plugin System | ✅ | 90% |
-| Profile System | ✅ | 85% |
-| Integration | ❌ | 0% |
-| Testing | ❌ | 0% |
-| Documentation | ✅ | 70% |
+| Component      | Status | Coverage |
+| -------------- | ------ | -------- |
+| Engine Core    | ✅     | 90%      |
+| Pipeline       | ✅     | 85%      |
+| Plugin System  | ✅     | 90%      |
+| Profile System | ✅     | 85%      |
+| Integration    | ❌     | 0%       |
+| Testing        | ❌     | 0%       |
+| Documentation  | ✅     | 70%      |
 
 ## 🔄 Next Development Steps
 
@@ -67,6 +71,7 @@ Currently we have implemented the core architecture but not yet connected the pa
 ## 🚀 Migration Path
 
 The strategy for migration will be:
+
 1. Maintain v1 API compatibility layer
 2. Introduce v2 engine with new capabilities
 3. Allow gradual migration through configuration switches
@@ -76,7 +81,7 @@ The strategy for migration will be:
 
 1. **Extend Components**: Add functionality to the implemented systems
 2. **Testing**: Write unit/integration tests for components
-3. **Documentation**: Improve API docs and usage examples  
+3. **Documentation**: Improve API docs and usage examples
 4. **Samples**: Create sample plugins demonstrating capabilities
 5. **Benchmarks**: Develop performance comparison tests
 

@@ -57,9 +57,13 @@ function escapeJs(value) {
 function featureI18n(lang) {
   const lines = [];
   for (const group of data.groups) {
-    lines.push(`feat_${group.id}_title: "${escapeJs(lang === "en" ? group.title.en : group.title.zh)}",`);
+    lines.push(
+      `feat_${group.id}_title: "${escapeJs(lang === "en" ? group.title.en : group.title.zh)}",`,
+    );
     group.items.forEach((item, idx) => {
-      lines.push(`feat_${group.id}_item_${idx + 1}: "${escapeJs(`${statusIcon(item.status)} ${lang === "en" ? item.en : item.zh}`)}",`);
+      lines.push(
+        `feat_${group.id}_item_${idx + 1}: "${escapeJs(`${statusIcon(item.status)} ${lang === "en" ? item.en : item.zh}`)}",`,
+      );
     });
   }
   return lines.map((line) => `          ${line}`).join("\n");
@@ -70,7 +74,7 @@ readmeEn = replaceBetween(
   readmeEn,
   "<!-- GENERATED:FEATURE_CHECKLIST_EN:START -->",
   "<!-- GENERATED:FEATURE_CHECKLIST_EN:END -->",
-  markdownChecklist("en")
+  markdownChecklist("en"),
 );
 writeFileSync(README_EN, readmeEn);
 
@@ -79,7 +83,7 @@ readmeZh = replaceBetween(
   readmeZh,
   "<!-- GENERATED:FEATURE_CHECKLIST_ZH:START -->",
   "<!-- GENERATED:FEATURE_CHECKLIST_ZH:END -->",
-  markdownChecklist("zh")
+  markdownChecklist("zh"),
 );
 writeFileSync(README_ZH, readmeZh);
 
@@ -88,20 +92,22 @@ landing = replaceBetween(
   landing,
   "<!-- GENERATED:FEATURE_CARDS:START -->",
   "<!-- GENERATED:FEATURE_CARDS:END -->",
-  featureCardsHtml()
+  featureCardsHtml(),
 );
 landing = replaceBetween(
   landing,
   "/* GENERATED:FEATURE_I18N_EN:START */",
   "/* GENERATED:FEATURE_I18N_EN:END */",
-  featureI18n("en")
+  featureI18n("en"),
 );
 landing = replaceBetween(
   landing,
   "/* GENERATED:FEATURE_I18N_ZH:START */",
   "/* GENERATED:FEATURE_I18N_ZH:END */",
-  featureI18n("zh")
+  featureI18n("zh"),
 );
 writeFileSync(LANDING, landing);
 
-console.log("[sync-doc-content] Updated README.md, README.zh-CN.md, docs/index.html from docs/content/feature-checklist.json");
+console.log(
+  "[sync-doc-content] Updated README.md, README.zh-CN.md, docs/index.html from docs/content/feature-checklist.json",
+);

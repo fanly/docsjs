@@ -1,8 +1,8 @@
 /**
  * Streaming Pipeline Manager
- * 
+ *
  * Handles chunked and streaming document transformation for large files.
- * 
+ *
  * Features:
  * - Chunk-based parsing for large DOCX files
  * - Streaming output for real-time results
@@ -23,16 +23,16 @@ import { DocumentAST, AST_VERSION } from "../ast/types";
 export interface StreamingOptions {
   /** Chunk size in bytes for processing */
   chunkSize: number;
-  
+
   /** Enable streaming output */
   streaming: boolean;
-  
+
   /** Progress callback */
   onProgress?: (progress: ProcessingProgress) => void;
-  
+
   /** Abort signal for cancellation */
   abortSignal?: AbortSignal;
-  
+
   /** Maximum memory usage in MB */
   maxMemoryMB?: number;
 }
@@ -81,15 +81,14 @@ export class StreamingPipelineManager {
    */
   async processChunked(
     input: File | string,
-    profile: TransformationProfile
+    profile: TransformationProfile,
   ): Promise<StreamingResult> {
     this.startTime = Date.now();
     this.chunksProcessed = 0;
     this.bytesProcessed = 0;
 
-    const totalBytes = typeof input === "string" 
-      ? new TextEncoder().encode(input).length 
-      : input.size;
+    const totalBytes =
+      typeof input === "string" ? new TextEncoder().encode(input).length : input.size;
 
     this.reportProgress("parsing", 0, totalBytes);
 
@@ -106,7 +105,6 @@ export class StreamingPipelineManager {
 
       // Small files - process normally
       return await this.processNormal(input, profile, totalBytes);
-
     } catch (error) {
       throw error;
     }
@@ -117,15 +115,14 @@ export class StreamingPipelineManager {
    */
   async *streamChunks(
     input: File | string,
-    profile: TransformationProfile
+    profile: TransformationProfile,
   ): AsyncGenerator<string, StreamingResult, unknown> {
     this.startTime = Date.now();
     this.chunksProcessed = 0;
     this.bytesProcessed = 0;
 
-    const totalBytes = typeof input === "string" 
-      ? new TextEncoder().encode(input).length 
-      : input.size;
+    const totalBytes =
+      typeof input === "string" ? new TextEncoder().encode(input).length : input.size;
 
     // For small inputs, process normally
     if (totalBytes <= this.options.chunkSize) {
@@ -148,10 +145,10 @@ export class StreamingPipelineManager {
 
       // Process chunk (simplified - in reality would need state management)
       const partialResult = await this.processChunk(
-        chunk, 
-        profile, 
+        chunk,
+        profile,
         this.bytesProcessed,
-        totalBytes
+        totalBytes,
       );
 
       if (partialResult.output) {
@@ -176,23 +173,23 @@ export class StreamingPipelineManager {
   private async processStringInput(
     input: string,
     profile: TransformationProfile,
-    totalBytes: number
+    totalBytes: number,
   ): Promise<StreamingResult> {
     // Use the regular pipeline manager logic
     // This is a simplified version - full implementation would use PipelineManager
     const context = this.createPipelineContext(input, profile);
-    
+
     // Parse
     this.reportProgress("parsing", 50, totalBytes);
-    
+
     // For string input, we'd use the HTML parser
     // Simplified here - full implementation would integrate with PipelineManager
-    
+
     // Render
     this.reportProgress("rendering", 80, totalBytes);
-    
+
     const output = ""; // Would be actual rendered output
-    
+
     return {
       output,
       complete: true,
@@ -207,28 +204,28 @@ export class StreamingPipelineManager {
   private async processLargeFile(
     input: File,
     profile: TransformationProfile,
-    totalBytes: number
+    totalBytes: number,
   ): Promise<StreamingResult> {
     // Read file in chunks
     const chunks: Uint8Array[] = [];
-    
+
     for await (const chunk of this.readFileChunks(input as File)) {
       if (this.options.abortSignal?.aborted) {
         throw new Error("Processing aborted");
       }
-      
+
       chunks.push(chunk);
       this.chunksProcessed++;
       this.bytesProcessed += chunk.length;
-      
+
       this.reportProgress("parsing", this.bytesProcessed, totalBytes);
     }
 
     // Combine chunks and process
     // In a full implementation, we'd process each chunk and maintain state
-    this.reportProgress("transforming", (totalBytes * 0.7), totalBytes);
-    
-    this.reportProgress("rendering", (totalBytes * 0.9), totalBytes);
+    this.reportProgress("transforming", totalBytes * 0.7, totalBytes);
+
+    this.reportProgress("rendering", totalBytes * 0.9, totalBytes);
 
     return {
       output: "", // Would be actual output
@@ -244,7 +241,7 @@ export class StreamingPipelineManager {
   private async processNormal(
     input: File | string,
     profile: TransformationProfile,
-    totalBytes: number
+    totalBytes: number,
   ): Promise<StreamingResult> {
     let output = "";
 
@@ -255,7 +252,7 @@ export class StreamingPipelineManager {
       // Process file normally
       const parser = new DocxParser(profile.parse as DocxParseOptions);
       const result = await parser.parse(input);
-      
+
       // Render based on profile
       const renderOpts: HtmlRenderOptions = {
         mode: "fidelity",
@@ -263,7 +260,7 @@ export class StreamingPipelineManager {
         wrapAsDocument: false,
         ...profile.render.options,
       };
-      
+
       const renderer = new HtmlRenderer(renderOpts);
       const renderResult = renderer.render(result.ast);
       output = renderResult.html;
@@ -284,13 +281,13 @@ export class StreamingPipelineManager {
     chunk: Uint8Array,
     profile: TransformationProfile,
     bytesProcessed: number,
-    totalBytes: number
+    totalBytes: number,
   ): Promise<{ output: string }> {
     // Simplified chunk processing
     // In reality, would need to maintain parsing state across chunks
-    
-    this.reportProgress("transforming", bytesProcessed * 0.7 / totalBytes, totalBytes);
-    
+
+    this.reportProgress("transforming", (bytesProcessed * 0.7) / totalBytes, totalBytes);
+
     return { output: "" };
   }
 
@@ -308,7 +305,7 @@ export class StreamingPipelineManager {
 
   private createPipelineContext(
     input: File | string,
-    profile: TransformationProfile
+    profile: TransformationProfile,
   ): PipelineContext {
     return {
       engine: this.engine,
@@ -353,17 +350,17 @@ export class StreamingPipelineManager {
   }
 
   private reportProgress(phase: PipelinePhase, bytesProcessed: number, totalBytes: number): void {
-    if (!this.options.onProgress) {return;}
+    if (!this.options.onProgress) {
+      return;
+    }
 
-    const percentage = totalBytes > 0 
-      ? Math.min(100, Math.round((bytesProcessed / totalBytes) * 100))
-      : 0;
+    const percentage =
+      totalBytes > 0 ? Math.min(100, Math.round((bytesProcessed / totalBytes) * 100)) : 0;
 
     // Estimate time remaining
     const elapsedMs = Date.now() - this.startTime;
-    const estimatedTimeRemainingMs = bytesProcessed > 0
-      ? (elapsedMs / bytesProcessed) * (totalBytes - bytesProcessed)
-      : undefined;
+    const estimatedTimeRemainingMs =
+      bytesProcessed > 0 ? (elapsedMs / bytesProcessed) * (totalBytes - bytesProcessed) : undefined;
 
     this.options.onProgress({
       phase,
@@ -382,7 +379,7 @@ export class StreamingPipelineManager {
  */
 export function createStreamingPipeline(
   engine: CoreEngine,
-  options?: Partial<StreamingOptions>
+  options?: Partial<StreamingOptions>,
 ): StreamingPipelineManager {
   return new StreamingPipelineManager(engine, options);
 }
@@ -392,7 +389,7 @@ export function createStreamingPipeline(
  */
 export function estimateMemoryUsage(
   inputSizeBytes: number,
-  options: StreamingOptions
+  options: StreamingOptions,
 ): {
   recommendedChunkSize: number;
   estimatedPeakMemoryMB: number;
@@ -406,7 +403,7 @@ export function estimateMemoryUsage(
   return {
     recommendedChunkSize: Math.min(
       options.chunkSize,
-      Math.max(1024 * 1024, Math.floor((options.maxMemoryMB || 512) * 0.2 * 1024 * 1024))
+      Math.max(1024 * 1024, Math.floor((options.maxMemoryMB || 512) * 0.2 * 1024 * 1024)),
     ),
     estimatedPeakMemoryMB: Math.ceil(totalEstimate),
     requiresStreaming: totalEstimate > (options.maxMemoryMB || 512) * 0.8,

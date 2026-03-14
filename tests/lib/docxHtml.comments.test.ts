@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 async function makeDocxWithComments(): Promise<File> {
@@ -14,7 +14,7 @@ async function makeDocxWithComments(): Promise<File> {
           <w:r><w:commentReference w:id="5"/></w:r>
         </w:p>
       </w:body>
-    </w:document>`
+    </w:document>`,
   );
   zip.file(
     "word/comments.xml",
@@ -23,12 +23,12 @@ async function makeDocxWithComments(): Promise<File> {
       <w:comment w:id="5" w:author="Alice" w:date="2026-02-14T12:00:00Z">
         <w:p><w:r><w:t>Review note</w:t></w:r></w:p>
       </w:comment>
-    </w:comments>`
+    </w:comments>`,
   );
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
   );
 
   const bytes = await zip.generateAsync({ type: "uint8array" });
@@ -36,7 +36,7 @@ async function makeDocxWithComments(): Promise<File> {
   const end = bytes.byteOffset + bytes.byteLength;
   return {
     name: "comments.docx",
-    arrayBuffer: async () => bytes.buffer.slice(start, end)
+    arrayBuffer: async () => bytes.buffer.slice(start, end),
   } as unknown as File;
 }
 
@@ -72,24 +72,25 @@ describe("parseDocxToHtmlSnapshot comments", () => {
             <w:r><w:commentReference w:id="7"/></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     );
     zip.file(
       "word/comments.xml",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
         <w:comment w:id="7"><w:p><w:r><w:t>Range note</w:t></w:r></w:p></w:comment>
-      </w:comments>`
+      </w:comments>`,
     );
     zip.file(
       "word/_rels/document.xml.rels",
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
     );
     const bytes = await zip.generateAsync({ type: "uint8array" });
     const file = {
       name: "comment-range.docx",
-      arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+      arrayBuffer: async () =>
+        bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     } as unknown as File;
 
     const snapshot = await parseDocxToHtmlSnapshot(file);

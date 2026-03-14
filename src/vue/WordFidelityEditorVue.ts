@@ -4,7 +4,7 @@ import type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
   DocsWordEditorErrorDetail,
-  DocsWordEditorReadyDetail
+  DocsWordEditorReadyDetail,
 } from "../index";
 
 defineDocsWordElement();
@@ -14,8 +14,8 @@ export const WordFidelityEditorVue = defineComponent({
   props: {
     lang: {
       type: String as () => "zh" | "en",
-      default: "zh"
-    }
+      default: "zh",
+    },
   },
   emits: ["change", "error", "ready"],
   setup(props, { emit }) {
@@ -44,5 +44,5 @@ export const WordFidelityEditorVue = defineComponent({
     });
 
     return () => h("docs-word-editor", { ref: elRef, lang: props.lang });
-  }
+  },
 });

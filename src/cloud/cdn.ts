@@ -1,10 +1,10 @@
 /**
  * CDN Delivery Infrastructure
- * 
+ *
  * CDN configuration and delivery optimization for transformation engine.
  */
 
-import type { CDNConfig, CacheRule, GeoRestriction } from './types';
+import type { CDNConfig, CacheRule, GeoRestriction } from "./types";
 
 /**
  * CDN Provider interface
@@ -26,7 +26,7 @@ export interface CDNProvider {
 export interface DistributionStatus {
   id: string;
   domain: string;
-  status: 'creating' | 'deployed' | 'disabled';
+  status: "creating" | "deployed" | "disabled";
   lastModified: number;
   enabled: boolean;
 }
@@ -43,7 +43,7 @@ export class CloudFrontProvider implements CDNProvider {
 
   async createDistribution(config: CDNConfig): Promise<string> {
     // In production, would call AWS CloudFront API
-    console.log('Creating CloudFront distribution:', config.domain);
+    console.log("Creating CloudFront distribution:", config.domain);
     return `dist_${Date.now()}`;
   }
 
@@ -55,9 +55,9 @@ export class CloudFrontProvider implements CDNProvider {
     return {
       id: distributionId,
       domain: `${distributionId}.cloudfront.net`,
-      status: 'deployed',
+      status: "deployed",
       lastModified: Date.now(),
-      enabled: true
+      enabled: true,
     };
   }
 
@@ -79,7 +79,7 @@ export class CloudflareProvider implements CDNProvider {
   }
 
   async createDistribution(config: CDNConfig): Promise<string> {
-    console.log('Creating Cloudflare zone:', config.domain);
+    console.log("Creating Cloudflare zone:", config.domain);
     return `zone_${Date.now()}`;
   }
 
@@ -91,9 +91,9 @@ export class CloudflareProvider implements CDNProvider {
     return {
       id: distributionId,
       domain: this.zoneId,
-      status: 'deployed',
+      status: "deployed",
       lastModified: Date.now(),
-      enabled: true
+      enabled: true,
     };
   }
 
@@ -116,9 +116,7 @@ export class CDNManager {
   /**
    * Create a new CDN distribution
    */
-  async createDistribution(
-    config: CDNConfig
-  ): Promise<DistributionStatus> {
+  async createDistribution(config: CDNConfig): Promise<DistributionStatus> {
     const distId = await this.provider.createDistribution(config);
     this.distributions.set(distId, config);
     return this.provider.getStatus(distId);
@@ -127,10 +125,7 @@ export class CDNManager {
   /**
    * Invalidate cache for paths
    */
-  async invalidateCache(
-    distributionId: string,
-    paths: string[]
-  ): Promise<void> {
+  async invalidateCache(distributionId: string, paths: string[]): Promise<void> {
     await this.provider.invalidate(distributionId, paths);
   }
 
@@ -138,28 +133,24 @@ export class CDNManager {
    * Invalidate all cache
    */
   async invalidateAll(distributionId: string): Promise<void> {
-    await this.provider.invalidate(distributionId, ['/*']);
+    await this.provider.invalidate(distributionId, ["/*"]);
   }
 
   /**
    * Get distribution status
    */
-  async getDistributionStatus(
-    distributionId: string
-  ): Promise<DistributionStatus | undefined> {
+  async getDistributionStatus(distributionId: string): Promise<DistributionStatus | undefined> {
     const config = this.distributions.get(distributionId);
-    if (!config) {return undefined;}
+    if (!config) {
+      return undefined;
+    }
     return this.provider.getStatus(distributionId);
   }
 
   /**
    * Generate signed URL
    */
-  generateSignedUrl(
-    distributionId: string,
-    path: string,
-    expiresIn: number
-  ): string {
+  generateSignedUrl(distributionId: string, path: string, expiresIn: number): string {
     const config = this.distributions.get(distributionId);
     if (!config) {
       throw new Error(`Distribution ${distributionId} not found`);
@@ -176,15 +167,15 @@ export class CDNManager {
   generateSignedCookie(
     distributionId: string,
     path: string,
-    expiresIn: number
+    expiresIn: number,
   ): Record<string, string> {
     const expires = Date.now() + expiresIn * 1000;
     const signature = this.generateSignature(path, expires);
 
     return {
-      'CloudFront-Expires': String(expires),
-      'CloudFront-Signature': signature,
-      'CloudFront-Key-Pair-Id': 'key-pair-id'
+      "CloudFront-Expires": String(expires),
+      "CloudFront-Signature": signature,
+      "CloudFront-Key-Pair-Id": "key-pair-id",
     };
   }
 
@@ -194,40 +185,37 @@ export class CDNManager {
   static getDefaultCacheRules(): CacheRule[] {
     return [
       {
-        pathPattern: '/results/*',
+        pathPattern: "/results/*",
         ttl: 86400, // 24 hours
-        cacheControl: 'public, max-age=86400'
+        cacheControl: "public, max-age=86400",
       },
       {
-        pathPattern: '/assets/*',
+        pathPattern: "/assets/*",
         ttl: 31536000, // 1 year
-        cacheControl: 'public, max-age=31536000, immutable'
+        cacheControl: "public, max-age=31536000, immutable",
       },
       {
-        pathPattern: '/api/*',
+        pathPattern: "/api/*",
         ttl: 0,
-        cacheControl: 'no-cache'
-      }
+        cacheControl: "no-cache",
+      },
     ];
   }
 
   /**
    * Create CloudFront configuration
    */
-  static createCloudFrontConfig(
-    domain: string,
-    origin: string
-  ): CDNConfig {
+  static createCloudFrontConfig(domain: string, origin: string): CDNConfig {
     return {
-      provider: 'cloudfront',
+      provider: "cloudfront",
       domain,
-      cacheRules: CDNManager.getDefaultCacheRules()
+      cacheRules: CDNManager.getDefaultCacheRules(),
     };
   }
 
   private generateSignature(path: string, expires: number): string {
     // Simplified signature - in production use proper HMAC
-    return Buffer.from(`${path}:${expires}:secret`).toString('base64');
+    return Buffer.from(`${path}:${expires}:secret`).toString("base64");
   }
 }
 
@@ -242,7 +230,7 @@ export class EdgeCache {
     this.config = {
       maxSize: 1000,
       defaultTTL: 3600,
-      ...config
+      ...config,
     };
   }
 
@@ -251,7 +239,9 @@ export class EdgeCache {
    */
   get(key: string): CachedResponse | undefined {
     const entry = this.cache.get(key);
-    if (!entry) {return undefined;}
+    if (!entry) {
+      return undefined;
+    }
 
     if (entry.expiresAt < Date.now()) {
       this.cache.delete(key);
@@ -265,11 +255,7 @@ export class EdgeCache {
   /**
    * Set cached response
    */
-  set(
-    key: string,
-    response: CachedResponse,
-    ttl?: number
-  ): void {
+  set(key: string, response: CachedResponse, ttl?: number): void {
     if (this.cache.size >= this.config.maxSize) {
       // Evict least recently used
       this.evictLRU();
@@ -279,7 +265,7 @@ export class EdgeCache {
       response,
       expiresAt: Date.now() + (ttl ?? this.config.defaultTTL) * 1000,
       createdAt: Date.now(),
-      hits: 0
+      hits: 0,
     });
   }
 
@@ -289,7 +275,7 @@ export class EdgeCache {
   invalidate(pattern: string): number {
     let count = 0;
     const regex = new RegExp(pattern);
-    
+
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
         this.cache.delete(key);
@@ -306,12 +292,12 @@ export class EdgeCache {
   getStats(): CacheStats {
     const entries = Array.from(this.cache.values());
     const totalHits = entries.reduce((sum, e) => sum + e.hits, 0);
-    
+
     return {
       size: this.cache.size,
       maxSize: this.config.maxSize,
       hitRate: entries.length > 0 ? totalHits / entries.length : 0,
-      totalHits
+      totalHits,
     };
   }
 

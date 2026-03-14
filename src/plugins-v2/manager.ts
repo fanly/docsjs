@@ -1,21 +1,21 @@
 /**
  * Enhanced Plugin System Manager
- * 
+ *
  * Manages the new plugin lifecycle and registration system.
  */
 
-import type { 
-  EnginePlugin, 
-  PluginHooks, 
-  PluginHook, 
+import type {
+  EnginePlugin,
+  PluginHooks,
+  PluginHook,
   PluginPriority,
-  PluginContext, 
+  PluginContext,
   HookResult,
   PluginPermissions,
   PluginRegistrationOptions,
-  PluginManager
-} from './types';
-import type { CoreEngine } from '../engine/core';
+  PluginManager,
+} from "./types";
+import type { CoreEngine } from "../engine/core";
 
 export class PluginManagerImpl implements PluginManager {
   private plugins: Map<string, EnginePlugin> = new Map();
@@ -41,7 +41,7 @@ export class PluginManagerImpl implements PluginManager {
     if (this.plugins.has(plugin.name) && !options?.overrideExisting) {
       throw new Error(`Plugin already registered: ${plugin.name}`);
     }
-    
+
     // Validate dependencies
     if (plugin.dependencies && plugin.dependencies.length > 0) {
       for (const dep of plugin.dependencies) {
@@ -59,7 +59,7 @@ export class PluginManagerImpl implements PluginManager {
 
     // Actually register the plugin
     this.plugins.set(plugin.name, plugin);
-    this.pluginPriorities.set(plugin.name, plugin.priority || 'normal');
+    this.pluginPriorities.set(plugin.name, plugin.priority || "normal");
 
     if (this.engine.getConfig().debug) {
       console.log(`Plugin registered: ${plugin.name} v${plugin.version}`);
@@ -83,23 +83,21 @@ export class PluginManagerImpl implements PluginManager {
   }
 
   listForHook(hook: PluginHook): EnginePlugin[] {
-    const plugins = Array.from(this.plugins.values())
-      .filter(plugin => plugin.availableHooks.includes(hook));
+    const plugins = Array.from(this.plugins.values()).filter((plugin) =>
+      plugin.availableHooks.includes(hook),
+    );
 
     // Sort by priority (highest first)
     return plugins.sort((a, b) => {
-      const priorityOrder: PluginPriority[] = ['highest', 'high', 'normal', 'low', 'lowest'];
-      const priorityA = priorityOrder.indexOf(a.priority ?? 'normal');
-      const priorityB = priorityOrder.indexOf(b.priority ?? 'normal');
-      
+      const priorityOrder: PluginPriority[] = ["highest", "high", "normal", "low", "lowest"];
+      const priorityA = priorityOrder.indexOf(a.priority ?? "normal");
+      const priorityB = priorityOrder.indexOf(b.priority ?? "normal");
+
       // Higher priority comes first (lower index = higher priority)
       return priorityA - priorityB;
       return priorityB - priorityA;
     });
   }
-
-
-
 
   async runForHook(hook: PluginHook, context: PluginContext): Promise<PluginContext> {
     const plugins = this.listForHook(hook);
@@ -113,40 +111,40 @@ export class PluginManagerImpl implements PluginManager {
       try {
         // Check if plugin actually implements the specific hook method
         let pluginMethod: ((context: any) => any) | undefined = undefined;
-        
+
         switch (hook) {
-          case 'beforeParse': 
+          case "beforeParse":
             pluginMethod = (plugin as any).beforeParse;
             break;
-          case 'afterParse': 
+          case "afterParse":
             pluginMethod = (plugin as any).afterParse;
-            break; 
-          case 'beforeTransform': 
+            break;
+          case "beforeTransform":
             pluginMethod = (plugin as any).beforeTransform;
             break;
-          case 'afterTransform': 
+          case "afterTransform":
             pluginMethod = (plugin as any).afterTransform;
             break;
-          case 'beforeRender': 
+          case "beforeRender":
             pluginMethod = (plugin as any).beforeRender;
             break;
-          case 'afterRender': 
+          case "afterRender":
             pluginMethod = (plugin as any).afterRender;
             break;
-          case 'beforeExport': 
+          case "beforeExport":
             pluginMethod = (plugin as any).beforeExport;
             break;
-          case 'afterExport': 
+          case "afterExport":
             pluginMethod = (plugin as any).afterExport;
             break;
         }
 
         if (pluginMethod) {
           const startTime = Date.now();
-          
+
           // Get max CPU time from permission config
           const maxCpuTime = plugin.permissions.compute.maxCpuSecs * 1000; // Convert to ms
-          
+
           // Create an abort signal that can cancel the operation if it takes too long
           // We'll use setTimeout to enforce the CPU time limit as a practical measure
           const timeoutHandle = setTimeout(() => {
@@ -155,49 +153,49 @@ export class PluginManagerImpl implements PluginManager {
               console.warn(`Plugin ${plugin.name} exceeded max CPU time (${maxCpuTime}ms)`);
             }
           }, maxCpuTime);
-          
+
           // Execute the plugin method
           const result: HookResult = await Promise.resolve(
-            pluginMethod.call(plugin, currentContext)
+            pluginMethod.call(plugin, currentContext),
           );
-          
+
           clearTimeout(timeoutHandle);
-          
+
           // Update context if plugin returned a modified context
           if (result !== undefined) {
             if (this.isPluginContext(result)) {
               currentContext = result;
             }
           }
-          
+
           // Update performance metrics (though actual update would happen outside)
           const elapsedTime = Date.now() - startTime;
           currentContext.pipeline!.metrics!.pluginApplications++;
-          
+
           if (this.engine.getConfig().debug) {
             console.log(`Plugin ${plugin.name} completed hook ${hook} in ${elapsedTime}ms`);
           }
         }
       } catch (error) {
         const errorMessage = `Plugin ${plugin.name} failed for hook ${hook}: ${error instanceof Error ? error.message : String(error)}`;
-        
+
         // If pipeline is attached, add error to the pipeline state
         if (currentContext.pipeline) {
           currentContext.pipeline.state.errors.push({
-            code: 'PLUGIN_ERROR',
+            code: "PLUGIN_ERROR",
             message: errorMessage,
             phase: currentContext!.pipeline.state.phase,
             timestamp: Date.now(),
             pluginName: plugin.name,
-            severity: 'error'
+            severity: "error",
           });
         }
-        
+
         // Log the error
         if (this.engine.getConfig().debug) {
           console.error(errorMessage, error);
         }
-        
+
         // Depending on error tolerance configuration, we might want to break instead of continuing
         // For now, we'll continue to allow other plugins to run
       }
@@ -226,14 +224,16 @@ export class PluginManagerImpl implements PluginManager {
 
     // Validate that the plugin implements only the methods it claims to support in availableHooks
     const supportedHooks = plugin.availableHooks;
-    
+
     // Check each hook to ensure corresponding method exists if the method is expected
     for (const hook of supportedHooks as PluginHook[]) {
       // The actual contract validation should happen in plugin registration where we verify
       // that if a plugin says it supports 'beforeParse', it has a beforeParse method
       const methodName = getMethodNameForHook(hook);
       if (!(plugin as any)[methodName]) {
-        console.warn(`Plugin ${plugin.name} claims to support hook ${hook} but missing ${methodName} method`);
+        console.warn(
+          `Plugin ${plugin.name} claims to support hook ${hook} but missing ${methodName} method`,
+        );
         // For now, we'll still allow registration since method might be optional for some hooks
       }
     }
@@ -244,7 +244,7 @@ export class PluginManagerImpl implements PluginManager {
   resolveDependencies(plugin: EnginePlugin): EnginePlugin[] {
     const resolved: EnginePlugin[] = [];
     const remaining: string[] = [...(plugin.dependencies || [])];
-    
+
     // Simple dependency resolution: look up dependencies by name
     for (const depName of remaining) {
       const depPlugin = this.get(depName);
@@ -259,41 +259,47 @@ export class PluginManagerImpl implements PluginManager {
 
   private validatePermissions(permissions: PluginPermissions): void {
     const config = this.engine.getConfig();
-    
+
     // Check if network access is allowed in config
     if (permissions.network && !config.security.allowNetwork) {
-      throw new Error('Plugin requests network access but engine restricts it');
+      throw new Error("Plugin requests network access but engine restricts it");
     }
-    
+
     // Check max memory
     if (permissions.compute.maxMemoryMB > config.performance.maxMemoryMB) {
       throw new Error(
-        `Plugin requested ${permissions.compute.maxMemoryMB}MB which exceeds engine max of ${config.performance.maxMemoryMB}`
+        `Plugin requested ${permissions.compute.maxMemoryMB}MB which exceeds engine max of ${config.performance.maxMemoryMB}`,
       );
     }
   }
-  
+
   private isPluginContext(obj: any): obj is PluginContext {
-    return typeof obj === 'object' && 
-           obj.engine && 
-           obj.pipeline !== undefined;
+    return typeof obj === "object" && obj.engine && obj.pipeline !== undefined;
   }
 }
-
 
 // Helper function to map a hook type to its corresponding method name
 function getMethodNameForHook(hook: PluginHook): string {
   switch (hook) {
-    case 'beforeParse': return 'beforeParse';
-    case 'afterParse': return 'afterParse';  
-    case 'beforeTransform': return 'beforeTransform';
-    case 'afterTransform': return 'afterTransform';
-    case 'beforeRender': return 'beforeRender';
-    case 'afterRender': return 'afterRender';
-    case 'beforeExport': return 'beforeExport';
-    case 'afterExport': return 'afterExport';
+    case "beforeParse":
+      return "beforeParse";
+    case "afterParse":
+      return "afterParse";
+    case "beforeTransform":
+      return "beforeTransform";
+    case "afterTransform":
+      return "afterTransform";
+    case "beforeRender":
+      return "beforeRender";
+    case "afterRender":
+      return "afterRender";
+    case "beforeExport":
+      return "beforeExport";
+    case "afterExport":
+      return "afterExport";
     default:
-      throw new Error(`Unknown hook: ${hook}`);
+      // Safely stringify hook for error message to avoid type-issues
+      throw new Error(`Unknown hook: ${String(hook as any)}`);
   }
 }
 

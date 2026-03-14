@@ -1,6 +1,6 @@
 /**
  * Enterprise Integration Adapters
- * 
+ *
  * Integrations for enterprise document management:
  * - SharePoint (Microsoft)
  * - Box
@@ -8,8 +8,8 @@
  * - Google Drive
  */
 
-import type { CMSAdapter, CMSImportOptions, CMSContent } from './adapters';
-import type { ConvertResultData } from '../server/types';
+import type { CMSAdapter, CMSImportOptions, CMSContent } from "./adapters";
+import type { ConvertResultData } from "../server/types";
 
 // ============================================================================
 // SharePoint Adapter
@@ -55,8 +55,8 @@ export interface SharePointItem {
 }
 
 export class SharePointAdapter implements CMSAdapter {
-  name = 'sharepoint';
-  version = '1.0.0';
+  name = "sharepoint";
+  version = "1.0.0";
   private options: SharePointOptions;
 
   constructor(options: SharePointOptions) {
@@ -66,10 +66,10 @@ export class SharePointAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const item = content as SharePointItem;
     return {
-      output: item.content || '',
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      output: item.content || "",
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
@@ -85,11 +85,12 @@ export class SharePointAdapter implements CMSAdapter {
    * Get site info
    */
   async getSite(siteId: string): Promise<SharePointSite> {
-    const response = await fetch(
-      `${this.options.baseUrl}/v1.0/sites/${siteId}`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
+    const response = await fetch(`${this.options.baseUrl}/v1.0/sites/${siteId}`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`SharePoint API error: ${response.statusText}`);
+    }
     return response.json();
   }
 
@@ -97,15 +98,16 @@ export class SharePointAdapter implements CMSAdapter {
    * Get drive contents
    */
   async getDriveContents(driveId: string, folderId?: string): Promise<SharePointItem[]> {
-    const path = folderId 
+    const path = folderId
       ? `/drives/${driveId}/items/${folderId}/children`
       : `/drives/${driveId}/root/children`;
-    
-    const response = await fetch(
-      `${this.options.baseUrl}/v1.0${path}`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
+
+    const response = await fetch(`${this.options.baseUrl}/v1.0${path}`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`SharePoint API error: ${response.statusText}`);
+    }
     const data = await response.json();
     return data.value || [];
   }
@@ -116,9 +118,11 @@ export class SharePointAdapter implements CMSAdapter {
   async downloadFile(driveId: string, itemId: string): Promise<string> {
     const response = await fetch(
       `${this.options.baseUrl}/v1.0/drives/${driveId}/items/${itemId}/content`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
-    if (!response.ok) {throw new Error(`SharePoint API error: ${response.statusText}`);}
+    if (!response.ok) {
+      throw new Error(`SharePoint API error: ${response.statusText}`);
+    }
     return response.text();
   }
 
@@ -129,27 +133,29 @@ export class SharePointAdapter implements CMSAdapter {
     const response = await fetch(
       `${this.options.baseUrl}/v1.0/drives/${this.options.driveId}/root:/${encodeURIComponent(content.title)}.html:/content`,
       {
-        method: 'PUT',
+        method: "PUT",
         headers: this.getHeaders(),
         body: content.body,
-      }
+      },
     );
-    if (!response.ok) {throw new Error(`SharePoint upload error: ${response.statusText}`);}
+    if (!response.ok) {
+      throw new Error(`SharePoint upload error: ${response.statusText}`);
+    }
     return response.json();
   }
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
     return {
-      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled',
+      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled",
       body: html,
     };
   }
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.options.accessToken}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.options.accessToken}`,
+      "Content-Type": "application/json",
     };
   }
 }
@@ -173,7 +179,7 @@ export interface BoxOptions extends CMSImportOptions {
 
 export interface BoxItem {
   id: string;
-  type: 'file' | 'folder';
+  type: "file" | "folder";
   name: string;
   size?: number;
   created_at: string;
@@ -182,14 +188,14 @@ export interface BoxItem {
 }
 
 export interface BoxFile extends BoxItem {
-  type: 'file';
+  type: "file";
   file_version?: { id: string };
   contents?: string;
 }
 
 export class BoxAdapter implements CMSAdapter {
-  name = 'box';
-  version = '1.0.0';
+  name = "box";
+  version = "1.0.0";
   private options: BoxOptions;
 
   constructor(options: BoxOptions) {
@@ -199,10 +205,10 @@ export class BoxAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const file = content as BoxFile;
     return {
-      output: file.contents || '',
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      output: file.contents || "",
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
@@ -217,12 +223,13 @@ export class BoxAdapter implements CMSAdapter {
   /**
    * Get folder contents
    */
-  async getFolderContents(folderId: string = '0'): Promise<BoxItem[]> {
-    const response = await fetch(
-      `${this.options.baseUrl}/2.0/folders/${folderId}/items`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`Box API error: ${response.statusText}`);}
+  async getFolderContents(folderId: string = "0"): Promise<BoxItem[]> {
+    const response = await fetch(`${this.options.baseUrl}/2.0/folders/${folderId}/items`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`Box API error: ${response.statusText}`);
+    }
     const data = await response.json();
     return data.entries || [];
   }
@@ -231,11 +238,12 @@ export class BoxAdapter implements CMSAdapter {
    * Download file
    */
   async downloadFile(fileId: string): Promise<string> {
-    const response = await fetch(
-      `${this.options.baseUrl}/2.0/files/${fileId}/content`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`Box API error: ${response.statusText}`);}
+    const response = await fetch(`${this.options.baseUrl}/2.0/files/${fileId}/content`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`Box API error: ${response.statusText}`);
+    }
     return response.text();
   }
 
@@ -244,35 +252,37 @@ export class BoxAdapter implements CMSAdapter {
    */
   async uploadToBox(content: CMSContent): Promise<BoxFile> {
     const formData = new FormData();
-    formData.append('attributes', JSON.stringify({
-      name: `${content.title}.html`,
-      parent: { id: this.options.folderId },
-    }));
-    formData.append('file', new Blob([content.body], { type: 'text/html' }));
-
-    const response = await fetch(
-      `${this.options.baseUrl}/2.0/files/content`,
-      {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.options.accessToken}` },
-        body: formData,
-      }
+    formData.append(
+      "attributes",
+      JSON.stringify({
+        name: `${content.title}.html`,
+        parent: { id: this.options.folderId },
+      }),
     );
-    if (!response.ok) {throw new Error(`Box upload error: ${response.statusText}`);}
+    formData.append("file", new Blob([content.body], { type: "text/html" }));
+
+    const response = await fetch(`${this.options.baseUrl}/2.0/files/content`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${this.options.accessToken}` },
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Box upload error: ${response.statusText}`);
+    }
     return (await response.json()).entries[0];
   }
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
     return {
-      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled',
+      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled",
       body: html,
     };
   }
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.options.accessToken}`,
+      Authorization: `Bearer ${this.options.accessToken}`,
     };
   }
 }
@@ -309,8 +319,8 @@ export interface OneDriveItem {
 }
 
 export class OneDriveAdapter implements CMSAdapter {
-  name = 'onedrive';
-  version = '1.0.0';
+  name = "onedrive";
+  version = "1.0.0";
   private options: OneDriveOptions;
 
   constructor(options: OneDriveOptions) {
@@ -320,10 +330,10 @@ export class OneDriveAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const item = content as OneDriveItem;
     return {
-      output: item.content || '',
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      output: item.content || "",
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
@@ -339,12 +349,13 @@ export class OneDriveAdapter implements CMSAdapter {
    * Get drive info
    */
   async getDrive(driveId?: string): Promise<unknown> {
-    const path = driveId ? `/drives/${driveId}` : '/me/drive';
-    const response = await fetch(
-      `${this.options.baseUrl}/v1.0${path}`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`OneDrive API error: ${response.statusText}`);}
+    const path = driveId ? `/drives/${driveId}` : "/me/drive";
+    const response = await fetch(`${this.options.baseUrl}/v1.0${path}`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`OneDrive API error: ${response.statusText}`);
+    }
     return response.json();
   }
 
@@ -352,11 +363,12 @@ export class OneDriveAdapter implements CMSAdapter {
    * Get item contents
    */
   async getItemContents(itemId: string): Promise<string> {
-    const response = await fetch(
-      `${this.options.baseUrl}/v1.0/me/drive/items/${itemId}/content`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`OneDrive API error: ${response.statusText}`);}
+    const response = await fetch(`${this.options.baseUrl}/v1.0/me/drive/items/${itemId}/content`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`OneDrive API error: ${response.statusText}`);
+    }
     return response.text();
   }
 
@@ -367,29 +379,31 @@ export class OneDriveAdapter implements CMSAdapter {
     const response = await fetch(
       `${this.options.baseUrl}/v1.0/me/drive/root:/${encodeURIComponent(content.title)}.html:/content`,
       {
-        method: 'PUT',
+        method: "PUT",
         headers: {
           ...this.getHeaders(),
-          'Content-Type': 'text/html',
+          "Content-Type": "text/html",
         },
         body: content.body,
-      }
+      },
     );
-    if (!response.ok) {throw new Error(`OneDrive upload error: ${response.statusText}`);}
+    if (!response.ok) {
+      throw new Error(`OneDrive upload error: ${response.statusText}`);
+    }
     return response.json();
   }
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
     return {
-      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled',
+      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled",
       body: html,
     };
   }
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.options.accessToken}`,
+      Authorization: `Bearer ${this.options.accessToken}`,
     };
   }
 }
@@ -423,8 +437,8 @@ export interface GoogleDriveFile {
 }
 
 export class GoogleDriveAdapter implements CMSAdapter {
-  name = 'google-drive';
-  version = '1.0.0';
+  name = "google-drive";
+  version = "1.0.0";
   private options: GoogleDriveOptions;
 
   constructor(options: GoogleDriveOptions) {
@@ -434,10 +448,10 @@ export class GoogleDriveAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const file = content as GoogleDriveFile;
     return {
-      output: file.content || '',
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      output: file.content || "",
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
@@ -460,9 +474,11 @@ export class GoogleDriveAdapter implements CMSAdapter {
 
     const response = await fetch(
       `${this.options.baseUrl}/drive/v3/files?q=${encodeURIComponent(query)}`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
-    if (!response.ok) {throw new Error(`Google Drive API error: ${response.statusText}`);}
+    if (!response.ok) {
+      throw new Error(`Google Drive API error: ${response.statusText}`);
+    }
     const data = await response.json();
     return data.files || [];
   }
@@ -471,11 +487,12 @@ export class GoogleDriveAdapter implements CMSAdapter {
    * Get file content
    */
   async getFileContent(fileId: string): Promise<string> {
-    const response = await fetch(
-      `${this.options.baseUrl}/drive/v3/files/${fileId}?alt=media`,
-      { headers: this.getHeaders() }
-    );
-    if (!response.ok) {throw new Error(`Google Drive API error: ${response.statusText}`);}
+    const response = await fetch(`${this.options.baseUrl}/drive/v3/files/${fileId}?alt=media`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`Google Drive API error: ${response.statusText}`);
+    }
     return response.text();
   }
 
@@ -485,37 +502,39 @@ export class GoogleDriveAdapter implements CMSAdapter {
   async uploadToGoogleDrive(content: CMSContent): Promise<GoogleDriveFile> {
     const metadata = {
       name: `${content.title}.html`,
-      mimeType: 'text/html',
+      mimeType: "text/html",
       parents: [this.options.folderId],
     };
 
     const formData = new FormData();
-    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formData.append('file', new Blob([content.body], { type: 'text/html' }));
+    formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+    formData.append("file", new Blob([content.body], { type: "text/html" }));
 
     const response = await fetch(
       `${this.options.baseUrl}/upload/drive/v3/files?uploadType=multipart`,
       {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.options.accessToken}` },
+        method: "POST",
+        headers: { Authorization: `Bearer ${this.options.accessToken}` },
         body: formData,
-      }
+      },
     );
-    if (!response.ok) {throw new Error(`Google Drive upload error: ${response.statusText}`);}
+    if (!response.ok) {
+      throw new Error(`Google Drive upload error: ${response.statusText}`);
+    }
     return response.json();
   }
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
     return {
-      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled',
+      title: titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled",
       body: html,
     };
   }
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.options.accessToken}`,
+      Authorization: `Bearer ${this.options.accessToken}`,
     };
   }
 }

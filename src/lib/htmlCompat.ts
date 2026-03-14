@@ -9,7 +9,9 @@ function parseStyle(styleText: string): Map<string, string> {
     const [rawKey, ...rawValue] = seg.split(":");
     const key = rawKey?.trim().toLowerCase();
     const value = rawValue.join(":").trim();
-    if (!key || !value) {continue;}
+    if (!key || !value) {
+      continue;
+    }
     map.set(key, value);
   }
   return map;
@@ -30,12 +32,14 @@ function applyMsoMappings(styleMap: Map<string, string>): void {
     ["mso-margin-bottom-alt", "margin-bottom"],
     ["mso-margin-left-alt", "margin-left"],
     ["mso-margin-right-alt", "margin-right"],
-    ["mso-line-height-alt", "line-height"]
+    ["mso-line-height-alt", "line-height"],
   ];
 
   for (const [msoKey, cssKey] of mappingPairs) {
     const value = styleMap.get(msoKey);
-    if (!value) {continue;}
+    if (!value) {
+      continue;
+    }
     if (!styleMap.has(cssKey)) {
       styleMap.set(cssKey, value);
     }
@@ -58,7 +62,9 @@ function applyListFallback(el: HTMLElement, styleMap: Map<string, string>): void
   const className = (el.getAttribute("class") ?? "").toLowerCase();
   const msoList = styleMap.get("mso-list") ?? "";
   const maybeList = className.includes("msolist") || msoList.length > 0;
-  if (!maybeList) {return;}
+  if (!maybeList) {
+    return;
+  }
 
   if (!styleMap.has("text-indent")) {
     styleMap.set("text-indent", "0");
@@ -104,7 +110,9 @@ function normalizeWordEmptyParagraphs(doc: Document): void {
 
 function applyGlobalDocFixes(doc: Document, options?: WordHtmlCompatOptions): void {
   const body = doc.body;
-  if (!body) {return;}
+  if (!body) {
+    return;
+  }
 
   if (options?.forceBodyFontFamily) {
     body.style.fontFamily = options.forceBodyFontFamily;

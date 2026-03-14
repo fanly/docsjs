@@ -1,6 +1,6 @@
 /**
  * DocumentAST v1.0 - Unified Document Semantic Intermediate Representation
- * 
+ *
  * Design Principles:
  * 1. Pure semantic representation - no rendering-specific data
  * 2. Versioned - supports migration between versions
@@ -32,7 +32,7 @@ export interface ASTMetadata {
   checksum?: string;
 }
 
-export type InputFormat = 
+export type InputFormat =
   | "docx"
   | "html"
   | "markdown"
@@ -65,19 +65,19 @@ export interface DocumentNode {
   type: "document";
   id: string;
   metadata: ASTMetadata;
-  
+
   /** Document-level properties */
   properties?: DocumentProperties;
-  
+
   /** Global style definitions */
   styles?: StyleDefinitions;
-  
+
   /** Content sections */
   children: SectionNode[];
-  
+
   /** Referenced resources (images, fonts, etc.) */
   resources?: ResourceMap;
-  
+
   /** Auxiliary content (footnotes, endnotes, comments) */
   auxiliary?: AuxiliaryContent;
 }
@@ -99,7 +99,7 @@ export interface DocumentProperties {
   language?: string;
   createdTime?: number;
   modifiedTime?: number;
-  
+
   /** Page setup (semantic-level, not rendering-level) */
   pageSetup?: PageSetup;
 }
@@ -142,12 +142,12 @@ export interface ParagraphStyleDef {
   id: string;
   name: string;
   basedOn?: string;
-  
+
   // Paragraph formatting
   alignment?: "start" | "center" | "end" | "justify";
   indent?: ParagraphIndent;
   spacing?: ParagraphSpacing;
-  
+
   // Outline level (for headings)
   outlineLevel?: number;
 }
@@ -156,7 +156,7 @@ export interface CharacterStyleDef {
   id: string;
   name: string;
   basedOn?: string;
-  
+
   // Character formatting hints (semantic)
   weight?: "normal" | "bold";
   style?: "normal" | "italic";
@@ -179,7 +179,14 @@ export interface ListStyleDef {
 
 export interface ListLevelDef {
   level: number;
-  format: "decimal" | "lowerLetter" | "upperLetter" | "lowerRoman" | "upperRoman" | "bullet" | "custom";
+  format:
+    | "decimal"
+    | "lowerLetter"
+    | "upperLetter"
+    | "lowerRoman"
+    | "upperRoman"
+    | "bullet"
+    | "custom";
   template?: string; // e.g., "%1.%2."
   startAt?: number;
   bulletChar?: string;
@@ -192,10 +199,10 @@ export interface ListLevelDef {
 export interface SectionNode {
   type: "section";
   id: string;
-  
+
   /** Section-specific properties */
   properties?: SectionProperties;
-  
+
   /** Block-level content */
   children: BlockNode[];
 }
@@ -203,13 +210,13 @@ export interface SectionNode {
 export interface SectionProperties {
   /** Section break type */
   breakType?: "continuous" | "nextPage" | "evenPage" | "oddPage";
-  
+
   /** Section-specific page setup */
   pageSetup?: PageSetup;
-  
+
   /** Header references */
   headerRef?: string;
-  
+
   /** Footer references */
   footerRef?: string;
 }
@@ -231,17 +238,16 @@ export type BlockNode =
   | CustomBlockNode
   | ImageNode;
 
-
 // ---- Paragraph ----
 
 export interface ParagraphNode {
   type: "paragraph";
   id: string;
   children: InlineNode[];
-  
+
   /** Semantic properties */
   semantics?: ParagraphSemantics;
-  
+
   /** Style reference */
   styleId?: string;
 }
@@ -251,16 +257,16 @@ export interface ParagraphSemantics {
   alignment?: "start" | "center" | "end" | "justify";
   spacing?: ParagraphSpacing;
   lineSpacing?: number;
-  
+
   /** Keep with next paragraph */
   keepWithNext?: boolean;
-  
+
   /** Keep lines together */
   keepLinesTogether?: boolean;
-  
+
   /** Widow/orphan control */
   widowControl?: boolean;
-  
+
   /** Page break before */
   pageBreakBefore?: boolean;
 }
@@ -286,10 +292,10 @@ export interface HeadingNode {
   id: string;
   level: 1 | 2 | 3 | 4 | 5 | 6;
   children: InlineNode[];
-  
+
   /** Auto-numbering state */
   numbering?: HeadingNumbering;
-  
+
   /** Style reference */
   styleId?: string;
 }
@@ -309,10 +315,10 @@ export interface ListNode {
   listType: "ordered" | "unordered" | "description";
   items: ListItemNode[];
   children?: BlockNode[];
-  
+
   /** List style reference */
   styleId?: string;
-  
+
   /** Numbering properties */
   numbering?: ListNumbering;
 }
@@ -321,16 +327,16 @@ export interface ListItemNode {
   type: "listItem";
   id: string;
   children: BlockNode[];
-  
+
   /** Item marker (for unordered lists) */
   marker?: string;
-  
+
   /** Item number (for ordered lists) */
   number?: number;
-  
+
   /** Nesting level (0-based) */
   level?: number;
-  
+
   /** For description lists */
   term?: InlineNode[];
 }
@@ -338,10 +344,10 @@ export interface ListItemNode {
 export interface ListNumbering {
   startAt?: number;
   format?: "decimal" | "lowerLetter" | "upperLetter" | "lowerRoman" | "upperRoman";
-  
+
   /** Multi-level template, e.g., ["%1", "%1.%2", "%1.%2.%3"] */
   levelTemplates?: string[];
-  
+
   /** Continue numbering from previous list */
   continueFrom?: string;
 }
@@ -352,16 +358,16 @@ export interface TableNode {
   type: "table";
   id: string;
   rows: TableRowNode[];
-  
+
   /** Table caption */
   caption?: string;
-  
+
   /** Table summary (accessibility) */
   summary?: string;
-  
+
   /** Style reference */
   styleId?: string;
-  
+
   /** Column widths (semantic) */
   columnWidths?: number[];
 }
@@ -370,10 +376,10 @@ export interface TableRowNode {
   type: "tableRow";
   id: string;
   cells: TableCellNode[];
-  
+
   /** Row is a header row */
   isHeader?: boolean;
-  
+
   /** Row height hint */
   height?: number;
 }
@@ -382,19 +388,19 @@ export interface TableCellNode {
   type: "tableCell";
   id: string;
   children: BlockNode[];
-  
+
   /** Column span */
   colspan?: number;
-  
+
   /** Row span */
   rowspan?: number;
-  
+
   /** Cell is a header cell */
   isHeader?: boolean;
-  
+
   /** Vertical alignment */
   valign?: "top" | "middle" | "bottom";
-  
+
   /** Cell width hint */
   width?: number;
 }
@@ -404,13 +410,13 @@ export interface TableCellNode {
 export interface FigureNode {
   type: "figure";
   id: string;
-  
+
   /** Figure content */
   content: ImageNode | VideoNode | AudioNode | CustomBlockNode;
-  
+
   /** Caption */
   caption?: FigcaptionNode;
-  
+
   /** Figure identifier for cross-references */
   identifier?: string;
 }
@@ -428,13 +434,13 @@ export interface CodeBlockNode {
   id: string;
   code: string;
   language?: string;
-  
+
   /** Line numbers to highlight */
   highlightLines?: number[];
-  
+
   /** Show line numbers */
   showLineNumbers?: boolean;
-  
+
   /** Starting line number */
   startLine?: number;
 }
@@ -445,7 +451,7 @@ export interface BlockquoteNode {
   type: "blockquote";
   id: string;
   children: BlockNode[];
-  
+
   /** Attribution/citation */
   attribution?: string;
 }
@@ -455,7 +461,7 @@ export interface BlockquoteNode {
 export interface DividerNode {
   type: "divider";
   id: string;
-  
+
   /** Divider style hint */
   style?: "solid" | "dashed" | "dotted" | "double";
 }
@@ -502,7 +508,7 @@ export interface TextNode {
   type: "text";
   id: string;
   text: string;
-  
+
   /** Text marks (semantic formatting) */
   marks?: TextMark[];
 }
@@ -542,16 +548,16 @@ export interface HyperlinkNode {
   type: "hyperlink";
   id: string;
   children: InlineNode[];
-  
+
   /** Link target URL */
   href: string;
-  
+
   /** Link title */
   title?: string;
-  
+
   /** Link target window */
   target?: "_blank" | "_self" | "_parent" | "_top";
-  
+
   /** Internal anchor reference */
   anchor?: string;
 }
@@ -564,16 +570,16 @@ export interface ImageNode {
   src: string;
   alt?: string;
   title?: string;
-  
+
   /** Image dimensions (semantic) */
   dimensions?: ImageDimensions;
-  
+
   /** Image positioning (for floating images) */
   positioning?: ImagePositioning;
-  
+
   /** Crop rectangle */
   crop?: ImageCrop;
-  
+
   /** Transform (rotation, flip) */
   transform?: ImageTransform;
 }
@@ -586,7 +592,7 @@ export interface ImageDimensions {
 
 export interface ImagePositioning {
   type: "inline" | "floating";
-  
+
   /** Floating anchor position */
   anchor?: {
     horizontal?: AnchorPosition;
@@ -622,13 +628,13 @@ export interface ImageTransform {
 export interface MathNode {
   type: "math";
   id: string;
-  
+
   /** Math source code */
   source: string;
-  
+
   /** Source format */
   format: "latex" | "omml" | "mathml" | "asciimath";
-  
+
   /** Display mode (block vs inline) */
   displayMode?: boolean;
 }
@@ -653,10 +659,10 @@ export interface CommentRefNode {
   type: "commentRef";
   id: string;
   commentId: string;
-  
+
   /** Comment range start marker */
   isRangeStart?: boolean;
-  
+
   /** Comment range end marker */
   isRangeEnd?: boolean;
 }
@@ -665,10 +671,10 @@ export interface BookmarkNode {
   type: "bookmark";
   id: string;
   name: string;
-  
+
   /** Bookmark range start marker */
   isRangeStart?: boolean;
-  
+
   /** Bookmark range end marker */
   isRangeEnd?: boolean;
 }
@@ -678,16 +684,16 @@ export interface BookmarkNode {
 export interface EmbedNode {
   type: "embed";
   id: string;
-  
+
   /** Embed source URL */
   src: string;
-  
+
   /** Embed type */
   embedType: "video" | "audio" | "iframe" | "object" | "unknown";
-  
+
   /** Dimensions */
   dimensions?: ImageDimensions;
-  
+
   /** Provider name (e.g., "YouTube", "Vimeo") */
   provider?: string;
 }
@@ -810,7 +816,7 @@ export interface RevisionNode {
   author?: string;
   authorId?: string;
   date?: string;
-  
+
   /** Affected content */
   content: InlineNode[];
 }
@@ -819,7 +825,7 @@ export interface HeaderFooterNode {
   type: "header" | "footer";
   id: string;
   children: BlockNode[];
-  
+
   /** Header/footer type */
   headerFooterType?: "default" | "firstPage" | "evenPage";
 }
@@ -829,7 +835,7 @@ export interface HeaderFooterNode {
 // ============================================================================
 
 /** Any AST node */
-export type ASTNode = 
+export type ASTNode =
   | DocumentNode
   | SectionNode
   | BlockNode
@@ -873,7 +879,6 @@ export interface SourceLocation {
   end: SourcePosition;
   source?: string;
 }
-
 
 /** Node with source location */
 export type LocatedNode = ASTNode & { position?: SourceLocation };

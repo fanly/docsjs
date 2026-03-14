@@ -1,6 +1,6 @@
 /**
  * Plugin Analytics
- * 
+ *
  * Tracks plugin usage metrics, performance data, and provides analytics dashboard.
  */
 
@@ -8,16 +8,16 @@
  * Usage event types
  */
 export enum EventType {
-  INSTALL = 'install',
-  UNINSTALL = 'uninstall',
-  UPDATE = 'update',
-  ENABLE = 'enable',
-  DISABLE = 'disable',
-  LOAD = 'load',
-  ERROR = 'error',
-  RENDER = 'render',
-  PARSE = 'parse',
-  TRANSFORM = 'transform'
+  INSTALL = "install",
+  UNINSTALL = "uninstall",
+  UPDATE = "update",
+  ENABLE = "enable",
+  DISABLE = "disable",
+  LOAD = "load",
+  ERROR = "error",
+  RENDER = "render",
+  PARSE = "parse",
+  TRANSFORM = "transform",
 }
 
 /**
@@ -112,11 +112,11 @@ export class PluginAnalytics {
   /**
    * Track an event
    */
-  track(event: Omit<UsageEvent, 'id' | 'timestamp'>): void {
+  track(event: Omit<UsageEvent, "id" | "timestamp">): void {
     const fullEvent: UsageEvent = {
       ...event,
       id: this.generateId(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.events.push(fullEvent);
@@ -139,7 +139,7 @@ export class PluginAnalytics {
       eventType: EventType.INSTALL,
       engineVersion,
       userId,
-      success: true
+      success: true,
     });
   }
 
@@ -147,10 +147,10 @@ export class PluginAnalytics {
    * Track plugin error
    */
   trackError(
-    pluginId: string, 
-    engineVersion: string, 
+    pluginId: string,
+    engineVersion: string,
     error: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): void {
     this.track({
       pluginId,
@@ -158,7 +158,7 @@ export class PluginAnalytics {
       engineVersion,
       success: false,
       errorMessage: error,
-      metadata
+      metadata,
     });
   }
 
@@ -169,14 +169,14 @@ export class PluginAnalytics {
     pluginId: string,
     engineVersion: string,
     duration: number,
-    success: boolean
+    success: boolean,
   ): void {
     this.track({
       pluginId,
       eventType: EventType.LOAD,
       engineVersion,
       duration,
-      success
+      success,
     });
   }
 
@@ -199,10 +199,8 @@ export class PluginAnalytics {
    */
   getDashboardSummary(limit: number = 10): DashboardSummary {
     const allMetrics = this.getAllMetrics();
-    
-    const topPlugins = [...allMetrics]
-      .sort((a, b) => b.installs - a.installs)
-      .slice(0, limit);
+
+    const topPlugins = [...allMetrics].sort((a, b) => b.installs - a.installs).slice(0, limit);
 
     const trendingPlugins = [...allMetrics]
       .sort((a, b) => b.activeUsers - a.activeUsers)
@@ -213,21 +211,22 @@ export class PluginAnalytics {
     const totalInstalls = allMetrics.reduce((sum, m) => sum + m.installs, 0);
     const totalActiveUsers = new Set(
       this.events
-        .filter(e => e.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000)
-        .map(e => e.userId)
+        .filter((e) => e.timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000)
+        .map((e) => e.userId),
     ).size;
 
     return {
       totalPlugins: allMetrics.length,
       totalInstalls,
       totalActiveUsers,
-      avgErrorRate: allMetrics.length > 0 
-        ? allMetrics.reduce((sum, m) => sum + m.errorRate, 0) / allMetrics.length 
-        : 0,
+      avgErrorRate:
+        allMetrics.length > 0
+          ? allMetrics.reduce((sum, m) => sum + m.errorRate, 0) / allMetrics.length
+          : 0,
       topPlugins,
       trendingPlugins,
       recentEvents,
-      performance: this.getPerformanceMetrics()
+      performance: this.getPerformanceMetrics(),
     };
   }
 
@@ -235,46 +234,38 @@ export class PluginAnalytics {
    * Get events for a plugin
    */
   getEvents(pluginId: string, limit: number = 100): UsageEvent[] {
-    return this.events
-      .filter(e => e.pluginId === pluginId)
-      .slice(-limit);
+    return this.events.filter((e) => e.pluginId === pluginId).slice(-limit);
   }
 
   /**
    * Get events by type
    */
   getEventsByType(eventType: EventType, limit: number = 100): UsageEvent[] {
-    return this.events
-      .filter(e => e.eventType === eventType)
-      .slice(-limit);
+    return this.events.filter((e) => e.eventType === eventType).slice(-limit);
   }
 
   /**
    * Get error events
    */
   getErrors(limit: number = 100): UsageEvent[] {
-    return this.events
-      .filter(e => e.eventType === EventType.ERROR)
-      .slice(-limit);
+    return this.events.filter((e) => e.eventType === EventType.ERROR).slice(-limit);
   }
 
   /**
    * Get usage over time
    */
   getUsageOverTime(
-    pluginId: string, 
-    startTime: number, 
-    endTime: number
+    pluginId: string,
+    startTime: number,
+    endTime: number,
   ): { timestamp: number; count: number }[] {
     const events = this.events.filter(
-      e => e.pluginId === pluginId && 
-           e.timestamp >= startTime && 
-           e.timestamp <= endTime
+      (e) => e.pluginId === pluginId && e.timestamp >= startTime && e.timestamp <= endTime,
     );
 
     // Group by hour
     const grouped = new Map<number, number>();
-    events.forEach(e => {
+    events.forEach((e) => {
       const hour = Math.floor(e.timestamp / 3600000) * 3600000;
       grouped.set(hour, (grouped.get(hour) || 0) + 1);
     });
@@ -287,28 +278,48 @@ export class PluginAnalytics {
   /**
    * Export analytics data
    */
-  exportData(format: 'json' | 'csv'): string {
-    if (format === 'json') {
-      return JSON.stringify({
-        events: this.events,
-        metrics: Array.from(this.metrics.entries())
-      }, null, 2);
+  exportData(format: "json" | "csv"): string {
+    if (format === "json") {
+      return JSON.stringify(
+        {
+          events: this.events,
+          metrics: Array.from(this.metrics.entries()),
+        },
+        null,
+        2,
+      );
     }
 
     // CSV format
-    const headers = ['id', 'pluginId', 'eventType', 'timestamp', 'engineVersion', 'success', 'duration'];
-    const rows = this.events.map(e => [
-      e.id, e.pluginId, e.eventType, e.timestamp, e.engineVersion, e.success, e.duration || ''
+    const headers = [
+      "id",
+      "pluginId",
+      "eventType",
+      "timestamp",
+      "engineVersion",
+      "success",
+      "duration",
+    ];
+    const rows = this.events.map((e) => [
+      e.id,
+      e.pluginId,
+      e.eventType,
+      e.timestamp,
+      e.engineVersion,
+      e.success,
+      e.duration || "",
     ]);
 
-    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
   }
 
   /**
    * Flush events (send to backend)
    */
   private async flush(): Promise<void> {
-    if (this.events.length === 0) {return;}
+    if (this.events.length === 0) {
+      return;
+    }
 
     // In real implementation, would send to analytics backend
     console.log(`[Analytics] Flushing ${this.events.length} events`);
@@ -319,7 +330,7 @@ export class PluginAnalytics {
    */
   private updateMetrics(event: UsageEvent): void {
     let m = this.metrics.get(event.pluginId);
-    
+
     if (!m) {
       m = {
         pluginId: event.pluginId,
@@ -332,7 +343,7 @@ export class PluginAnalytics {
         avgExecutionTime: 0,
         updatedAt: Date.now(),
         rating: 0,
-        reviewCount: 0
+        reviewCount: 0,
       };
       this.metrics.set(event.pluginId, m);
     }
@@ -364,8 +375,7 @@ export class PluginAnalytics {
    */
   private getPerformanceMetrics(): PerformanceMetrics {
     const recentErrors = this.events.filter(
-      e => e.eventType === EventType.ERROR && 
-           e.timestamp > Date.now() - 60000
+      (e) => e.eventType === EventType.ERROR && e.timestamp > Date.now() - 60000,
     );
 
     return {
@@ -373,7 +383,7 @@ export class PluginAnalytics {
       memoryUsage: process.memoryUsage().heapUsed / 1024 / 1024,
       executionTime: 0,
       throughput: this.events.length / 60,
-      errors: recentErrors.length
+      errors: recentErrors.length,
     };
   }
 
@@ -417,15 +427,15 @@ export class AnalyticsAggregator {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const dayEvents = this.analytics['events'].filter(
-      e => e.timestamp >= startOfDay.getTime() && e.timestamp <= endOfDay.getTime()
+    const dayEvents = this.analytics["events"].filter(
+      (e) => e.timestamp >= startOfDay.getTime() && e.timestamp <= endOfDay.getTime(),
     );
 
     return {
-      installs: dayEvents.filter(e => e.eventType === EventType.INSTALL).length,
-      uninstalls: dayEvents.filter(e => e.eventType === EventType.UNINSTALL).length,
-      errors: dayEvents.filter(e => e.eventType === EventType.ERROR).length,
-      activePlugins: new Set(dayEvents.map(e => e.pluginId)).size
+      installs: dayEvents.filter((e) => e.eventType === EventType.INSTALL).length,
+      uninstalls: dayEvents.filter((e) => e.eventType === EventType.UNINSTALL).length,
+      errors: dayEvents.filter((e) => e.eventType === EventType.ERROR).length,
+      activePlugins: new Set(dayEvents.map((e) => e.pluginId)).size,
     };
   }
 
@@ -434,15 +444,15 @@ export class AnalyticsAggregator {
    */
   getWeeklyTrends(): { date: string; installs: number; errors: number }[] {
     const trends: { date: string; installs: number; errors: number }[] = [];
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const report = this.getDailyReport(date);
       trends.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split("T")[0],
         installs: report.installs,
-        errors: report.errors
+        errors: report.errors,
       });
     }
 

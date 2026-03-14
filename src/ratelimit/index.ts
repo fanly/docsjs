@@ -1,6 +1,6 @@
 /**
  * Rate Limiter Module
- * 
+ *
  * Provides rate limiting for API endpoints.
  */
 
@@ -72,8 +72,8 @@ export class RateLimiter {
 
   constructor(config: RateLimitConfig, keyGenerator?: KeyGenerator) {
     this.config = config;
-    this.keyGenerator = keyGenerator || ((req) => req.ip || 'default');
-    
+    this.keyGenerator = keyGenerator || ((req) => req.ip || "default");
+
     // Cleanup old buckets every 5 minutes
     this.cleanupInterval = setInterval(() => {
       const now = Date.now();
@@ -88,7 +88,7 @@ export class RateLimiter {
   async check(req: { ip?: string; headers?: Record<string, string> }): Promise<RateLimitResult> {
     const key = this.keyGenerator(req);
     let bucket = this.buckets.get(key);
-    
+
     if (!bucket) {
       const maxTokens = this.config.maxRequests;
       const refillRate = maxTokens / (this.config.windowMs / 1000);
@@ -104,27 +104,30 @@ export class RateLimiter {
       success,
       remaining: Math.max(0, remaining),
       resetTime,
-      message: success ? undefined : this.config.message || 'Rate limit exceeded'
+      message: success ? undefined : this.config.message || "Rate limit exceeded",
     };
   }
 
-  async middleware(req: { ip?: string; headers?: Record<string, string> }, res: {
-    setHeader(name: string, value: string): void;
-    status(code: number): { json(data: unknown): void };
-  }): Promise<boolean> {
+  async middleware(
+    req: { ip?: string; headers?: Record<string, string> },
+    res: {
+      setHeader(name: string, value: string): void;
+      status(code: number): { json(data: unknown): void };
+    },
+  ): Promise<boolean> {
     const result = await this.check(req);
-    
-    res.setHeader('X-RateLimit-Limit', String(this.config.maxRequests));
-    res.setHeader('X-RateLimit-Remaining', String(result.remaining));
-    res.setHeader('X-RateLimit-Reset', String(Math.ceil(result.resetTime / 1000)));
+
+    res.setHeader("X-RateLimit-Limit", String(this.config.maxRequests));
+    res.setHeader("X-RateLimit-Remaining", String(result.remaining));
+    res.setHeader("X-RateLimit-Reset", String(Math.ceil(result.resetTime / 1000)));
 
     if (!result.success) {
       res.status(429).json({
         success: false,
         error: {
-          code: 'RATE_LIMITED',
-          message: result.message || 'Too many requests'
-        }
+          code: "RATE_LIMITED",
+          message: result.message || "Too many requests",
+        },
       });
       return false;
     }
@@ -144,7 +147,7 @@ export class RateLimiter {
 // Express/Node.js HTTP middleware wrapper
 export function createRateLimitMiddleware(config: RateLimitConfig) {
   const limiter = new RateLimiter(config);
-  
+
   return async function rateLimitMiddleware(req: any, res: any, next: Function) {
     const allowed = await limiter.middleware(req, res);
     if (allowed) {

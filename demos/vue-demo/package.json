@@ -1,12 +1,12 @@
 {
   "name": "docsjs-vue-demo",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4174"
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview --port 4174"
   },
   "dependencies": {
     "jszip": "^3.10.1",
@@ -15,6 +15,12 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.0",
     "typescript": "^5.7.3",
-    "vite": "^8.0.0"
-  }
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.11.1"
 }

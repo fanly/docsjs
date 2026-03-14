@@ -1,6 +1,6 @@
 /**
  * Markdown Renderer Module
- * 
+ *
  * Exports the Markdown renderer for converting DocumentAST to Markdown format.
  */
 

@@ -1,8 +1,8 @@
 /**
  * DOCX Parser
- * 
+ *
  * Parses DOCX files and outputs DocumentAST.
- * 
+ *
  * Architecture:
  * - DOCX file → XML parsing → AST nodes
  * - Clean separation from rendering
@@ -117,7 +117,9 @@ function getChildByLocalName(parent: ParentNode, localName: string): Element | n
 }
 
 function getAttr(el: Element | null, name: string): string | null {
-  if (!el) {return null;}
+  if (!el) {
+    return null;
+  }
   return el.getAttribute(name) ?? el.getAttribute(`w:${name}`) ?? null;
 }
 
@@ -182,25 +184,25 @@ export class DocxParser {
 
   async parse(file: File): Promise<DocxParseResult> {
     const startTime = Date.now();
-    
+
     // Load ZIP
     const buffer = await this.loadFileBuffer(file);
     this.zip = await JSZip.loadAsync(buffer);
-    
+
     // Parse XML files
     await this.parseXmlFiles();
-    
+
     // Parse relationships
     this.parseRelationships();
-    
+
     // Parse auxiliary content
     this.parseFootnotes();
     this.parseEndnotes();
     this.parseComments();
-    
+
     // Build AST
     const ast = this.buildDocument();
-    
+
     return {
       ast,
       report: {
@@ -214,9 +216,10 @@ export class DocxParser {
   // ---- FILE LOADING ----
 
   private async loadFileBuffer(file: File): Promise<ArrayBuffer> {
-    const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer;
-    return maybeArrayBuffer 
-      ? await maybeArrayBuffer.call(file) 
+    const maybeArrayBuffer = (file as unknown as { arrayBuffer?: () => Promise<ArrayBuffer> })
+      .arrayBuffer;
+    return maybeArrayBuffer
+      ? await maybeArrayBuffer.call(file)
       : await new Response(file).arrayBuffer();
   }
 
@@ -237,11 +240,13 @@ export class DocxParser {
   private parseRelationships(): void {
     // @ts-ignore
     const relsText: any = this.zip?.file("word/_rels/document.xml.rels")?.async("string");
-    if (!relsText) {return;}
+    if (!relsText) {
+      return;
+    }
 
     const relsDoc = parseXml(relsText);
     const rels = getChildrenByLocalName(relsDoc, "Relationship");
-    
+
     for (const rel of rels) {
       const id = getAttr(rel, "Id");
       const target = getAttr(rel, "Target");
@@ -269,7 +274,7 @@ export class DocxParser {
 
   private buildDocument(): DocumentNode {
     const doc = createEmptyDocument("docx");
-    
+
     const body = getChildByLocalName(this.documentXml!, "body");
     if (!body) {
       this.warnings.push("Document missing body element");
@@ -278,11 +283,9 @@ export class DocxParser {
 
     const section = this.parseBody(body);
     doc.children.push(section);
-    
+
     // Attach auxiliary content
-    if (this.footnotesMap.size > 0 || 
-        this.endnotesMap.size > 0 || 
-        this.commentsMap.size > 0) {
+    if (this.footnotesMap.size > 0 || this.endnotesMap.size > 0 || this.commentsMap.size > 0) {
       doc.auxiliary = {
         footnotes: this.footnotesMap,
         endnotes: this.endnotesMap,
@@ -295,14 +298,18 @@ export class DocxParser {
 
   private parseBody(body: Element): SectionNode {
     const children: BlockNode[] = [];
-    
+
     for (const child of Array.from(body.children)) {
       if (child.localName === "p") {
         const node = this.parseParagraph(child);
-        if (node) {children.push(node);}
+        if (node) {
+          children.push(node);
+        }
       } else if (child.localName === "tbl") {
         const node = this.parseTable(child);
-        if (node) {children.push(node);}
+        if (node) {
+          children.push(node);
+        }
       } else if (child.localName === "sectPr") {
         // Section properties - could create new section
       }
@@ -320,10 +327,10 @@ export class DocxParser {
 
     // Check if heading
     const headingLevel = this.getHeadingLevel(styleVal);
-    
+
     // Parse runs
     const inlines = this.parseParagraphContent(p);
-    
+
     // Parse paragraph semantics
     const semantics = this.parseParagraphSemantics(pPr);
 
@@ -338,27 +345,46 @@ export class DocxParser {
   }
 
   private getHeadingLevel(styleVal: string): 1 | 2 | 3 | 4 | 5 | 6 | null {
-    if (styleVal.includes("heading1") || styleVal === "1" || styleVal === "heading 1") {return 1;}
-    if (styleVal.includes("heading2") || styleVal === "2" || styleVal === "heading 2") {return 2;}
-    if (styleVal.includes("heading3") || styleVal === "3" || styleVal === "heading 3") {return 3;}
-    if (styleVal.includes("heading4") || styleVal === "4" || styleVal === "heading 4") {return 4;}
-    if (styleVal.includes("heading5") || styleVal === "5" || styleVal === "heading 5") {return 5;}
-    if (styleVal.includes("heading6") || styleVal === "6" || styleVal === "heading 6") {return 6;}
+    if (styleVal.includes("heading1") || styleVal === "1" || styleVal === "heading 1") {
+      return 1;
+    }
+    if (styleVal.includes("heading2") || styleVal === "2" || styleVal === "heading 2") {
+      return 2;
+    }
+    if (styleVal.includes("heading3") || styleVal === "3" || styleVal === "heading 3") {
+      return 3;
+    }
+    if (styleVal.includes("heading4") || styleVal === "4" || styleVal === "heading 4") {
+      return 4;
+    }
+    if (styleVal.includes("heading5") || styleVal === "5" || styleVal === "heading 5") {
+      return 5;
+    }
+    if (styleVal.includes("heading6") || styleVal === "6" || styleVal === "heading 6") {
+      return 6;
+    }
     return null;
   }
 
   private parseParagraphSemantics(pPr: Element | null): ParagraphSemantics | undefined {
-    if (!pPr) {return undefined;}
+    if (!pPr) {
+      return undefined;
+    }
 
     const semantics: ParagraphSemantics = {};
-    
+
     // Alignment
     const jc = getChildByLocalName(pPr, "jc");
     const alignVal = getAttr(jc, "val")?.toLowerCase();
-    if (alignVal === "left" || alignVal === "start") {semantics.alignment = "start";}
-    else if (alignVal === "center") {semantics.alignment = "center";}
-    else if (alignVal === "right" || alignVal === "end") {semantics.alignment = "end";}
-    else if (alignVal === "both") {semantics.alignment = "justify";}
+    if (alignVal === "left" || alignVal === "start") {
+      semantics.alignment = "start";
+    } else if (alignVal === "center") {
+      semantics.alignment = "center";
+    } else if (alignVal === "right" || alignVal === "end") {
+      semantics.alignment = "end";
+    } else if (alignVal === "both") {
+      semantics.alignment = "justify";
+    }
 
     // Indent
     const ind = getChildByLocalName(pPr, "ind");
@@ -370,10 +396,18 @@ export class DocxParser {
 
       if (left || right || firstLine || hanging) {
         semantics.indent = { unit: "pt" };
-        if (left) {semantics.indent.left = twipToPt(parseInt(left, 10));}
-        if (right) {semantics.indent.right = twipToPt(parseInt(right, 10));}
-        if (firstLine) {semantics.indent.firstLine = twipToPt(parseInt(firstLine, 10));}
-        if (hanging) {semantics.indent.hanging = twipToPt(parseInt(hanging, 10));}
+        if (left) {
+          semantics.indent.left = twipToPt(parseInt(left, 10));
+        }
+        if (right) {
+          semantics.indent.right = twipToPt(parseInt(right, 10));
+        }
+        if (firstLine) {
+          semantics.indent.firstLine = twipToPt(parseInt(firstLine, 10));
+        }
+        if (hanging) {
+          semantics.indent.hanging = twipToPt(parseInt(hanging, 10));
+        }
       }
     }
 
@@ -382,11 +416,15 @@ export class DocxParser {
     if (spacing) {
       const before = getAttr(spacing, "before");
       const after = getAttr(spacing, "after");
-      
+
       if (before || after) {
         semantics.spacing = { unit: "pt" };
-        if (before) {semantics.spacing.before = twipToPt(parseInt(before, 10));}
-        if (after) {semantics.spacing.after = twipToPt(parseInt(after, 10));}
+        if (before) {
+          semantics.spacing.before = twipToPt(parseInt(before, 10));
+        }
+        if (after) {
+          semantics.spacing.after = twipToPt(parseInt(after, 10));
+        }
       }
     }
 
@@ -408,13 +446,19 @@ export class DocxParser {
         inlines.push(...runInlines);
       } else if (child.localName === "hyperlink") {
         const hyperlink = this.parseHyperlink(child);
-        if (hyperlink) {inlines.push(hyperlink);}
+        if (hyperlink) {
+          inlines.push(hyperlink);
+        }
       } else if (child.localName === "bookmarkStart") {
         const bookmark = this.parseBookmarkStart(child);
-        if (bookmark) {inlines.push(bookmark);}
+        if (bookmark) {
+          inlines.push(bookmark);
+        }
       } else if (child.localName === "oMath" || child.localName === "oMathPara") {
         const math = this.parseMath(child);
-        if (math) {inlines.push(math);}
+        if (math) {
+          inlines.push(math);
+        }
       } else if (child.localName === "ins" || child.localName === "del") {
         // Revision markers
         const revisionInlines = this.parseRevision(child);
@@ -429,7 +473,7 @@ export class DocxParser {
 
   private parseRun(r: Element): InlineNode[] {
     const inlines: InlineNode[] = [];
-    
+
     const rPr = getChildByLocalName(r, "rPr");
     const marks = this.parseRunMarks(rPr);
 
@@ -520,7 +564,9 @@ export class DocxParser {
 
   private parseRunMarks(rPr: Element | null): TextMark[] {
     const marks: TextMark[] = [];
-    if (!rPr) {return marks;}
+    if (!rPr) {
+      return marks;
+    }
 
     if (getChildByLocalName(rPr, "b")) {
       marks.push({ type: "bold" });
@@ -536,8 +582,12 @@ export class DocxParser {
     }
     if (getChildByLocalName(rPr, "vertAlign")) {
       const val = getAttr(getChildByLocalName(rPr, "vertAlign"), "val")?.toLowerCase();
-      if (val === "superscript") {marks.push({ type: "superscript" });}
-      if (val === "subscript") {marks.push({ type: "subscript" });}
+      if (val === "superscript") {
+        marks.push({ type: "superscript" });
+      }
+      if (val === "subscript") {
+        marks.push({ type: "subscript" });
+      }
     }
 
     return marks;
@@ -548,7 +598,7 @@ export class DocxParser {
   private parseHyperlink(el: Element): HyperlinkNode | null {
     const rid = getAttr(el, "id");
     const anchor = getAttr(el, "anchor");
-    
+
     let href = "";
     if (anchor) {
       href = `#${encodeURIComponent(anchor)}`;
@@ -556,7 +606,9 @@ export class DocxParser {
       href = this.relsMap[rid];
     }
 
-    if (!href) {return null;}
+    if (!href) {
+      return null;
+    }
 
     this.report.hyperlinkCount++;
 
@@ -569,8 +621,10 @@ export class DocxParser {
   private parseBookmarkStart(el: Element): BookmarkNode | null {
     const id = getAttr(el, "id");
     const name = getAttr(el, "name");
-    
-    if (!id || !name) {return null;}
+
+    if (!id || !name) {
+      return null;
+    }
 
     this.report.bookmarkCount++;
 
@@ -587,7 +641,9 @@ export class DocxParser {
   private parseMath(el: Element): MathNode | null {
     // Extract linear representation for now
     const linear = this.ommlToLinear(el);
-    if (!linear) {return null;}
+    if (!linear) {
+      return null;
+    }
 
     this.report.mathCount++;
 
@@ -602,29 +658,29 @@ export class DocxParser {
   private ommlToLinear(node: Element): string {
     // Simplified linear representation
     const localName = node.localName;
-    
+
     if (localName === "t") {
       return node.textContent ?? "";
     }
-    
+
     if (localName === "f") {
       const num = getChildByLocalName(node, "num");
       const den = getChildByLocalName(node, "den");
       return `(${this.ommlToLinear(num)})/(${this.ommlToLinear(den)})`;
     }
-    
+
     if (localName === "sSup" || localName === "sup") {
       const e = getChildByLocalName(node, "e");
       const sup = getChildByLocalName(node, "sup");
       return `${this.ommlToLinear(e)}^(${this.ommlToLinear(sup)})`;
     }
-    
+
     if (localName === "sSub" || localName === "sub") {
       const e = getChildByLocalName(node, "e");
       const sub = getChildByLocalName(node, "sub");
       return `${this.ommlToLinear(e)}_(${this.ommlToLinear(sub)})`;
     }
-    
+
     if (localName === "rad" || localName === "root") {
       const e = getChildByLocalName(node, "e");
       return `sqrt(${this.ommlToLinear(e)})`;
@@ -643,7 +699,7 @@ export class DocxParser {
   private parseRevision(el: Element): InlineNode[] {
     const revisionType = el.localName === "ins" ? "insert" : "delete";
     this.report.revisionCount++;
-    
+
     // Parse the content inside revision
     const inlines: InlineNode[] = [];
     for (const child of Array.from(el.children)) {
@@ -653,30 +709,35 @@ export class DocxParser {
         inlines.push(...runInlines);
       }
     }
-    
+
     return inlines;
   }
 
   // ---- DRAWING / IMAGE PARSING ----
 
   private parseDrawing(drawing: Element): ImageNode | null {
-    const blip = getChildByLocalName(drawing, "blip") ?? 
-                 this.queryByLocalName(drawing, "blip");
-    
-    if (!blip) {return null;}
+    const blip = getChildByLocalName(drawing, "blip") ?? this.queryByLocalName(drawing, "blip");
+
+    if (!blip) {
+      return null;
+    }
 
     const rid = getAttr(blip, "embed");
-    if (!rid) {return null;}
+    if (!rid) {
+      return null;
+    }
 
     const src = this.relsMap[rid];
-    if (!src) {return null;}
+    if (!src) {
+      return null;
+    }
 
     // Resolve image data
     const imageSrc = this.resolveImageSrc(src);
 
     // Parse dimensions
     const dimensions = this.parseDrawingDimensions(drawing);
-    
+
     // Parse positioning
     const positioning = this.parseDrawingPositioning(drawing);
 
@@ -686,7 +747,7 @@ export class DocxParser {
   private resolveImageSrc(relTarget: string): string {
     const normalized = relTarget.replace(/\\/g, "/").replace(/^\/+/, "");
     const path = normalized.startsWith("word/") ? normalized : `word/${normalized}`;
-    
+
     // For now, return the path - in production, we'd convert to base64
     // This would be handled by the resource resolver
     return `docx:${path}`;
@@ -694,17 +755,23 @@ export class DocxParser {
 
   private parseDrawingDimensions(drawing: Element): ImageDimensions | undefined {
     const extent = this.queryByLocalName(drawing, "extent");
-    if (!extent) {return undefined;}
+    if (!extent) {
+      return undefined;
+    }
 
     const cx = getAttr(extent, "cx");
     const cy = getAttr(extent, "cy");
-    
-    if (!cx || !cy) {return undefined;}
+
+    if (!cx || !cy) {
+      return undefined;
+    }
 
     const cxNum = parseInt(cx, 10);
     const cyNum = parseInt(cy, 10);
-    
-    if (!Number.isFinite(cxNum) || !Number.isFinite(cyNum)) {return undefined;}
+
+    if (!Number.isFinite(cxNum) || !Number.isFinite(cyNum)) {
+      return undefined;
+    }
 
     return {
       width: emuToPx(cxNum),
@@ -722,7 +789,7 @@ export class DocxParser {
     // Parse anchor position
     const posH = getChildByLocalName(anchor, "positionH");
     const posV = getChildByLocalName(anchor, "positionV");
-    
+
     let horizontal: ImagePositioning["anchor"]["horizontal"];
     let vertical: ImagePositioning["anchor"]["vertical"];
 
@@ -750,10 +817,15 @@ export class DocxParser {
 
     // Parse wrap mode
     let wrap: ImagePositioning["anchor"]["wrap"] = "inline";
-    if (getChildByLocalName(anchor, "wrapSquare")) {wrap = "square";}
-    else if (getChildByLocalName(anchor, "wrapTight")) {wrap = "tight";}
-    else if (getChildByLocalName(anchor, "wrapTopAndBottom")) {wrap = "topAndBottom";}
-    else if (getChildByLocalName(anchor, "wrapNone")) {wrap = "none";}
+    if (getChildByLocalName(anchor, "wrapSquare")) {
+      wrap = "square";
+    } else if (getChildByLocalName(anchor, "wrapTight")) {
+      wrap = "tight";
+    } else if (getChildByLocalName(anchor, "wrapTopAndBottom")) {
+      wrap = "topAndBottom";
+    } else if (getChildByLocalName(anchor, "wrapNone")) {
+      wrap = "none";
+    }
 
     const behindDoc = getAttr(anchor, "behindDoc") === "1";
     const allowOverlap = getAttr(anchor, "allowOverlap") !== "0";
@@ -780,7 +852,9 @@ export class DocxParser {
 
     for (const tr of trs) {
       const row = this.parseTableRow(tr);
-      if (row) {rows.push(row);}
+      if (row) {
+        rows.push(row);
+      }
     }
 
     return createTableNode(rows);
@@ -792,7 +866,9 @@ export class DocxParser {
 
     for (const tc of tcs) {
       const cell = this.parseTableCell(tc);
-      if (cell) {cells.push(cell);}
+      if (cell) {
+        cells.push(cell);
+      }
     }
 
     return createTableRowNode(cells);
@@ -800,7 +876,7 @@ export class DocxParser {
 
   private parseTableCell(tc: Element): TableCellNode | null {
     const children: BlockNode[] = [];
-    
+
     // Parse cell properties
     const tcPr = getChildByLocalName(tc, "tcPr");
     let colspan: number | undefined;
@@ -830,10 +906,14 @@ export class DocxParser {
     for (const child of Array.from(tc.children)) {
       if (child.localName === "p") {
         const node = this.parseParagraph(child);
-        if (node) {children.push(node);}
+        if (node) {
+          children.push(node);
+        }
       } else if (child.localName === "tbl") {
         const node = this.parseTable(child);
-        if (node) {children.push(node);}
+        if (node) {
+          children.push(node);
+        }
       }
     }
 
@@ -846,7 +926,9 @@ export class DocxParser {
     const stack = [...(rootChildren(root) as any)].reverse();
     while (stack.length > 0) {
       const node = stack.pop()!;
-      if (node.localName === localName) {return node;}
+      if (node.localName === localName) {
+        return node;
+      }
       // @ts-ignore
       stack.push(...[...node.children].reverse());
     }
@@ -884,7 +966,7 @@ function rootChildren(root: ParentNode): Element[] {
  */
 export async function parseDocxToAST(
   file: File,
-  options?: DocxParseOptions
+  options?: DocxParseOptions,
 ): Promise<DocxParseResult> {
   const parser = new DocxParser(options);
   return parser.parse(file);

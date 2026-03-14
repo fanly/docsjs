@@ -1,18 +1,18 @@
 /**
  * Profile Management System
- * 
+ *
  * Handles configuration profiles for different transformation needs.
  */
 
-import type { TransformationProfile, EngineConfig } from '../types/engine';
-import type { CoreEngine } from '../engine/core';
+import type { TransformationProfile, EngineConfig } from "../types/engine";
+import type { CoreEngine } from "../engine/core";
 
 // Predefined system profiles
 export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
-  'default': {
-    id: 'default',
-    name: 'Default Profile',
-    description: 'General-purpose profile for typical document conversion',
+  default: {
+    id: "default",
+    name: "Default Profile",
+    description: "General-purpose profile for typical document conversion",
     parse: {
       enablePlugins: true,
       features: {
@@ -28,26 +28,26 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
     },
     transform: {
       enablePlugins: true,
-      operations: ['normalize', 'enhance-structure', 'preserve-semantics'],
+      operations: ["normalize", "enhance-structure", "preserve-semantics"],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'default',
+      outputFormat: "html",
+      theme: "default",
       options: {
         fidelityMode: true,
-        includeImageData: false
-      }
+        includeImageData: false,
+      },
     },
     security: {
       allowedDomains: [],
-      sanitizerProfile: 'fidelity-first',
+      sanitizerProfile: "fidelity-first",
     },
   },
 
-  'knowledge-base': {
-    id: 'knowledge-base',
-    name: 'Knowledge Base Profile',
-    description: 'High-fidelity conversion optimal for documentation and knowledge bases',
+  "knowledge-base": {
+    id: "knowledge-base",
+    name: "Knowledge Base Profile",
+    description: "High-fidelity conversion optimal for documentation and knowledge bases",
     parse: {
       enablePlugins: true,
       features: {
@@ -57,45 +57,45 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
         annotations: true,
       },
       performance: {
-        chunkSize: 20 * 1024 * 1024, // 20MB 
+        chunkSize: 20 * 1024 * 1024, // 20MB
         maxFileSizeMB: 100,
       },
     },
     transform: {
       enablePlugins: true,
       operations: [
-        'normalize-headings', 
-        'enhance-semantic-meaning', 
-        'preserve-structure', 
-        'optimize-for-search',
-        'annotate-with-ids'
+        "normalize-headings",
+        "enhance-semantic-meaning",
+        "preserve-structure",
+        "optimize-for-search",
+        "annotate-with-ids",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'knowledge-base',
+      outputFormat: "html",
+      theme: "knowledge-base",
       options: {
         fidelityMode: true,
         includeImageData: true,
         enableSyntaxHighlighting: true,
         generateTOC: true,
-        preserveOriginalFormatting: true
-      }
+        preserveOriginalFormatting: true,
+      },
     },
     security: {
-      allowedDomains: ['*.cdn.jsdelivr.net', '*.githubusercontent.com'],
-      sanitizerProfile: 'fidelity-first',
+      allowedDomains: ["*.cdn.jsdelivr.net", "*.githubusercontent.com"],
+      sanitizerProfile: "fidelity-first",
     },
   },
 
-  'exam-paper': {
-    id: 'exam-paper',
-    name: 'Exam Paper Profile',
-    description: 'Optimized for academic document and exam paper conversion',
+  "exam-paper": {
+    id: "exam-paper",
+    name: "Exam Paper Profile",
+    description: "Optimized for academic document and exam paper conversion",
     parse: {
       enablePlugins: true,
       features: {
-        mathML: true,  // Critical for exams
+        mathML: true, // Critical for exams
         tables: false, // Don't prioritize complex tables
         images: true,
         annotations: false, // Don't want comments in exam papers
@@ -108,38 +108,38 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
     transform: {
       enablePlugins: true,
       operations: [
-        'extract-questions', 
-        'sanitize-content', 
-        'preserve-question-formatting',
-        'optimize-for-print'
+        "extract-questions",
+        "sanitize-content",
+        "preserve-question-formatting",
+        "optimize-for-print",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'exam-paper',
+      outputFormat: "html",
+      theme: "exam-paper",
       options: {
-        fidelityMode: false,  // Focus on readability over 1:1 fidelity
+        fidelityMode: false, // Focus on readability over 1:1 fidelity
         printOptimized: true,
-        hideAnswers: true
-      }
+        hideAnswers: true,
+      },
     },
     security: {
       allowedDomains: [],
-      sanitizerProfile: 'strict',
+      sanitizerProfile: "strict",
     },
   },
 
-  'enterprise-document': {
-    id: 'enterprise-document',
-    name: 'Enterprise Document Profile',
-    description: 'Security and compliance-focused document processing for enterprise use',
+  "enterprise-document": {
+    id: "enterprise-document",
+    name: "Enterprise Document Profile",
+    description: "Security and compliance-focused document processing for enterprise use",
     parse: {
       enablePlugins: true,
       features: {
-        mathML: false,      // Not always needed in business docs
+        mathML: false, // Not always needed in business docs
         tables: true,
         images: true,
-        annotations: true,  // For tracking changes
+        annotations: true, // For tracking changes
       },
       performance: {
         chunkSize: 50 * 1024 * 1024, // 50MB for large enterprise docs
@@ -149,26 +149,26 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
     transform: {
       enablePlugins: true,
       operations: [
-        'add-metadata', 
-        'apply-watermark', 
-        'remove-personal-info',
-        'compliance-check',
-        'security-classification'
+        "add-metadata",
+        "apply-watermark",
+        "remove-personal-info",
+        "compliance-check",
+        "security-classification",
       ],
     },
     render: {
-      outputFormat: 'html',
-      theme: 'enterprise',
+      outputFormat: "html",
+      theme: "enterprise",
       options: {
         enterpriseBranding: true,
-        watermarkTemplate: 'CONFIDENTIAL',
+        watermarkTemplate: "CONFIDENTIAL",
         trackChangesOverlay: true,
-        enableEnterpriseFeatures: true
-      }
+        enableEnterpriseFeatures: true,
+      },
     },
     security: {
-      allowedDomains: ['*.company.internal', '*.enterprise-domain.com'],
-      sanitizerProfile: 'strict',
+      allowedDomains: ["*.company.internal", "*.enterprise-domain.com"],
+      sanitizerProfile: "strict",
     },
   },
 };
@@ -176,13 +176,13 @@ export const SYSTEM_PROFILES: Record<string, TransformationProfile> = {
 export interface ProfileManagerOptions {
   /** Whether to load system profiles initially */
   loadSystemProfiles: boolean;
-  
+
   /** Location to load custom profiles from */
   customProfileDir?: string;
-  
+
   /** Whether to sync profiles to storage */
   syncToStorage: boolean;
-  
+
   /** Storage key for profiles */
   storageKey: string;
 }
@@ -201,10 +201,10 @@ export class ProfileManager {
     this.options = {
       loadSystemProfiles: true,
       syncToStorage: true,
-      storageKey: 'docsjs-profiles',
-      ...options
+      storageKey: "docsjs-profiles",
+      ...options,
     };
-    
+
     if (this.options.loadSystemProfiles) {
       this.loadSystemProfiles();
     }
@@ -216,7 +216,7 @@ export class ProfileManager {
   private loadSystemProfiles(): void {
     for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
       this.profiles.set(id, profile);
-      
+
       if (this.engine.getConfig().debug) {
         console.log(`Loaded system profile: ${profile.name} (${id})`);
       }
@@ -230,9 +230,9 @@ export class ProfileManager {
     if (this.profiles.has(profile.id)) {
       throw new Error(`Profile with id '${profile.id}' already exists`);
     }
-    
+
     this.profiles.set(profile.id, profile);
-    
+
     if (this.engine.getConfig().debug) {
       console.log(`Added profile: ${profile.name} (${profile.id})`);
     }
@@ -266,17 +266,17 @@ export class ProfileManager {
     const existed = this.profiles.has(id);
     if (existed) {
       this.profiles.delete(id);
-      
+
       // If we removed the currently active profile, reset it
       if (this.currentProfileId === id) {
         this.currentProfileId = null;
       }
-      
+
       if (this.engine.getConfig().debug) {
         console.log(`Removed profile: ${id}`);
       }
     }
-    
+
     return existed;
   }
 
@@ -287,9 +287,9 @@ export class ProfileManager {
     if (!this.profiles.has(id)) {
       throw new Error(`Profile not found: ${id}`);
     }
-    
+
     this.currentProfileId = id;
-    
+
     if (this.engine.getConfig().debug) {
       console.log(`Activated profile: ${id}`);
     }
@@ -308,18 +308,22 @@ export class ProfileManager {
   /**
    * Create a new profile based on an existing one
    */
-  createVariantFrom(sourceId: string, newId: string, modifications: Partial<TransformationProfile> = {}): void {
+  createVariantFrom(
+    sourceId: string,
+    newId: string,
+    modifications: Partial<TransformationProfile> = {},
+  ): void {
     const sourceProfile = this.getProfile(sourceId);
     if (!sourceProfile) {
       throw new Error(`Cannot find source profile: ${sourceId}`);
     }
-    
+
     // Clone the source profile deeply with modifications applied
     const newProfile = this.combineProfileWithOverrides(sourceProfile, modifications);
     newProfile.id = newId;
     newProfile.name = `${sourceProfile.name} (variant)`;
     newProfile.description = `${sourceProfile.description} [Variant based on ${sourceProfile.name}]`;
-    
+
     this.addProfile(newProfile);
   }
 
@@ -343,9 +347,9 @@ export class ProfileManager {
 
     // Validate security settings
     const config = this.engine.getConfig();
-    
+
     // Check if sanitizer is valid
-    if (!['fidelity-first', 'strict', 'none'].includes(profile.security.sanitizerProfile)) {
+    if (!["fidelity-first", "strict", "none"].includes(profile.security.sanitizerProfile)) {
       errors.push("Invalid sanitizer profile - must be 'fidelity-first', 'strict', or 'none'");
     }
 
@@ -357,13 +361,13 @@ export class ProfileManager {
     }
 
     // Check if output format is valid
-    if (!['html', 'markdown', 'json', 'editor'].includes(profile.render.outputFormat)) {
+    if (!["html", "markdown", "json", "editor"].includes(profile.render.outputFormat)) {
       errors.push("Invalid output format - must be 'html', 'markdown', 'json', or 'editor'");
     }
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -371,20 +375,20 @@ export class ProfileManager {
    * Save all profiles to persistent storage (if supported)
    */
   saveProfiles(): void {
-    if (this.options.syncToStorage && typeof window !== 'undefined' && window.localStorage) {
+    if (this.options.syncToStorage && typeof window !== "undefined" && window.localStorage) {
       const serializableProfiles: Record<string, any> = {};
-      
+
       // Just include user-defined profiles, not system ones to prevent bloat
       for (const [id, profile] of this.profiles.entries()) {
         if (!this.isSystemProfile(id)) {
           serializableProfiles[id] = profile;
         }
       }
-      
+
       try {
         localStorage.setItem(this.options.storageKey, JSON.stringify(serializableProfiles));
       } catch (error) {
-        console.error('Failed to save profiles to storage:', error);
+        console.error("Failed to save profiles to storage:", error);
       }
     }
   }
@@ -393,18 +397,18 @@ export class ProfileManager {
    * Load profiles from persistent storage (if supported)
    */
   loadProfiles(): void {
-    if (this.options.syncToStorage && typeof window !== 'undefined' && window.localStorage) {
+    if (this.options.syncToStorage && typeof window !== "undefined" && window.localStorage) {
       try {
         const stored = localStorage.getItem(this.options.storageKey);
         if (stored) {
           const storedProfiles = JSON.parse(stored);
-          
+
           for (const [id, profile] of Object.entries(storedProfiles as Record<string, any>)) {
             this.addProfile(profile as TransformationProfile);
           }
         }
       } catch (error) {
-        console.error('Failed to load profiles from storage:', error);
+        console.error("Failed to load profiles from storage:", error);
       }
     }
   }
@@ -417,7 +421,7 @@ export class ProfileManager {
     if (!profile) {
       throw new Error(`Profile not found: ${id}`);
     }
-    
+
     return JSON.stringify(profile, null, 2);
   }
 
@@ -426,19 +430,19 @@ export class ProfileManager {
    */
   importProfile(jsonStr: string): TransformationProfile {
     const profile: TransformationProfile = JSON.parse(jsonStr);
-    
+
     const validation = this.validateProfile(profile);
     if (!validation.valid) {
-      throw new Error(`Imported profile is invalid: ${validation.errors.join('; ')}`);
+      throw new Error(`Imported profile is invalid: ${validation.errors.join("; ")}`);
     }
-    
+
     // Check if profile already exists - if so, update it; otherwise add new
     if (this.profiles.has(profile.id)) {
       this.profiles.set(profile.id, profile);
     } else {
       this.addProfile(profile);
     }
-    
+
     return profile;
   }
 
@@ -456,11 +460,11 @@ export class ProfileManager {
    * Combine a profile with overrides to create a custom version
    */
   private combineProfileWithOverrides(
-    original: TransformationProfile, 
-    overrides: Partial<TransformationProfile>
+    original: TransformationProfile,
+    overrides: Partial<TransformationProfile>,
   ): TransformationProfile {
     const result: TransformationProfile = JSON.parse(JSON.stringify(original));
-    
+
     // Merge nested objects properly
     if (overrides.parse) {
       result.parse = { ...result.parse, ...overrides.parse };
@@ -471,19 +475,19 @@ export class ProfileManager {
         result.parse.performance = { ...result.parse.performance, ...overrides.parse.performance };
       }
     }
-    
+
     if (overrides.transform) {
       result.transform = { ...result.transform, ...overrides.transform };
     }
-    
+
     if (overrides.render) {
       result.render = { ...result.render, ...overrides.render };
     }
-    
+
     if (overrides.security) {
       result.security = { ...result.security, ...overrides.security };
     }
-    
+
     return result;
   }
 
@@ -493,22 +497,28 @@ export class ProfileManager {
   findProfile(filter: Partial<TransformationProfile>): TransformationProfile | null {
     for (const profile of this.getAllProfiles()) {
       let matches = true;
-      
+
       // Test top-level matches
-      if (filter.id && profile.id !== filter.id) {matches = false;}
-      if (filter.name && profile.name !== filter.name) {matches = false;}
-      
-      // Test nested matches if needed
-      if (filter.render?.outputFormat !== undefined && 
-          profile.render.outputFormat !== filter.render.outputFormat) {
+      if (filter.id && profile.id !== filter.id) {
         matches = false;
       }
-      
+      if (filter.name && profile.name !== filter.name) {
+        matches = false;
+      }
+
+      // Test nested matches if needed
+      if (
+        filter.render?.outputFormat !== undefined &&
+        profile.render.outputFormat !== filter.render.outputFormat
+      ) {
+        matches = false;
+      }
+
       if (matches) {
         return profile;
       }
     }
-    
+
     return null;
   }
 }

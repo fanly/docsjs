@@ -1,11 +1,22 @@
 /**
  * ProseMirror Adapter
- * 
+ *
  * Converts DocumentAST to/from ProseMirror JSON format.
  * ProseMirror is a rich text editor framework with a schema-based architecture.
  */
 
-import type { DocumentNode, BlockNode, InlineNode, ParagraphNode, HeadingNode, TextNode, ImageNode, HyperlinkNode, ListNode, TableNode } from "../ast/types";
+import type {
+  DocumentNode,
+  BlockNode,
+  InlineNode,
+  ParagraphNode,
+  HeadingNode,
+  TextNode,
+  ImageNode,
+  HyperlinkNode,
+  ListNode,
+  TableNode,
+} from "../ast/types";
 
 export interface ProseMirrorNode {
   type: string;
@@ -31,8 +42,8 @@ export interface ProseMirrorDoc {
 export function astToProseMirror(doc: DocumentNode): ProseMirrorDoc {
   return {
     type: "doc",
-    content: doc.children.flatMap(section =>
-      section.children.map(block => blockToProseMirror(block))
+    content: doc.children.flatMap((section) =>
+      section.children.map((block) => blockToProseMirror(block)),
     ),
   };
 }
@@ -174,11 +185,13 @@ function markToProseMirror(mark: any): ProseMirrorMark {
 function hyperlinkToProseMirror(link: HyperlinkNode): ProseMirrorNode {
   return {
     type: "text",
-    text: link.children.map(c => c.type === "text" ? c.text : "").join(""),
-    marks: [{
-      type: "link",
-      attrs: { href: link.href, title: link.title },
-    }],
+    text: link.children.map((c) => (c.type === "text" ? c.text : "")).join(""),
+    marks: [
+      {
+        type: "link",
+        attrs: { href: link.href, title: link.title },
+      },
+    ],
   };
 }
 
@@ -199,7 +212,7 @@ export function proseMirrorToAst(pm: ProseMirrorDoc): DocumentNode {
       {
         type: "section",
         id: generateId(),
-        children: pm.content?.map(proseMirrorToBlock).filter(Boolean) as BlockNode[] || [],
+        children: (pm.content?.map(proseMirrorToBlock).filter(Boolean) as BlockNode[]) || [],
       },
     ],
   };
@@ -227,7 +240,7 @@ function proseMirrorToParagraph(node: ProseMirrorNode): ParagraphNode {
   return {
     type: "paragraph",
     id: generateId(),
-    children: node.content?.map(proseMirrorToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.content?.map(proseMirrorToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -236,7 +249,7 @@ function proseMirrorToHeading(node: ProseMirrorNode): HeadingNode {
     type: "heading",
     id: generateId(),
     level: (node.attrs?.level || 1) as 1 | 2 | 3 | 4 | 5 | 6,
-    children: node.content?.map(proseMirrorToInline).filter(Boolean) as InlineNode[] || [],
+    children: (node.content?.map(proseMirrorToInline).filter(Boolean) as InlineNode[]) || [],
   };
 }
 
@@ -245,11 +258,12 @@ function proseMirrorToList(node: ProseMirrorNode): ListNode {
     type: "list",
     id: generateId(),
     listType: node.type === "ordered_list" ? "ordered" : "unordered",
-    items: node.content?.map((item: any) => ({
-      type: "listItem",
-      id: generateId(),
-      children: item.content?.map(proseMirrorToBlock).filter(Boolean) || [],
-    })) || [],
+    items:
+      node.content?.map((item: any) => ({
+        type: "listItem",
+        id: generateId(),
+        children: item.content?.map(proseMirrorToBlock).filter(Boolean) || [],
+      })) || [],
   };
 }
 
@@ -258,7 +272,7 @@ function proseMirrorToCodeBlock(node: ProseMirrorNode): BlockNode {
     type: "codeBlock",
     id: generateId(),
     code: node.content?.[0]?.text || "",
-    language: node.attrs?.language as string || "",
+    language: (node.attrs?.language as string) || "",
   };
 }
 
@@ -266,7 +280,7 @@ function proseMirrorToBlockquote(node: ProseMirrorNode): BlockNode {
   return {
     type: "blockquote",
     id: generateId(),
-    children: node.content?.map(proseMirrorToBlock).filter(Boolean) as BlockNode[] || [],
+    children: (node.content?.map(proseMirrorToBlock).filter(Boolean) as BlockNode[]) || [],
   };
 }
 
@@ -283,9 +297,9 @@ function proseMirrorToInline(node: ProseMirrorNode): InlineNode | null {
     return {
       type: "image",
       id: generateId(),
-      src: node.attrs?.src as string || "",
-      alt: node.attrs?.alt as string || "",
-      title: node.attrs?.title as string || "",
+      src: (node.attrs?.src as string) || "",
+      alt: (node.attrs?.alt as string) || "",
+      title: (node.attrs?.title as string) || "",
     };
   }
   return null;

@@ -7,19 +7,23 @@ export function createPageBackgroundPlugin(): TransformPlugin {
     description: "Parses page background color",
     phases: [PluginPhase.TRANSFORM],
     priority: PluginPriority.LOW,
-    
+
     init() {},
     execute() {},
-    
+
     transform(html: string, context: PluginContext): string {
-      if (!context.documentXml) {return html;}
+      if (!context.documentXml) {
+        return html;
+      }
       const sectPr = context.documentXml.querySelector("w\\:sectPr, sectPr");
-      if (!sectPr) {return html;}
-      
+      if (!sectPr) {
+        return html;
+      }
+
       const pgFill = sectPr.querySelector("w\\:pgFill, pgFill");
-      
+
       let bgStyle = "";
-      
+
       if (pgFill) {
         const fillColor = pgFill.getAttribute("w:fill");
         if (fillColor && fillColor !== "FFFFFFFF") {
@@ -27,15 +31,17 @@ export function createPageBackgroundPlugin(): TransformPlugin {
           bgStyle = `background-color:#${hexColor.slice(2)};`;
         }
       }
-      
-      if (!bgStyle) {return html;}
-      
+
+      if (!bgStyle) {
+        return html;
+      }
+
       const bodyMatch = html.match(/<body[^>]*>/);
       if (bodyMatch) {
         return html.replace(bodyMatch[0], `<body ${bgStyle}>`);
       }
-      
+
       return html;
-    }
+    },
   };
 }

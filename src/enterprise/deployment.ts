@@ -1,11 +1,11 @@
 /**
  * On-Premises Deployment Toolkit
- * 
+ *
  * Docker configuration, deployment scripts, and infrastructure for enterprise on-premises部署.
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 /**
  * Docker configuration
@@ -35,7 +35,7 @@ export interface DockerConfig {
 export interface PortMapping {
   container: number;
   host: number;
-  protocol: 'tcp' | 'udp';
+  protocol: "tcp" | "udp";
 }
 
 /**
@@ -123,7 +123,7 @@ export interface DockerService {
  * Network configuration
  */
 export interface NetworkConfig {
-  driver: 'bridge' | 'host' | 'overlay' | 'macvlan';
+  driver: "bridge" | "host" | "overlay" | "macvlan";
   ipam?: {
     driver: string;
     config: { subnet: string; gateway: string }[];
@@ -200,8 +200,8 @@ export function generateDockerfile(config: {
   app?: string;
   appPath?: string;
 }): string {
-  const nodeVersion = config.nodeVersion || '20-alpine';
-  const appPath = config.appPath || '/app';
+  const nodeVersion = config.nodeVersion || "20-alpine";
+  const appPath = config.appPath || "/app";
 
   return `# DocsJS Enterprise Docker Image
 FROM node:${nodeVersion}
@@ -249,66 +249,68 @@ export function generateDockerCompose(services: {
   postgres?: boolean;
 }): DockerComposeConfig {
   const config: DockerComposeConfig = {
-    version: '3.8',
+    version: "3.8",
     services: {
       docsjs: {
-        build: { context: '.', dockerfile: 'Dockerfile', args: {} },
-        container_name: 'docsjs-enterprise',
-        ports: ['3000:3000', '3001:3001'],
+        build: { context: ".", dockerfile: "Dockerfile", args: {} },
+        container_name: "docsjs-enterprise",
+        ports: ["3000:3000", "3001:3001"],
         environment: {
-          NODE_ENV: 'production',
-          LOG_LEVEL: 'info',
-          REDIS_URL: services.redis ? 'redis://redis:6379' : '',
-          DATABASE_URL: services.postgres ? 'postgresql://docsjs:password@postgres:5432/docsjs' : ''
+          NODE_ENV: "production",
+          LOG_LEVEL: "info",
+          REDIS_URL: services.redis ? "redis://redis:6379" : "",
+          DATABASE_URL: services.postgres
+            ? "postgresql://docsjs:password@postgres:5432/docsjs"
+            : "",
         },
-        volumes: ['docsjs-data:/app/data', 'docsjs-logs:/app/logs'],
+        volumes: ["docsjs-data:/app/data", "docsjs-logs:/app/logs"],
         resources: {
-          limits: { cpus: '2', memory: '2G' },
-          reservations: { cpus: '0.5', memory: '512M' }
+          limits: { cpus: "2", memory: "2G" },
+          reservations: { cpus: "0.5", memory: "512M" },
         },
         healthcheck: {
-          test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/v1/health'],
-          interval: '30s',
-          timeout: '10s',
+          test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/health"],
+          interval: "30s",
+          timeout: "10s",
           retries: 3,
-          start_period: '30s'
+          start_period: "30s",
         },
-        networks: ['docsjs-network']
-      }
+        networks: ["docsjs-network"],
+      },
     },
     networks: {
-      docsjsNetwork: { driver: 'bridge' }
+      docsjsNetwork: { driver: "bridge" },
     },
     volumes: {
-      docsjsData: { driver: 'local' },
-      docsjsLogs: { driver: 'local' }
-    }
+      docsjsData: { driver: "local" },
+      docsjsLogs: { driver: "local" },
+    },
   };
 
   if (services.redis) {
     config.services.redis = {
-      image: 'redis:7-alpine',
-      container_name: 'docsjs-redis',
-      ports: ['6379:6379'],
-      volumes: ['redis-data:/data'],
-      networks: ['docsjs-network']
+      image: "redis:7-alpine",
+      container_name: "docsjs-redis",
+      ports: ["6379:6379"],
+      volumes: ["redis-data:/data"],
+      networks: ["docsjs-network"],
     };
-    config.volumes.redisData = { driver: 'local' };
+    config.volumes.redisData = { driver: "local" };
   }
 
   if (services.postgres) {
     config.services.postgres = {
-      image: 'postgres:15-alpine',
-      container_name: 'docsjs-postgres',
+      image: "postgres:15-alpine",
+      container_name: "docsjs-postgres",
       environment: {
-        POSTGRES_DB: 'docsjs',
-        POSTGRES_USER: 'docsjs',
-        POSTGRES_PASSWORD: 'password'
+        POSTGRES_DB: "docsjs",
+        POSTGRES_USER: "docsjs",
+        POSTGRES_PASSWORD: "password",
       },
-      volumes: ['postgres-data:/var/lib/postgresql/data'],
-      networks: ['docsjs-network']
+      volumes: ["postgres-data:/var/lib/postgresql/data"],
+      networks: ["docsjs-network"],
     };
-    config.volumes.postgresData = { driver: 'local' };
+    config.volumes.postgresData = { driver: "local" };
   }
 
   return config;
@@ -317,16 +319,19 @@ export function generateDockerCompose(services: {
 /**
  * Generate Kubernetes deployment
  */
-export function generateKubernetesManifest(name: string, opts: {
-  replicas?: number;
-  image?: string;
-  port?: number;
-  memoryLimit?: string;
-  cpuLimit?: string;
-}): KubernetesConfig {
+export function generateKubernetesManifest(
+  name: string,
+  opts: {
+    replicas?: number;
+    image?: string;
+    port?: number;
+    memoryLimit?: string;
+    cpuLimit?: string;
+  },
+): KubernetesConfig {
   return {
-    apiVersion: 'apps/v1',
-    kind: 'Deployment',
+    apiVersion: "apps/v1",
+    kind: "Deployment",
     metadata: { name },
     spec: {
       replicas: opts.replicas || 3,
@@ -334,39 +339,39 @@ export function generateKubernetesManifest(name: string, opts: {
       template: {
         metadata: { labels: { app: name } },
         spec: {
-          containers: [{
-            name,
-            image: opts.image || 'docsjs/enterprise:latest',
-            ports: [{ containerPort: opts.port || 3000, protocol: 'TCP' }],
-            env: [
-              { name: 'NODE_ENV', value: 'production' }
-            ],
-            resources: {
-              limits: {
-                cpu: opts.cpuLimit || '1',
-                memory: opts.memoryLimit || '1Gi'
+          containers: [
+            {
+              name,
+              image: opts.image || "docsjs/enterprise:latest",
+              ports: [{ containerPort: opts.port || 3000, protocol: "TCP" }],
+              env: [{ name: "NODE_ENV", value: "production" }],
+              resources: {
+                limits: {
+                  cpu: opts.cpuLimit || "1",
+                  memory: opts.memoryLimit || "1Gi",
+                },
+                requests: {
+                  cpu: "250m",
+                  memory: "256Mi",
+                },
               },
-              requests: {
-                cpu: '250m',
-                memory: '256Mi'
-              }
+              livenessProbe: {
+                httpGet: { path: "/api/v1/health", port: 3000 },
+                initialDelaySeconds: 30,
+                periodSeconds: 10,
+                timeoutSeconds: 5,
+              },
+              readinessProbe: {
+                httpGet: { path: "/api/v1/health", port: 3000 },
+                initialDelaySeconds: 10,
+                periodSeconds: 5,
+                timeoutSeconds: 3,
+              },
             },
-            livenessProbe: {
-              httpGet: { path: '/api/v1/health', port: 3000 },
-              initialDelaySeconds: 30,
-              periodSeconds: 10,
-              timeoutSeconds: 5
-            },
-            readinessProbe: {
-              httpGet: { path: '/api/v1/health', port: 3000 },
-              initialDelaySeconds: 10,
-              periodSeconds: 5,
-              timeoutSeconds: 3
-            }
-          }]
-        }
-      }
-    }
+          ],
+        },
+      },
+    },
   };
 }
 
@@ -377,41 +382,41 @@ export function generateHelmValues(name: string): Record<string, unknown> {
   return {
     replicaCount: 3,
     image: {
-      repository: 'docsjs/enterprise',
-      tag: 'latest',
-      pullPolicy: 'IfNotPresent'
+      repository: "docsjs/enterprise",
+      tag: "latest",
+      pullPolicy: "IfNotPresent",
     },
     service: {
-      type: 'ClusterIP',
+      type: "ClusterIP",
       port: 3000,
-      annotations: {}
+      annotations: {},
     },
     ingress: {
       enabled: true,
-      className: 'nginx',
+      className: "nginx",
       annotations: {
-        'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
-        'nginx.ingress.kubernetes.io/ssl-redirect': 'true'
+        "cert-manager.io/cluster-issuer": "letsencrypt-prod",
+        "nginx.ingress.kubernetes.io/ssl-redirect": "true",
       },
-      hosts: [{ host: `${name}.example.com`, paths: [{ path: '/', pathType: 'Prefix' }] }],
-      tls: [{ secretName: `${name}-tls`, hosts: [`${name}.example.com`] }]
+      hosts: [{ host: `${name}.example.com`, paths: [{ path: "/", pathType: "Prefix" }] }],
+      tls: [{ secretName: `${name}-tls`, hosts: [`${name}.example.com`] }],
     },
     resources: {
-      limits: { cpu: '1000m', memory: '1Gi' },
-      requests: { cpu: '250m', memory: '256Mi' }
+      limits: { cpu: "1000m", memory: "1Gi" },
+      requests: { cpu: "250m", memory: "256Mi" },
     },
     persistence: {
       enabled: true,
-      storageClass: 'standard',
-      accessMode: 'ReadWriteOnce',
-      size: '10Gi'
+      storageClass: "standard",
+      accessMode: "ReadWriteOnce",
+      size: "10Gi",
     },
     autoscaling: {
       enabled: true,
       minReplicas: 2,
       maxReplicas: 10,
-      targetCPUUtilizationPercentage: 70
-    }
+      targetCPUUtilizationPercentage: 70,
+    },
   };
 }
 
@@ -452,9 +457,9 @@ spec:
  */
 export function generateDeploymentScripts() {
   return {
-    'docker-compose.yml': generateDockerCompose({ redis: true, postgres: true }),
-    'Dockerfile': generateDockerfile({}),
-    'deploy.sh': `#!/bin/bash
+    "docker-compose.yml": generateDockerCompose({ redis: true, postgres: true }),
+    Dockerfile: generateDockerfile({}),
+    "deploy.sh": `#!/bin/bash
 set -e
 
 echo "Deploying DocsJS Enterprise..."
@@ -472,9 +477,9 @@ curl -f http://localhost:3000/api/v1/health || exit 1
 
 echo "Deployment complete!"`,
 
-    'kubernetes/deployment.yaml': generateKubernetesManifest('docsjs', {}),
-    'kubernetes/ingress.yaml': generateNginxIngress('docsjs'),
-    'kubernetes/values.yaml': generateHelmValues('docsjs')
+    "kubernetes/deployment.yaml": generateKubernetesManifest("docsjs", {}),
+    "kubernetes/ingress.yaml": generateNginxIngress("docsjs"),
+    "kubernetes/values.yaml": generateHelmValues("docsjs"),
   };
 }
 
@@ -485,40 +490,40 @@ export class OnPremisesDeploymentManager {
   private config: DockerConfig;
   private outputDir: string;
 
-  constructor(outputDir: string = './deployment') {
+  constructor(outputDir: string = "./deployment") {
     this.outputDir = outputDir;
     this.config = this.defaultConfig();
   }
 
   private defaultConfig(): DockerConfig {
     return {
-      imageName: 'docsjs/enterprise',
-      tag: 'latest',
+      imageName: "docsjs/enterprise",
+      tag: "latest",
       ports: [
-        { container: 3000, host: 3000, protocol: 'tcp' },
-        { container: 3001, host: 3001, protocol: 'tcp' }
+        { container: 3000, host: 3000, protocol: "tcp" },
+        { container: 3001, host: 3001, protocol: "tcp" },
       ],
       env: [
-        { key: 'NODE_ENV', value: 'production' },
-        { key: 'LOG_LEVEL', value: 'info' }
+        { key: "NODE_ENV", value: "production" },
+        { key: "LOG_LEVEL", value: "info" },
       ],
       volumes: [
-        { containerPath: '/app/data', hostPath: './data', readonly: false },
-        { containerPath: '/app/logs', hostPath: './logs', readonly: false }
+        { containerPath: "/app/data", hostPath: "./data", readonly: false },
+        { containerPath: "/app/logs", hostPath: "./logs", readonly: false },
       ],
       resources: {
         memoryMB: 2048,
         cpuCores: 2,
-        storageGB: 50
+        storageGB: 50,
       },
       healthCheck: {
-        command: 'curl -f http://localhost:3000/api/v1/health',
+        command: "curl -f http://localhost:3000/api/v1/health",
         interval: 30,
         timeout: 10,
         retries: 3,
-        startPeriod: 30
+        startPeriod: 30,
       },
-      buildArgs: {}
+      buildArgs: {},
     };
   }
 
@@ -532,29 +537,26 @@ export class OnPremisesDeploymentManager {
 
     // Generate Dockerfile
     const dockerfile = generateDockerfile({});
-    writeFileSync(resolve(this.outputDir, 'Dockerfile'), dockerfile);
+    writeFileSync(resolve(this.outputDir, "Dockerfile"), dockerfile);
 
     // Generate docker-compose
     const compose = generateDockerCompose({ redis: true, postgres: true });
-    writeFileSync(
-      resolve(this.outputDir, 'docker-compose.yml'),
-      JSON.stringify(compose, null, 2)
-    );
+    writeFileSync(resolve(this.outputDir, "docker-compose.yml"), JSON.stringify(compose, null, 2));
 
     // Generate K8s
-    const k8sDir = resolve(this.outputDir, 'kubernetes');
+    const k8sDir = resolve(this.outputDir, "kubernetes");
     if (!existsSync(k8sDir)) {
       mkdirSync(k8sDir, { recursive: true });
     }
 
-    const deployment = generateKubernetesManifest('docsjs', {});
-    writeFileSync(resolve(k8sDir, 'deployment.yaml'), JSON.stringify(deployment, null, 2));
+    const deployment = generateKubernetesManifest("docsjs", {});
+    writeFileSync(resolve(k8sDir, "deployment.yaml"), JSON.stringify(deployment, null, 2));
 
-    const ingress = generateNginxIngress('docsjs');
-    writeFileSync(resolve(k8sDir, 'ingress.yaml'), ingress);
+    const ingress = generateNginxIngress("docsjs");
+    writeFileSync(resolve(k8sDir, "ingress.yaml"), ingress);
 
-    const values = generateHelmValues('docsjs');
-    writeFileSync(resolve(k8sDir, 'values.yaml'), JSON.stringify(values, null, 2));
+    const values = generateHelmValues("docsjs");
+    writeFileSync(resolve(k8sDir, "values.yaml"), JSON.stringify(values, null, 2));
 
     console.log(`Generated deployment files in ${this.outputDir}`);
   }
@@ -563,7 +565,7 @@ export class OnPremisesDeploymentManager {
    * Get Docker run command
    */
   getDockerRunCommand(): string {
-    const parts = ['docker run -d'];
+    const parts = ["docker run -d"];
 
     // Ports
     for (const port of this.config.ports) {
@@ -577,7 +579,7 @@ export class OnPremisesDeploymentManager {
 
     // Volumes
     for (const vol of this.config.volumes) {
-      parts.push(`-v ${vol.hostPath}:${vol.containerPath}${vol.readonly ? ':ro' : ''}`);
+      parts.push(`-v ${vol.hostPath}:${vol.containerPath}${vol.readonly ? ":ro" : ""}`);
     }
 
     // Resources
@@ -587,6 +589,6 @@ export class OnPremisesDeploymentManager {
     // Image
     parts.push(`${this.config.imageName}:${this.config.tag}`);
 
-    return parts.join(' \\\n  ');
+    return parts.join(" \\\n  ");
   }
 }

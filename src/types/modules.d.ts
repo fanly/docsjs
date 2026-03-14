@@ -2,10 +2,8 @@
  * Missing module declarations
  */
 
-export {};
-
 // Declaration for yjs (collaboration)
-declare module 'yjs' {
+declare module "yjs" {
   export class Doc {
     constructor();
     getMap(name?: string): any;
@@ -18,7 +16,7 @@ declare module 'yjs' {
     on(event: string, callback: Function): void;
   }
   export function createDoc(): Doc;
-  
+
   const Y: {
     Doc: typeof Doc;
     Awareness: typeof Awareness;
@@ -28,7 +26,7 @@ declare module 'yjs' {
 }
 
 // Declaration for pdf-parse
-declare module 'pdf-parse' {
+declare module "pdf-parse" {
   interface PDFData {
     numpages: number;
     numrender: number;
@@ -40,7 +38,6 @@ declare module 'pdf-parse' {
   function pdf(dataBuffer: Buffer, options?: any): Promise<PDFData>;
   export = pdf;
 }
-
 
 // Plugin types (referenced but not defined)
 export interface InstalledPlugin {

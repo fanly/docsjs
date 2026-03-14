@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { extractFromClipboardDataTransfer } from "../../src/lib/pastePipeline";
 
 class MockDataTransferItem implements DataTransferItem {
@@ -26,9 +26,7 @@ class MockDataTransferItem implements DataTransferItem {
 }
 
 function makeDataTransfer(html: string, text: string, imageFile?: File): DataTransfer {
-  const itemList = imageFile
-    ? [new MockDataTransferItem("file", imageFile.type, imageFile)]
-    : [];
+  const itemList = imageFile ? [new MockDataTransferItem("file", imageFile.type, imageFile)] : [];
 
   return {
     dropEffect: "none",
@@ -38,12 +36,16 @@ function makeDataTransfer(html: string, text: string, imageFile?: File): DataTra
     types: ["text/html", "text/plain"],
     clearData: () => undefined,
     getData: (format: string) => {
-      if (format === "text/html") {return html;}
-      if (format === "text/plain") {return text;}
+      if (format === "text/html") {
+        return html;
+      }
+      if (format === "text/plain") {
+        return text;
+      }
       return "";
     },
     setData: () => false,
-    setDragImage: () => undefined
+    setDragImage: () => undefined,
   } as unknown as DataTransfer;
 }
 

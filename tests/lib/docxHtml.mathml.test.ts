@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot, parseDocxToHtmlSnapshotWithReport } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -14,10 +14,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("(1)/(2)");
   });
 
@@ -32,10 +32,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("x^(2)");
   });
 
@@ -50,10 +50,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("x_(n)");
   });
 
@@ -68,10 +68,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("sqrt(x)");
   });
 
@@ -86,10 +86,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("sqrt(x)");
   });
 
@@ -104,10 +104,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("renders barUnder to linear fallback", async () => {
@@ -121,10 +121,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("renders bold math to linear fallback", async () => {
@@ -138,10 +138,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("renders italic math to linear fallback", async () => {
@@ -155,10 +155,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("renders complex expression to linear fallback", async () => {
@@ -172,10 +172,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("(a)/(b2)");
   });
 
@@ -190,7 +190,7 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const result = await parseDocxToHtmlSnapshotWithReport(file);
     expect(result.report.features.ommlCount).toBeGreaterThan(0);
@@ -207,10 +207,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("handles number in math", async () => {
@@ -224,10 +224,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("123");
   });
 
@@ -242,10 +242,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("^(3)");
   });
 
@@ -260,10 +260,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
     expect(snapshot).toContain("a");
     expect(snapshot).toContain("+");
     expect(snapshot).toContain("*");
@@ -279,10 +279,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             <m:oMath></m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).not.toContain("data-word-omml=\"1\"");
+    expect(snapshot).not.toContain('data-word-omml="1"');
   });
 
   it("handles math with only whitespace gracefully", async () => {
@@ -294,10 +294,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             <m:oMath>   </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).not.toContain("data-word-omml=\"1\"");
+    expect(snapshot).not.toContain('data-word-omml="1"');
   });
 
   it("handles group character with custom character", async () => {
@@ -311,10 +311,10 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 
   it("handles lim element with base and limit", async () => {
@@ -328,9 +328,9 @@ describe("parseDocxToHtmlSnapshot OMML/MathML", () => {
             </m:oMath>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const snapshot = await parseDocxToHtmlSnapshot(file);
-    expect(snapshot).toContain("data-word-omml=\"1\"");
+    expect(snapshot).toContain('data-word-omml="1"');
   });
 });

@@ -1,11 +1,11 @@
 /**
  * Confluence Adapter
- * 
+ *
  * Integration with Atlassian Confluence for enterprise documentation.
  */
 
-import type { CMSAdapter, CMSImportOptions, CMSContent } from './adapters';
-import type { ConvertResultData } from '../server/types';
+import type { CMSAdapter, CMSImportOptions, CMSContent } from "./adapters";
+import type { ConvertResultData } from "../server/types";
 
 export interface ConfluenceOptions extends CMSImportOptions {
   /** Confluence base URL */
@@ -53,8 +53,8 @@ export interface ConfluenceAttachment {
 }
 
 export class ConfluenceAdapter implements CMSAdapter {
-  name = 'confluence';
-  version = '1.0.0';
+  name = "confluence";
+  version = "1.0.0";
   private options: ConfluenceOptions;
 
   constructor(options: ConfluenceOptions) {
@@ -64,22 +64,22 @@ export class ConfluenceAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const page = content as ConfluencePage;
     const html = this.confluenceToHtml(page);
-    
+
     return {
       output: html,
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const extracted = this.extractContent(content);
-    
+
     if (this.options.spaceKey || this.options.parentId) {
       await this.createConfluencePage(extracted);
     }
-    
+
     return extracted;
   }
 
@@ -89,7 +89,7 @@ export class ConfluenceAdapter implements CMSAdapter {
   async getPage(pageId: string): Promise<ConfluencePage> {
     const response = await fetch(
       `${this.options.baseUrl}/wiki/api/v2/pages/${pageId}?body-format=storage`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
 
     if (!response.ok) {
@@ -105,17 +105,16 @@ export class ConfluenceAdapter implements CMSAdapter {
   async getPageByTitle(title: string, spaceKey?: string): Promise<ConfluencePage | null> {
     const params = new URLSearchParams({
       title,
-      'body-format': 'storage',
+      "body-format": "storage",
     });
 
     if (spaceKey) {
-      params.set('space-key', spaceKey);
+      params.set("space-key", spaceKey);
     }
 
-    const response = await fetch(
-      `${this.options.baseUrl}/wiki/api/v2/pages?${params}`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.baseUrl}/wiki/api/v2/pages?${params}`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error(`Confluence API error: ${response.statusText}`);
@@ -131,7 +130,7 @@ export class ConfluenceAdapter implements CMSAdapter {
   async getChildren(pageId: string): Promise<ConfluencePage[]> {
     const response = await fetch(
       `${this.options.baseUrl}/wiki/api/v2/pages?parent-id=${pageId}&body-format=storage`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
 
     if (!response.ok) {
@@ -146,10 +145,9 @@ export class ConfluenceAdapter implements CMSAdapter {
    * Get space info
    */
   async getSpace(spaceKey: string): Promise<ConfluenceSpace> {
-    const response = await fetch(
-      `${this.options.baseUrl}/wiki/api/v2/spaces?keys=${spaceKey}`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.baseUrl}/wiki/api/v2/spaces?keys=${spaceKey}`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error(`Confluence API error: ${response.statusText}`);
@@ -169,7 +167,7 @@ export class ConfluenceAdapter implements CMSAdapter {
   async getAttachments(pageId: string): Promise<ConfluenceAttachment[]> {
     const response = await fetch(
       `${this.options.baseUrl}/wiki/api/v2/pages/${pageId}/attachments`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
 
     if (!response.ok) {
@@ -186,13 +184,12 @@ export class ConfluenceAdapter implements CMSAdapter {
   async search(cql: string): Promise<ConfluencePage[]> {
     const params = new URLSearchParams({
       cql,
-      'body-format': 'storage',
+      "body-format": "storage",
     });
 
-    const response = await fetch(
-      `${this.options.baseUrl}/wiki/api/v2/pages?${params}`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.baseUrl}/wiki/api/v2/pages?${params}`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error(`Confluence API error: ${response.statusText}`);
@@ -205,23 +202,20 @@ export class ConfluenceAdapter implements CMSAdapter {
   private async createConfluencePage(content: CMSContent): Promise<ConfluencePage> {
     const body: Record<string, unknown> = {
       spaceId: this.options.spaceKey,
-      status: 'current',
+      status: "current",
       title: content.title,
       parentId: this.options.parentId,
       body: {
-        representation: 'storage',
+        representation: "storage",
         value: content.body,
       },
     };
 
-    const response = await fetch(
-      `${this.options.baseUrl}/wiki/api/v2/pages`,
-      {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${this.options.baseUrl}/wiki/api/v2/pages`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(body),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to create Confluence page: ${response.statusText}`);
@@ -232,11 +226,11 @@ export class ConfluenceAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     const imgMatch = body.match(/<img[^>]+src="([^"]+)"/i);
@@ -252,12 +246,12 @@ export class ConfluenceAdapter implements CMSAdapter {
   private confluenceToHtml(page: ConfluencePage): string {
     const title = page.title;
     let html = `<h1>${title}</h1>\n`;
-    
+
     // Add storage format content
     if (page.body?.storage?.value) {
       html += this.convertStorageToHtml(page.body.storage.value);
     }
-    
+
     return html;
   }
 
@@ -268,14 +262,14 @@ export class ConfluenceAdapter implements CMSAdapter {
   }
 
   private getHeaders(): Record<string, string> {
-    const credentials = Buffer.from(
-      `${this.options.email}:${this.options.apiToken}`
-    ).toString('base64');
+    const credentials = Buffer.from(`${this.options.email}:${this.options.apiToken}`).toString(
+      "base64",
+    );
 
     return {
-      'Authorization': `Basic ${credentials}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
   }
 }

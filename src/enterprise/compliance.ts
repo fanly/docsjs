@@ -1,26 +1,22 @@
 /**
  * Enterprise Compliance Profiles
- * 
+ *
  * Compliance processing profiles for SOX, FERPA, HIPAA, and other regulations.
  */
 
-import type { TransformationProfile as Profile } from '../types/engine';
-
 /**
  */
-
-
 
 /**
  * Compliance framework types
  */
 export enum ComplianceFramework {
-  SOX = 'sox',           // Sarbanes-Oxley Act
-  FERPA = 'ferpa',       // Family Educational Rights and Privacy Act
-  HIPAA = 'hipaa',       // Health Insurance Portability and Accountability Act
-  GDPR = 'gdpr',         // General Data Protection Regulation
-  PCI_DSS = 'pci_dss',   // Payment Card Industry Data Security Standard
-  ISO_27001 = 'iso27001' // Information Security Management
+  SOX = "sox", // Sarbanes-Oxley Act
+  FERPA = "ferpa", // Family Educational Rights and Privacy Act
+  HIPAA = "hipaa", // Health Insurance Portability and Accountability Act
+  GDPR = "gdpr", // General Data Protection Regulation
+  PCI_DSS = "pci_dss", // Payment Card Industry Data Security Standard
+  ISO_27001 = "iso27001", // Information Security Management
 }
 
 /**
@@ -40,7 +36,7 @@ export interface ComplianceProfileConfig {
   /** Access control */
   accessControl: AccessControlRules;
   /** Audit requirements */
-  auditLevel: 'basic' | 'standard' | 'strict';
+  auditLevel: "basic" | "standard" | "strict";
   /** Encryption requirements */
   encryption: EncryptionRequirements;
 }
@@ -60,7 +56,7 @@ export interface DataHandlingRules {
   /** Allow external processing */
   allowExternalProcessing: boolean;
   /** Data must stay in region */
-  dataResidency?: 'us' | 'eu' | 'apac';
+  dataResidency?: "us" | "eu" | "apac";
 }
 
 /**
@@ -113,16 +109,16 @@ export interface EncryptionRequirements {
  * Compliance feature flags
  */
 export enum ComplianceFeature {
-  AUDIT_LOGGING = 'audit_logging',
-  DATA_MASKING = 'data_masking',
-  ACCESS_CONTROL = 'access_control',
-  ENCRYPTION = 'encryption',
-  DATA_RETENTION = 'data_retention',
-  CONSENT_MANAGEMENT = 'consent_management',
-  RIGHT_TO_DELETE = 'right_to_delete',
-  DATA_PORTABILITY = 'data_portability',
-  BREACH_NOTIFICATION = 'breach_notification',
-  TRAINING_TRACKING = 'training_tracking'
+  AUDIT_LOGGING = "audit_logging",
+  DATA_MASKING = "data_masking",
+  ACCESS_CONTROL = "access_control",
+  ENCRYPTION = "encryption",
+  DATA_RETENTION = "data_retention",
+  CONSENT_MANAGEMENT = "consent_management",
+  RIGHT_TO_DELETE = "right_to_delete",
+  DATA_PORTABILITY = "data_portability",
+  BREACH_NOTIFICATION = "breach_notification",
+  TRAINING_TRACKING = "training_tracking",
 }
 
 /**
@@ -130,99 +126,7 @@ export enum ComplianceFeature {
  */
 export const SOX_PROFILE: ComplianceProfileConfig = {
   framework: ComplianceFramework.SOX,
-  name: 'SOX Compliance',
-  features: [
-    ComplianceFeature.AUDIT_LOGGING,
-    ComplianceFeature.DATA_MASKING,
-    ComplianceFeature.ACCESS_CONTROL,
-    ComplianceFeature.ENCRYPTION,
-    ComplianceFeature.DATA_RETENTION,
-    ComplianceFeature.BREACH_NOTIFICATION
-  ],
-  dataHandling: {
-    maskPII: true,
-    piiPatterns: ['\\b\\d{3}-\\d{2}-\\d{4}\\b', '\\b\\d{16}\\b'], // SSN, Credit Card
-    redactPatterns: ['financial_data', 'executive_compensation'],
-    maxRetentionDays: 2555, // 7 years
-    allowExternalProcessing: false,
-    dataResidency: 'us'
-  },
-  retention: {
-    minDays: 2555, // 7 years
-    maxDays: 3650, // 10 years
-    deletionApproval: true,
-    archiveBeforeDelete: true,
-    immutableAuditTrail: true
-  },
-  accessControl: {
-    requireMFA: true,
-    roleBasedAccess: true,
-    sessionTimeoutMinutes: 15,
-    ipAllowlist: true
-  },
-  auditLevel: 'strict',
-  encryption: {
-    requireAtRest: true,
-    requireInTransit: true,
-    minKeyLength: 256,
-    allowedAlgorithms: ['AES-256-GCM', 'RSA-OAEP']
-  }
-};
-
-/**
- * FERPA Compliance Profile
- */
-export const FERPA_PROFILE: ComplianceProfileConfig = {
-  framework: ComplianceFramework.FERPA,
-  name: 'FERPA Compliance',
-  features: [
-    ComplianceFeature.AUDIT_LOGGING,
-    ComplianceFeature.DATA_MASKING,
-    ComplianceFeature.ACCESS_CONTROL,
-    ComplianceFeature.DATA_RETENTION,
-    ComplianceFeature.CONSENT_MANAGEMENT,
-    ComplianceFeature.DATA_PORTABILITY
-  ],
-  dataHandling: {
-    maskPII: true,
-    piiPatterns: [
-      '\\b\\d{3}-\\d{2}-\\d{4}\\b', // SSN
-      '\\b[A-Z]{2}\\d{6,9}\\b', // Student ID
-      '\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b' // Phone
-    ],
-    redactPatterns: ['grades', 'disciplinary_records', 'medical_records'],
-    maxRetentionDays: 2190, // 6 years
-    allowExternalProcessing: false,
-    dataResidency: 'us'
-  },
-  retention: {
-    minDays: 2190, // 6 years
-    maxDays: 2920, // 8 years
-    deletionApproval: true,
-    archiveBeforeDelete: true,
-    immutableAuditTrail: true
-  },
-  accessControl: {
-    requireMFA: true,
-    roleBasedAccess: true,
-    sessionTimeoutMinutes: 30,
-    ipAllowlist: false
-  },
-  auditLevel: 'standard',
-  encryption: {
-    requireAtRest: true,
-    requireInTransit: true,
-    minKeyLength: 128,
-    allowedAlgorithms: ['AES-128-GCM', 'RSA-OAEP']
-  }
-};
-
-/**
- * HIPAA Compliance Profile
- */
-export const HIPAA_PROFILE: ComplianceProfileConfig = {
-  framework: ComplianceFramework.HIPAA,
-  name: 'HIPAA Compliance',
+  name: "SOX Compliance",
   features: [
     ComplianceFeature.AUDIT_LOGGING,
     ComplianceFeature.DATA_MASKING,
@@ -230,41 +134,133 @@ export const HIPAA_PROFILE: ComplianceProfileConfig = {
     ComplianceFeature.ENCRYPTION,
     ComplianceFeature.DATA_RETENTION,
     ComplianceFeature.BREACH_NOTIFICATION,
-    ComplianceFeature.CONSENT_MANAGEMENT
+  ],
+  dataHandling: {
+    maskPII: true,
+    piiPatterns: ["\\b\\d{3}-\\d{2}-\\d{4}\\b", "\\b\\d{16}\\b"], // SSN, Credit Card
+    redactPatterns: ["financial_data", "executive_compensation"],
+    maxRetentionDays: 2555, // 7 years
+    allowExternalProcessing: false,
+    dataResidency: "us",
+  },
+  retention: {
+    minDays: 2555, // 7 years
+    maxDays: 3650, // 10 years
+    deletionApproval: true,
+    archiveBeforeDelete: true,
+    immutableAuditTrail: true,
+  },
+  accessControl: {
+    requireMFA: true,
+    roleBasedAccess: true,
+    sessionTimeoutMinutes: 15,
+    ipAllowlist: true,
+  },
+  auditLevel: "strict",
+  encryption: {
+    requireAtRest: true,
+    requireInTransit: true,
+    minKeyLength: 256,
+    allowedAlgorithms: ["AES-256-GCM", "RSA-OAEP"],
+  },
+};
+
+/**
+ * FERPA Compliance Profile
+ */
+export const FERPA_PROFILE: ComplianceProfileConfig = {
+  framework: ComplianceFramework.FERPA,
+  name: "FERPA Compliance",
+  features: [
+    ComplianceFeature.AUDIT_LOGGING,
+    ComplianceFeature.DATA_MASKING,
+    ComplianceFeature.ACCESS_CONTROL,
+    ComplianceFeature.DATA_RETENTION,
+    ComplianceFeature.CONSENT_MANAGEMENT,
+    ComplianceFeature.DATA_PORTABILITY,
   ],
   dataHandling: {
     maskPII: true,
     piiPatterns: [
-      '\\b\\d{3}-\\d{2}-\\d{4}\\b', // SSN
-      '\\b\\d{9}\\b', // Medical Record Number
-      '\\b\\d{3}[-.]?\\d{2}[-.]?\\d{4}\\b', // Phone
-      '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b' // Email
+      "\\b\\d{3}-\\d{2}-\\d{4}\\b", // SSN
+      "\\b[A-Z]{2}\\d{6,9}\\b", // Student ID
+      "\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b", // Phone
     ],
-    redactPatterns: ['diagnosis', 'treatment', 'prescription', 'medical_history'],
+    redactPatterns: ["grades", "disciplinary_records", "medical_records"],
     maxRetentionDays: 2190, // 6 years
     allowExternalProcessing: false,
-    dataResidency: 'us'
+    dataResidency: "us",
+  },
+  retention: {
+    minDays: 2190, // 6 years
+    maxDays: 2920, // 8 years
+    deletionApproval: true,
+    archiveBeforeDelete: true,
+    immutableAuditTrail: true,
+  },
+  accessControl: {
+    requireMFA: true,
+    roleBasedAccess: true,
+    sessionTimeoutMinutes: 30,
+    ipAllowlist: false,
+  },
+  auditLevel: "standard",
+  encryption: {
+    requireAtRest: true,
+    requireInTransit: true,
+    minKeyLength: 128,
+    allowedAlgorithms: ["AES-128-GCM", "RSA-OAEP"],
+  },
+};
+
+/**
+ * HIPAA Compliance Profile
+ */
+export const HIPAA_PROFILE: ComplianceProfileConfig = {
+  framework: ComplianceFramework.HIPAA,
+  name: "HIPAA Compliance",
+  features: [
+    ComplianceFeature.AUDIT_LOGGING,
+    ComplianceFeature.DATA_MASKING,
+    ComplianceFeature.ACCESS_CONTROL,
+    ComplianceFeature.ENCRYPTION,
+    ComplianceFeature.DATA_RETENTION,
+    ComplianceFeature.BREACH_NOTIFICATION,
+    ComplianceFeature.CONSENT_MANAGEMENT,
+  ],
+  dataHandling: {
+    maskPII: true,
+    piiPatterns: [
+      "\\b\\d{3}-\\d{2}-\\d{4}\\b", // SSN
+      "\\b\\d{9}\\b", // Medical Record Number
+      "\\b\\d{3}[-.]?\\d{2}[-.]?\\d{4}\\b", // Phone
+      "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b", // Email
+    ],
+    redactPatterns: ["diagnosis", "treatment", "prescription", "medical_history"],
+    maxRetentionDays: 2190, // 6 years
+    allowExternalProcessing: false,
+    dataResidency: "us",
   },
   retention: {
     minDays: 2190, // 6 years
     maxDays: 3650, // 10 years
     deletionApproval: true,
     archiveBeforeDelete: true,
-    immutableAuditTrail: true
+    immutableAuditTrail: true,
   },
   accessControl: {
     requireMFA: true,
     roleBasedAccess: true,
     sessionTimeoutMinutes: 15,
-    ipAllowlist: true
+    ipAllowlist: true,
   },
-  auditLevel: 'strict',
+  auditLevel: "strict",
   encryption: {
     requireAtRest: true,
     requireInTransit: true,
     minKeyLength: 256,
-    allowedAlgorithms: ['AES-256-GCM', 'RSA-OAEP', 'ECC']
-  }
+    allowedAlgorithms: ["AES-256-GCM", "RSA-OAEP", "ECC"],
+  },
 };
 
 /**
@@ -272,7 +268,7 @@ export const HIPAA_PROFILE: ComplianceProfileConfig = {
  */
 export const GDPR_PROFILE: ComplianceProfileConfig = {
   framework: ComplianceFramework.GDPR,
-  name: 'GDPR Compliance',
+  name: "GDPR Compliance",
   features: [
     ComplianceFeature.AUDIT_LOGGING,
     ComplianceFeature.DATA_MASKING,
@@ -282,40 +278,40 @@ export const GDPR_PROFILE: ComplianceProfileConfig = {
     ComplianceFeature.CONSENT_MANAGEMENT,
     ComplianceFeature.RIGHT_TO_DELETE,
     ComplianceFeature.DATA_PORTABILITY,
-    ComplianceFeature.BREACH_NOTIFICATION
+    ComplianceFeature.BREACH_NOTIFICATION,
   ],
   dataHandling: {
     maskPII: true,
     piiPatterns: [
-      '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b', // Email
-      '\\b\\+?\\d{1,3}[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}\\b', // Phone
-      '\\b\\d{4}[-]?\\d{4}[-]?\\d{4}[-]?\\d{4}\\b' // Credit Card
+      "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b", // Email
+      "\\b\\+?\\d{1,3}[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}\\b", // Phone
+      "\\b\\d{4}[-]?\\d{4}[-]?\\d{4}[-]?\\d{4}\\b", // Credit Card
     ],
     redactPatterns: [],
     maxRetentionDays: 730, // 2 years
     allowExternalProcessing: false,
-    dataResidency: 'eu'
+    dataResidency: "eu",
   },
   retention: {
     minDays: 0,
     maxDays: 730,
     deletionApproval: false,
     archiveBeforeDelete: false,
-    immutableAuditTrail: true
+    immutableAuditTrail: true,
   },
   accessControl: {
     requireMFA: false,
     roleBasedAccess: true,
     sessionTimeoutMinutes: 60,
-    ipAllowlist: false
+    ipAllowlist: false,
   },
-  auditLevel: 'standard',
+  auditLevel: "standard",
   encryption: {
     requireAtRest: true,
     requireInTransit: true,
     minKeyLength: 128,
-    allowedAlgorithms: ['AES-128-GCM', 'RSA-OAEP']
-  }
+    allowedAlgorithms: ["AES-128-GCM", "RSA-OAEP"],
+  },
 };
 
 /**
@@ -328,37 +324,79 @@ export const COMPLIANCE_PROFILES: Record<ComplianceFramework, ComplianceProfileC
   [ComplianceFramework.GDPR]: GDPR_PROFILE,
   [ComplianceFramework.PCI_DSS]: {
     framework: ComplianceFramework.PCI_DSS,
-    name: 'PCI-DSS Compliance',
-    features: [ComplianceFeature.AUDIT_LOGGING, ComplianceFeature.DATA_MASKING, ComplianceFeature.ENCRYPTION, ComplianceFeature.ACCESS_CONTROL],
+    name: "PCI-DSS Compliance",
+    features: [
+      ComplianceFeature.AUDIT_LOGGING,
+      ComplianceFeature.DATA_MASKING,
+      ComplianceFeature.ENCRYPTION,
+      ComplianceFeature.ACCESS_CONTROL,
+    ],
     dataHandling: {
       maskPII: true,
-      piiPatterns: ['\\b\\d{4}[-]?\\d{4}[-]?\\d{4}[-]?\\d{4}\\b'],
-      redactPatterns: ['cvv', 'pin'],
+      piiPatterns: ["\\b\\d{4}[-]?\\d{4}[-]?\\d{4}[-]?\\d{4}\\b"],
+      redactPatterns: ["cvv", "pin"],
       maxRetentionDays: 365,
       allowExternalProcessing: false,
-      dataResidency: 'us'
+      dataResidency: "us",
     },
-    retention: { minDays: 365, maxDays: 730, deletionApproval: true, archiveBeforeDelete: true, immutableAuditTrail: true },
-    accessControl: { requireMFA: true, roleBasedAccess: true, sessionTimeoutMinutes: 15, ipAllowlist: true },
-    auditLevel: 'strict',
-    encryption: { requireAtRest: true, requireInTransit: true, minKeyLength: 256, allowedAlgorithms: ['AES-256-GCM'] }
+    retention: {
+      minDays: 365,
+      maxDays: 730,
+      deletionApproval: true,
+      archiveBeforeDelete: true,
+      immutableAuditTrail: true,
+    },
+    accessControl: {
+      requireMFA: true,
+      roleBasedAccess: true,
+      sessionTimeoutMinutes: 15,
+      ipAllowlist: true,
+    },
+    auditLevel: "strict",
+    encryption: {
+      requireAtRest: true,
+      requireInTransit: true,
+      minKeyLength: 256,
+      allowedAlgorithms: ["AES-256-GCM"],
+    },
   },
   [ComplianceFramework.ISO_27001]: {
     framework: ComplianceFramework.ISO_27001,
-    name: 'ISO 27001 Compliance',
-    features: [ComplianceFeature.AUDIT_LOGGING, ComplianceFeature.ACCESS_CONTROL, ComplianceFeature.ENCRYPTION, ComplianceFeature.DATA_RETENTION],
+    name: "ISO 27001 Compliance",
+    features: [
+      ComplianceFeature.AUDIT_LOGGING,
+      ComplianceFeature.ACCESS_CONTROL,
+      ComplianceFeature.ENCRYPTION,
+      ComplianceFeature.DATA_RETENTION,
+    ],
     dataHandling: {
       maskPII: false,
       piiPatterns: [],
       redactPatterns: [],
       maxRetentionDays: 1095, // 3 years
-      allowExternalProcessing: false
+      allowExternalProcessing: false,
     },
-    retention: { minDays: 1095, maxDays: 1825, deletionApproval: true, archiveBeforeDelete: true, immutableAuditTrail: true },
-    accessControl: { requireMFA: true, roleBasedAccess: true, sessionTimeoutMinutes: 30, ipAllowlist: false },
-    auditLevel: 'strict',
-    encryption: { requireAtRest: true, requireInTransit: true, minKeyLength: 128, allowedAlgorithms: ['AES-128-GCM', 'AES-256-GCM', 'RSA-OAEP'] }
-  }
+    retention: {
+      minDays: 1095,
+      maxDays: 1825,
+      deletionApproval: true,
+      archiveBeforeDelete: true,
+      immutableAuditTrail: true,
+    },
+    accessControl: {
+      requireMFA: true,
+      roleBasedAccess: true,
+      sessionTimeoutMinutes: 30,
+      ipAllowlist: false,
+    },
+    auditLevel: "strict",
+    encryption: {
+      requireAtRest: true,
+      requireInTransit: true,
+      minKeyLength: 128,
+      allowedAlgorithms: ["AES-128-GCM", "AES-256-GCM", "RSA-OAEP"],
+    },
+  },
 };
 
 /**
@@ -419,10 +457,10 @@ export class ComplianceManagerV2 {
 
     // Check PII patterns
     for (const pattern of this.config.dataHandling.piiPatterns) {
-      const regex = new RegExp(pattern, 'gi');
+      const regex = new RegExp(pattern, "gi");
       const matches = content.match(regex);
       if (matches && this.config.dataHandling.maskPII) {
-        masked = masked.replace(regex, '[REDACTED]');
+        masked = masked.replace(regex, "[REDACTED]");
         issues.push(`PII detected and masked: ${matches.length} occurrences`);
       }
     }
@@ -437,7 +475,7 @@ export class ComplianceManagerV2 {
     return {
       compliant: issues.length === 0,
       issues,
-      masked
+      masked,
     };
   }
 
@@ -446,11 +484,11 @@ export class ComplianceManagerV2 {
    */
   checkRetentionPolicy(createdAt: number): {
     compliant: boolean;
-    action: 'keep' | 'archive' | 'delete';
+    action: "keep" | "archive" | "delete";
     reason?: string;
   } {
     if (!this.config) {
-      return { compliant: true, action: 'keep' };
+      return { compliant: true, action: "keep" };
     }
 
     const ageMs = Date.now() - createdAt;
@@ -458,32 +496,32 @@ export class ComplianceManagerV2 {
     const { minDays, maxDays, archiveBeforeDelete } = this.config.retention;
 
     if (ageDays < minDays) {
-      return { compliant: true, action: 'keep' };
+      return { compliant: true, action: "keep" };
     }
 
     if (ageDays >= maxDays) {
       return {
         compliant: true,
-        action: 'delete',
-        reason: 'Maximum retention period exceeded'
+        action: "delete",
+        reason: "Maximum retention period exceeded",
       };
     }
 
     if (ageDays >= minDays && archiveBeforeDelete) {
       return {
         compliant: true,
-        action: 'archive',
-        reason: 'Approaching retention limit, archive recommended'
+        action: "archive",
+        reason: "Approaching retention limit, archive recommended",
       };
     }
 
-    return { compliant: true, action: 'keep' };
+    return { compliant: true, action: "keep" };
   }
 
   /**
    * Convert to processing profile
    */
-  toProcessingProfile(): Partial<Profile> {
+  toProcessingProfile(): Partial<any> {
     if (!this.config) {
       return {};
     }
@@ -492,11 +530,11 @@ export class ComplianceManagerV2 {
       id: `compliance-${this.activeFramework}`,
       name: this.config.name,
       security: {
-        allowedDomains: this.config.dataHandling.dataResidency 
-          ? [this.config.dataHandling.dataResidency] 
+        allowedDomains: this.config.dataHandling.dataResidency
+          ? [this.config.dataHandling.dataResidency]
           : [],
-        sanitizerProfile: this.config.auditLevel === 'strict' ? 'strict' : 'fidelity-first'
-      }
+        sanitizerProfile: this.config.auditLevel === "strict" ? "strict" : "fidelity-first",
+      },
     };
   }
 }

@@ -1,4 +1,4 @@
-import type { TransformationProfile } from '../types/engine';
+import type { TransformationProfile } from "../types/engine";
 
 export interface PerformanceMetrics {
   parseTimeMs: number;
@@ -9,7 +9,7 @@ export interface PerformanceMetrics {
 }
 
 export interface DiagnosticEntry {
-  type: 'error' | 'warning' | 'info';
+  type: "error" | "warning" | "info";
   code: string;
   message: string;
   location?: { line: number; column: number };
@@ -18,7 +18,11 @@ export interface DiagnosticEntry {
 export interface TransformResult {
   output: string;
   outputFormat: string;
-  diagnostics?: { errors?: DiagnosticEntry[]; warnings?: DiagnosticEntry[]; stats?: PerformanceMetrics };
+  diagnostics?: {
+    errors?: DiagnosticEntry[];
+    warnings?: DiagnosticEntry[];
+    stats?: PerformanceMetrics;
+  };
 }
 
 export interface ApiResponse<T = unknown> {
@@ -50,8 +54,8 @@ export interface PaginatedResponse<T> extends ApiResponse<T> {
 }
 
 export interface ConvertRequest {
-  inputFormat?: 'docx' | 'html' | 'markdown';
-  outputFormat: 'html' | 'markdown' | 'json';
+  inputFormat?: "docx" | "html" | "markdown";
+  outputFormat: "html" | "markdown" | "json";
   profile?: string;
   report?: boolean;
   file?: string;
@@ -76,12 +80,12 @@ export interface ConvertResultData {
   metrics?: PerformanceMetrics;
   diagnostics?: DiagnosticEntry[];
   jobId?: string;
-  status?: 'completed' | 'pending' | 'processing';
+  status?: "completed" | "pending" | "processing";
 }
 
 export interface BatchConvertRequest {
   files: BatchFileItem[];
-  outputFormat: 'html' | 'markdown' | 'json';
+  outputFormat: "html" | "markdown" | "json";
   profile?: string;
   async?: boolean;
 }
@@ -98,7 +102,7 @@ export interface BatchConvertResultData {
   total: number;
   completed: number;
   failed: number;
-  status: 'pending' | 'processing' | 'completed' | 'partial' | 'failed';
+  status: "pending" | "processing" | "completed" | "partial" | "failed";
   results?: BatchItemResult[];
 }
 
@@ -111,7 +115,7 @@ export interface BatchItemResult {
 }
 
 export interface CreateJobRequest {
-  type: 'convert' | 'batch';
+  type: "convert" | "batch";
   payload: ConvertRequest | BatchConvertRequest;
   priority?: number;
   callbackUrl?: string;
@@ -121,7 +125,7 @@ export interface JobResponse extends ApiResponse<JobData> {}
 
 export interface JobData {
   id: string;
-  type: 'convert' | 'batch';
+  type: "convert" | "batch";
   status: JobStatus;
   progress: number;
   createdAt: number;
@@ -131,7 +135,7 @@ export interface JobData {
   error?: ApiError;
 }
 
-export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+export type JobStatus = "pending" | "processing" | "completed" | "failed" | "cancelled";
 
 export interface JobListResponse extends PaginatedResponse<JobData[]> {}
 
@@ -166,27 +170,27 @@ export interface RateLimitConfig {
 
 export const DEFAULT_SERVER_CONFIG: Partial<ServerConfig> = {
   port: 3000,
-  host: '0.0.0.0',
-  apiPrefix: '/api/v1',
+  host: "0.0.0.0",
+  apiPrefix: "/api/v1",
   cors: true,
   rateLimit: {
     windowMs: 60000,
     maxRequests: 100,
   },
-  bodyLimit: '10mb',
+  bodyLimit: "10mb",
   logging: true,
   timeout: 30000,
 };
 
-export type WebhookEventType = 
-  | 'conversion.started'
-  | 'conversion.completed'
-  | 'conversion.failed'
-  | 'batch.started'
-  | 'batch.completed'
-  | 'batch.failed'
-  | 'job.completed'
-  | 'job.failed';
+export type WebhookEventType =
+  | "conversion.started"
+  | "conversion.completed"
+  | "conversion.failed"
+  | "batch.started"
+  | "batch.completed"
+  | "batch.failed"
+  | "job.completed"
+  | "job.failed";
 
 export interface WebhookPayload {
   event: WebhookEventType;

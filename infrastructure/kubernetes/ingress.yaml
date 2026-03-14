@@ -11,21 +11,21 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   tls:
-  - hosts:
-    - api.docsjs.cloud
-    - docsjs.yourdomain.com
-    secretName: docsjs-tls
+    - hosts:
+        - api.docsjs.cloud
+        - docsjs.yourdomain.com
+      secretName: docsjs-tls
   rules:
-  - host: docsjs.yourdomain.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: docsjs-api
-            port:
-              number: 80
+    - host: docsjs.yourdomain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: docsjs-api
+                port:
+                  number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -36,40 +36,40 @@ spec:
     matchLabels:
       app: docsjs
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: docsjs
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    ports:
-    - protocol: TCP
-      port: 3000
+    - from:
+        - podSelector:
+            matchLabels:
+              app: docsjs
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
   egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: docsjs
-          component: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to:
-    - podSelector:
-        matchLabels:
-          app: docsjs
-          component: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - namespaceSelector: {}
-    ports:
-    - protocol: TCP
-      port: 443
-    - protocol: TCP
-      port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app: docsjs
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - podSelector:
+            matchLabels:
+              app: docsjs
+              component: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 53

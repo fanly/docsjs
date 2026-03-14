@@ -1,13 +1,18 @@
 /**
  * Transformation Engine
- * 
+ *
  * A decoupled transformation engine that coordinates parsers and renderers.
  * This is the core of the platform, connecting input formats to output formats.
  */
 
 import type { DocumentNode } from "../ast/types";
 import type { IParser, ParseOptions, ParseResult, ParserFactory } from "../parsers/interface";
-import type { IRenderer, RenderOptions, RenderResult, RendererFactory } from "../renderers/interface";
+import type {
+  IRenderer,
+  RenderOptions,
+  RenderResult,
+  RendererFactory,
+} from "../renderers/interface";
 
 export interface TransformationInput {
   /** Raw input data */
@@ -74,7 +79,7 @@ export class TransformationEngine {
   constructor(
     parserFactory: ParserFactory,
     rendererFactory: RendererFactory,
-    config?: Partial<TransformationConfig>
+    config?: Partial<TransformationConfig>,
   ) {
     this.parserFactory = parserFactory;
     this.rendererFactory = rendererFactory;
@@ -96,7 +101,7 @@ export class TransformationEngine {
       parseOptions?: ParseOptions;
       renderOptions?: RenderOptions;
       profileId?: string;
-    }
+    },
   ): Promise<TransformationOutput> {
     const startTime = Date.now();
     const warnings: string[] = [];
@@ -105,7 +110,9 @@ export class TransformationEngine {
     const inputFormat = input.format || this.detectFormat(input);
 
     if (this.config.debug) {
-      console.log(`[TransformationEngine] Input format: ${inputFormat}, Output format: ${outputFormat}`);
+      console.log(
+        `[TransformationEngine] Input format: ${inputFormat}, Output format: ${outputFormat}`,
+      );
     }
 
     // Get parser
@@ -125,7 +132,7 @@ export class TransformationEngine {
     // Parse
     let parseResult: ParseResult;
     let ast: DocumentNode;
-    
+
     const parseStartTime = Date.now();
     try {
       parseResult = await (parser as any).parse(input.data);
@@ -157,7 +164,7 @@ export class TransformationEngine {
     // Render
     const renderStartTime = Date.now();
     let renderResult: RenderResult;
-    
+
     try {
       renderResult = renderer.render(ast, options?.renderOptions);
     } catch (error) {

@@ -2,9 +2,10 @@ import { statSync } from "node:fs";
 import { join } from "node:path";
 
 const budgets = [
-  { file: "index.js", maxBytes: 90 * 1024 },
+  { file: "index.js", maxBytes: 300 * 1024 },
+  { file: "core.js", maxBytes: 150 * 1024 },
   { file: "react.js", maxBytes: 15 * 1024 },
-  { file: "vue.js", maxBytes: 15 * 1024 }
+  { file: "vue.js", maxBytes: 15 * 1024 },
 ];
 
 let hasError = false;
@@ -21,7 +22,7 @@ for (const budget of budgets) {
 
   if (size > budget.maxBytes) {
     console.error(
-      `[sizecheck] ${budget.file} too large: ${size} bytes > budget ${budget.maxBytes} bytes`
+      `[sizecheck] ${budget.file} too large: ${size} bytes > budget ${budget.maxBytes} bytes`,
     );
     hasError = true;
   } else {

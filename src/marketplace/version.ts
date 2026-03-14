@@ -1,17 +1,17 @@
 /**
  * Plugin Version Manager
- * 
+ *
  * Manages plugin versions, compatibility checking, and auto-updates.
  */
 
-import type { PluginManifest } from '../types/plugins';
+import type { PluginManifest } from "../types/plugins";
 
 /**
  * Version constraint
  */
 export interface VersionConstraint {
   /** Operator: ^, ~, >=, <=, =, etc. */
-  operator: '^' | '~' | '>=' | '<=' | '>' | '<' | '=' | '~';
+  operator: "^" | "~" | ">=" | "<=" | ">" | "<" | "=";
   /** Version string */
   version: string;
 }
@@ -53,7 +53,7 @@ export interface CompatibilityResult {
   /** Errors */
   errors: string[];
   /** Confidence level */
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
   /** Missing features */
   missingFeatures: string[];
   /** Conflicting plugins */
@@ -71,7 +71,7 @@ export interface UpdateInfo {
   /** Whether update is available */
   updateAvailable: boolean;
   /** Type of update */
-  updateType: 'major' | 'minor' | 'patch' | 'none';
+  updateType: "major" | "minor" | "patch" | "none";
   /** Breaking changes */
   breaking: boolean;
   /** Migration guide */
@@ -89,7 +89,7 @@ export class PluginVersionManager {
   private versions: Map<string, PluginVersion[]> = new Map();
   private currentEngineVersion: string;
 
-  constructor(engineVersion: string = '2.0.0') {
+  constructor(engineVersion: string = "2.0.0") {
     this.currentEngineVersion = engineVersion;
   }
 
@@ -98,17 +98,17 @@ export class PluginVersionManager {
    */
   registerVersion(pluginId: string, version: PluginVersion): void {
     const existing = this.versions.get(pluginId) || [];
-    
+
     // Check for duplicates
-    if (existing.some(v => v.version === version.version)) {
+    if (existing.some((v) => v.version === version.version)) {
       throw new Error(`Version ${version.version} already exists for plugin ${pluginId}`);
     }
 
     existing.push(version);
-    
+
     // Sort by version (newest first)
     existing.sort((a, b) => this.compareVersions(b.version, a.version));
-    
+
     this.versions.set(pluginId, existing);
   }
 
@@ -117,13 +117,15 @@ export class PluginVersionManager {
    */
   getLatestVersion(pluginId: string, includeDeprecated: boolean = false): PluginVersion | null {
     const versions = this.versions.get(pluginId);
-    if (!versions || versions.length === 0) {return null;}
+    if (!versions || versions.length === 0) {
+      return null;
+    }
 
     if (includeDeprecated) {
       return versions[0];
     }
 
-    return versions.find(v => !v.deprecated) || null;
+    return versions.find((v) => !v.deprecated) || null;
   }
 
   /**
@@ -138,8 +140,10 @@ export class PluginVersionManager {
    */
   getVersion(pluginId: string, version: string): PluginVersion | null {
     const versions = this.versions.get(pluginId);
-    if (!versions) {return null;}
-    return versions.find(v => v.version === version) || null;
+    if (!versions) {
+      return null;
+    }
+    return versions.find((v) => v.version === version) || null;
   }
 
   /**
@@ -148,15 +152,15 @@ export class PluginVersionManager {
   checkCompatibility(pluginId: string, engineVersion?: string): CompatibilityResult {
     const engine = engineVersion || this.currentEngineVersion;
     const versions = this.versions.get(pluginId);
-    
+
     if (!versions || versions.length === 0) {
       return {
         compatible: false,
         warnings: [],
-        errors: ['Plugin not found'],
-        confidence: 'high',
+        errors: ["Plugin not found"],
+        confidence: "high",
         missingFeatures: [],
-        conflictingPlugins: []
+        conflictingPlugins: [],
       };
     }
 
@@ -165,10 +169,10 @@ export class PluginVersionManager {
       return {
         compatible: false,
         warnings: [],
-        errors: ['No non-deprecated versions available'],
-        confidence: 'high',
+        errors: ["No non-deprecated versions available"],
+        confidence: "high",
         missingFeatures: [],
-        conflictingPlugins: []
+        conflictingPlugins: [],
       };
     }
 
@@ -180,34 +184,34 @@ export class PluginVersionManager {
    */
   checkForUpdates(pluginId: string, currentVersion: string): UpdateInfo {
     const latest = this.getLatestVersion(pluginId);
-    
+
     if (!latest) {
       return {
         currentVersion,
         latestVersion: currentVersion,
         updateAvailable: false,
-        updateType: 'none',
+        updateType: "none",
         breaking: false,
-        autoUpdateRecommended: false
+        autoUpdateRecommended: false,
       };
     }
 
     const comparison = this.compareVersions(latest.version, currentVersion);
-    
-    let updateType: 'major' | 'minor' | 'patch' | 'none' = 'none';
+
+    let updateType: "major" | "minor" | "patch" | "none" = "none";
     let breaking = false;
 
     if (comparison > 0) {
-      const currentParts = currentVersion.split('.').map(Number);
-      const latestParts = latest.version.split('.').map(Number);
+      const currentParts = currentVersion.split(".").map(Number);
+      const latestParts = latest.version.split(".").map(Number);
 
       if (latestParts[0] > currentParts[0]) {
-        updateType = 'major';
+        updateType = "major";
         breaking = true;
       } else if (latestParts[1] > currentParts[1]) {
-        updateType = 'minor';
+        updateType = "minor";
       } else {
-        updateType = 'patch';
+        updateType = "patch";
       }
     }
 
@@ -219,7 +223,7 @@ export class PluginVersionManager {
       breaking,
       migrationGuide: latest.changelog,
       downloadUrl: latest.distUrl,
-      autoUpdateRecommended: updateType !== 'none' && !breaking
+      autoUpdateRecommended: updateType !== "none" && !breaking,
     };
   }
 
@@ -228,8 +232,10 @@ export class PluginVersionManager {
    */
   getDeprecatedVersions(pluginId: string): PluginVersion[] {
     const versions = this.versions.get(pluginId);
-    if (!versions) {return [];}
-    return versions.filter(v => v.deprecated);
+    if (!versions) {
+      return [];
+    }
+    return versions.filter((v) => v.deprecated);
   }
 
   /**
@@ -237,10 +243,14 @@ export class PluginVersionManager {
    */
   deprecateVersion(pluginId: string, version: string, message: string): void {
     const versions = this.versions.get(pluginId);
-    if (!versions) {throw new Error('Plugin not found');}
+    if (!versions) {
+      throw new Error("Plugin not found");
+    }
 
-    const v = versions.find(v => v.version === version);
-    if (!v) {throw new Error(`Version ${version} not found`);}
+    const v = versions.find((v) => v.version === version);
+    if (!v) {
+      throw new Error(`Version ${version} not found`);
+    }
 
     v.deprecated = true;
     v.deprecationMessage = message;
@@ -251,9 +261,11 @@ export class PluginVersionManager {
    */
   supportsEngineVersion(pluginId: string, engineVersion: string): boolean {
     const latest = this.getLatestVersion(pluginId, true);
-    if (!latest) {return false;}
+    if (!latest) {
+      return false;
+    }
 
-    return latest.engineVersions.some(constraint => {
+    return latest.engineVersions.some((constraint) => {
       return this.satisfies(engineVersion, constraint);
     });
   }
@@ -263,17 +275,17 @@ export class PluginVersionManager {
    */
   parseRange(range: string): VersionConstraint[] {
     const constraints: VersionConstraint[] = [];
-    
+
     // Match patterns like ^1.0.0, >=2.0.0, ~1.2.0
     const matches = range.matchAll(/(\^|~|>=|<=|>|<|=)?(\d+\.\d+\.\d+)/g);
-    
+
     for (const match of matches) {
       constraints.push({
-        operator: (match[1] || '=') as VersionConstraint['operator'],
-        version: match[2]
+        operator: (match[1] || "=") as VersionConstraint["operator"],
+        version: match[2],
       });
     }
-    
+
     return constraints;
   }
 
@@ -282,14 +294,24 @@ export class PluginVersionManager {
    * @returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
    */
   compareVersions(v1: string, v2: string): number {
-    const p1 = v1.replace(/[^0-9.]/g, '').split('.').map(Number);
-    const p2 = v2.replace(/[^0-9.]/g, '').split('.').map(Number);
+    const p1 = v1
+      .replace(/[^0-9.]/g, "")
+      .split(".")
+      .map(Number);
+    const p2 = v2
+      .replace(/[^0-9.]/g, "")
+      .split(".")
+      .map(Number);
 
     for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
       const n1 = p1[i] || 0;
       const n2 = p2[i] || 0;
-      if (n1 > n2) {return 1;}
-      if (n1 < n2) {return -1;}
+      if (n1 > n2) {
+        return 1;
+      }
+      if (n1 < n2) {
+        return -1;
+      }
     }
     return 0;
   }
@@ -299,44 +321,49 @@ export class PluginVersionManager {
    */
   private satisfies(version: string, constraint: string): boolean {
     const constraints = this.parseRange(constraint);
-    return constraints.every(c => this.satisfiesConstraint(version, c));
+    return constraints.every((c) => this.satisfiesConstraint(version, c));
   }
 
   private satisfiesConstraint(version: string, constraint: VersionConstraint): boolean {
     const comparison = this.compareVersions(version, constraint.version);
-    
+
     switch (constraint.operator) {
-      case '^': // Caret - compatible updates
-        const vParts = version.split('.');
-        const cParts = constraint.version.split('.');
+      case "^": // Caret - compatible updates
+        const vParts = version.split(".");
+        const cParts = constraint.version.split(".");
         return vParts[0] === cParts[0] && comparison >= 0;
-      case '~': // Tilde - patch updates
-        return version.startsWith(constraint.version.replace(/\.\d+$/, '')) && comparison >= 0;
-      case '>=':
+      case "~": // Tilde - patch updates
+        return version.startsWith(constraint.version.replace(/\.\d+$/, "")) && comparison >= 0;
+      case ">=":
         return comparison >= 0;
-      case '<=':
+      case "<=":
         return comparison <= 0;
-      case '>':
+      case ">":
         return comparison > 0;
-      case '<':
+      case "<":
         return comparison < 0;
-      case '=':
+      case "=":
         return comparison === 0;
       default:
         return comparison >= 0;
     }
   }
 
-  private validateCompatibility(version: PluginVersion, engineVersion: string): CompatibilityResult {
+  private validateCompatibility(
+    version: PluginVersion,
+    engineVersion: string,
+  ): CompatibilityResult {
     const errors: string[] = [];
     const warnings: string[] = [];
     const missingFeatures: string[] = [];
     const conflictingPlugins: string[] = [];
 
     // Check engine version compatibility
-    const hasCompatible = version.engineVersions.some(v => this.satisfies(engineVersion, v));
+    const hasCompatible = version.engineVersions.some((v) => this.satisfies(engineVersion, v));
     if (!hasCompatible) {
-      errors.push(`Plugin requires engine version ${version.engineVersions.join(' or ')}, but running ${engineVersion}`);
+      errors.push(
+        `Plugin requires engine version ${version.engineVersions.join(" or ")}, but running ${engineVersion}`,
+      );
     }
 
     // Check for deprecated version
@@ -346,14 +373,18 @@ export class PluginVersionManager {
 
     // Check for breaking changes
     if (version.breaking) {
-      warnings.push('This version contains breaking changes');
+      warnings.push("This version contains breaking changes");
     }
 
     // Determine confidence
-    let confidence: 'high' | 'medium' | 'low' = 'high';
-    if (errors.length > 0) {confidence = 'high';}
-    else if (warnings.length > 2) {confidence = 'medium';}
-    else if (version.engineVersions.length > 3) {confidence = 'low';}
+    let confidence: "high" | "medium" | "low" = "high";
+    if (errors.length > 0) {
+      confidence = "high";
+    } else if (warnings.length > 2) {
+      confidence = "medium";
+    } else if (version.engineVersions.length > 3) {
+      confidence = "low";
+    }
 
     return {
       compatible: errors.length === 0,
@@ -361,7 +392,7 @@ export class PluginVersionManager {
       errors,
       confidence,
       missingFeatures,
-      conflictingPlugins
+      conflictingPlugins,
     };
   }
 }
@@ -383,13 +414,17 @@ export class PluginCompatibilityChecker {
       for (let j = i + 1; j < pluginIds.length; j++) {
         const p1 = pluginIds[i];
         const p2 = pluginIds[j];
-        
+
         const conflict = this.findConflict(p1, p2);
         if (conflict) {
-          if (!conflicts.has(p1)) {conflicts.set(p1, []);}
+          if (!conflicts.has(p1)) {
+            conflicts.set(p1, []);
+          }
           conflicts.get(p1)!.push(p2);
-          
-          if (!conflicts.has(p2)) {conflicts.set(p2, []);}
+
+          if (!conflicts.has(p2)) {
+            conflicts.set(p2, []);
+          }
           conflicts.get(p2)!.push(p1);
         }
       }
@@ -406,12 +441,12 @@ export class PluginCompatibilityChecker {
     const reasons: string[] = [];
 
     conflicts.forEach((conflictList, pluginId) => {
-      reasons.push(`${pluginId} conflicts with: ${conflictList.join(', ')}`);
+      reasons.push(`${pluginId} conflicts with: ${conflictList.join(", ")}`);
     });
 
     return {
       possible: conflicts.size === 0,
-      reasons
+      reasons,
     };
   }
 
@@ -428,9 +463,9 @@ export class PluginCompatibilityChecker {
     }
 
     // Check shared dependency with version conflict (simplified)
-    const sharedDeps = deps1.filter(d => deps2.includes(d));
+    const sharedDeps = deps1.filter((d) => deps2.includes(d));
     if (sharedDeps.length > 0) {
-      return `${p1} and ${p2} share dependencies: ${sharedDeps.join(', ')}`;
+      return `${p1} and ${p2} share dependencies: ${sharedDeps.join(", ")}`;
     }
 
     return null;
@@ -441,7 +476,7 @@ export class PluginCompatibilityChecker {
    */
   registerManifest(pluginId: string, manifest: PluginManifest): void {
     this.manifestCache.set(pluginId, manifest);
-    
+
     const deps: string[] = [];
     if (manifest.dependencies) {
       for (const [dep] of Object.entries(manifest.dependencies)) {
@@ -456,6 +491,6 @@ export class PluginCompatibilityChecker {
    */
   getMissingDependencies(pluginId: string, availablePlugins: string[]): string[] {
     const deps = this.pluginDependencies.get(pluginId) || [];
-    return deps.filter(dep => !availablePlugins.includes(dep));
+    return deps.filter((dep) => !availablePlugins.includes(dep));
   }
 }

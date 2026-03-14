@@ -1,16 +1,16 @@
-import type { ConvertResultData } from '../server/types';
+import type { ConvertResultData } from "../server/types";
 
 // Import CMS adapters and options
-import { GhostAdapter, type GhostOptions } from './ghost';
-import { NotionAdapter, type NotionOptions } from './notion';
-import { ConfluenceAdapter, type ConfluenceOptions } from './confluence';
-import { GitBookAdapter, type GitBookOptions } from './gitbook';
+import { GhostAdapter, type GhostOptions } from "./ghost";
+import { NotionAdapter, type NotionOptions } from "./notion";
+import { ConfluenceAdapter, type ConfluenceOptions } from "./confluence";
+import { GitBookAdapter, type GitBookOptions } from "./gitbook";
 
 // Re-export types
-export type { GhostOptions } from './ghost';
-export type { NotionOptions } from './notion';
-export type { ConfluenceOptions } from './confluence';
-export type { GitBookOptions } from './gitbook';
+export type { GhostOptions } from "./ghost";
+export type { NotionOptions } from "./notion";
+export type { ConfluenceOptions } from "./confluence";
+export type { GitBookOptions } from "./gitbook";
 
 export interface CMSAdapter {
   name: string;
@@ -22,7 +22,7 @@ export interface CMSAdapter {
 export interface CMSImportOptions {
   preserveFormatting?: boolean;
   extractMetadata?: boolean;
-  imagesHandling?: 'embed' | 'link' | 'download';
+  imagesHandling?: "embed" | "link" | "download";
 }
 
 export interface CMSContent {
@@ -37,19 +37,19 @@ export interface CMSContent {
   customFields?: Record<string, unknown>;
 }
 
-export interface WordPressOptions extends CMSImportOptions {
+export type WordPressOptions = CMSImportOptions & {
   apiUrl: string;
   username?: string;
   applicationPassword?: string;
-  defaultStatus?: 'draft' | 'publish' | 'private';
-}
+  defaultStatus?: "draft" | "publish" | "private";
+};
 
-export interface ContentfulOptions extends CMSImportOptions {
+export type ContentfulOptions = CMSImportOptions & {
   spaceId: string;
   accessToken: string;
   environment?: string;
   contentTypeId?: string;
-}
+};
 
 export interface StrapiOptions extends CMSImportOptions {
   apiUrl: string;
@@ -58,8 +58,8 @@ export interface StrapiOptions extends CMSImportOptions {
 }
 
 class WordPressAdapter implements CMSAdapter {
-  name = 'wordpress';
-  version = '1.0.0';
+  name = "wordpress";
+  version = "1.0.0";
   private options: WordPressOptions;
 
   constructor(options: WordPressOptions) {
@@ -72,9 +72,9 @@ class WordPressAdapter implements CMSAdapter {
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const mergedOptions = { ...this.options, ...options };
-    
+
     const extracted = this.extractContent(content);
-    
+
     if (mergedOptions.apiUrl && this.options.applicationPassword) {
       await this.postToWordPress(extracted);
     }
@@ -84,15 +84,17 @@ class WordPressAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     const excerptMatch = body.match(/<p[^>]*class="[^"]*excerpt[^"]*"[^>]*>(.*?)<\/p>/i);
-    const excerpt = excerptMatch ? excerptMatch[1].replace(/<[^>]+>/g, '').substring(0, 200) : undefined;
+    const excerpt = excerptMatch
+      ? excerptMatch[1].replace(/<[^>]+>/g, "").substring(0, 200)
+      : undefined;
 
     const imgMatch = body.match(/<img[^>]+src="([^"]+)"/i);
     const featuredImage = imgMatch ? imgMatch[1] : undefined;
@@ -106,27 +108,29 @@ class WordPressAdapter implements CMSAdapter {
   }
 
   private async postToWordPress(content: CMSContent): Promise<void> {
-    const credentials = Buffer.from(`${this.options.username}:${this.options.applicationPassword}`).toString('base64');
-    
+    const credentials = Buffer.from(
+      `${this.options.username}:${this.options.applicationPassword}`,
+    ).toString("base64");
+
     await fetch(`${this.options.apiUrl}/wp-json/wp/v2/posts`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/json',
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         title: content.title,
         content: content.body,
         excerpt: content.excerpt,
-        status: this.options.defaultStatus || 'draft',
+        status: this.options.defaultStatus || "draft",
       }),
     });
   }
 }
 
 class ContentfulAdapter implements CMSAdapter {
-  name = 'contentful';
-  version = '1.0.0';
+  name = "contentful";
+  version = "1.0.0";
   private options: ContentfulOptions;
 
   constructor(options: ContentfulOptions) {
@@ -139,7 +143,7 @@ class ContentfulAdapter implements CMSAdapter {
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const extracted = this.extractContent(content);
-    
+
     if (this.options.accessToken) {
       await this.postToContentful(extracted);
     }
@@ -149,11 +153,11 @@ class ContentfulAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     return {
@@ -163,19 +167,19 @@ class ContentfulAdapter implements CMSAdapter {
   }
 
   private async postToContentful(content: CMSContent): Promise<void> {
-    const url = `https://api.contentful.com/spaces/${this.options.spaceId}/environments/${this.options.environment || 'master'}/entries`;
-    
+    const url = `https://api.contentful.com/spaces/${this.options.spaceId}/environments/${this.options.environment || "master"}/entries`;
+
     await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.options.accessToken}`,
-        'Content-Type': 'application/vnd.contentful.management.v1+json',
-        'X-Contentful-Content-Type': this.options.contentTypeId || 'article',
+        Authorization: `Bearer ${this.options.accessToken}`,
+        "Content-Type": "application/vnd.contentful.management.v1+json",
+        "X-Contentful-Content-Type": this.options.contentTypeId || "article",
       },
       body: JSON.stringify({
         fields: {
-          title: { 'en-US': content.title },
-          body: { 'en-US': content.body },
+          title: { "en-US": content.title },
+          body: { "en-US": content.body },
         },
       }),
     });
@@ -183,8 +187,8 @@ class ContentfulAdapter implements CMSAdapter {
 }
 
 class StrapiAdapter implements CMSAdapter {
-  name = 'strapi';
-  version = '1.0.0';
+  name = "strapi";
+  version = "1.0.0";
   private options: StrapiOptions;
 
   constructor(options: StrapiOptions) {
@@ -197,7 +201,7 @@ class StrapiAdapter implements CMSAdapter {
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const extracted = this.extractContent(content);
-    
+
     if (this.options.apiUrl && this.options.apiToken) {
       await this.postToStrapi(extracted);
     }
@@ -207,11 +211,11 @@ class StrapiAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     return {
@@ -221,13 +225,13 @@ class StrapiAdapter implements CMSAdapter {
   }
 
   private async postToStrapi(content: CMSContent): Promise<void> {
-    const collection = this.options.collection || 'articles';
-    
+    const collection = this.options.collection || "articles";
+
     await fetch(`${this.options.apiUrl}/api/${collection}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.options.apiToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.options.apiToken}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         data: {
@@ -240,8 +244,8 @@ class StrapiAdapter implements CMSAdapter {
 }
 
 class GenericAdapter implements CMSAdapter {
-  name = 'generic';
-  version = '1.0.0';
+  name = "generic";
+  version = "1.0.0";
 
   async convert(content: unknown): Promise<ConvertResultData> {
     return content as ConvertResultData;
@@ -253,11 +257,11 @@ class GenericAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     return {
@@ -280,24 +284,31 @@ export function createStrapiAdapter(options: StrapiOptions): StrapiAdapter {
 }
 
 export function createCMSAdapter(
-
-  type: 'wordpress' | 'contentful' | 'strapi' | 'ghost' | 'notion' | 'confluence' | 'gitbook' | 'generic', 
-  options: unknown
+  type:
+    | "wordpress"
+    | "contentful"
+    | "strapi"
+    | "ghost"
+    | "notion"
+    | "confluence"
+    | "gitbook"
+    | "generic",
+  options: unknown,
 ): CMSAdapter {
   switch (type) {
-    case 'wordpress':
+    case "wordpress":
       return new WordPressAdapter(options as WordPressOptions);
-    case 'contentful':
+    case "contentful":
       return new ContentfulAdapter(options as ContentfulOptions);
-    case 'strapi':
+    case "strapi":
       return new StrapiAdapter(options as StrapiOptions);
-    case 'ghost':
+    case "ghost":
       return new GhostAdapter(options as GhostOptions);
-    case 'notion':
+    case "notion":
       return new NotionAdapter(options as NotionOptions);
-    case 'confluence':
+    case "confluence":
       return new ConfluenceAdapter(options as ConfluenceOptions);
-    case 'gitbook':
+    case "gitbook":
       return new GitBookAdapter(options as GitBookOptions);
     default:
       return new GenericAdapter();

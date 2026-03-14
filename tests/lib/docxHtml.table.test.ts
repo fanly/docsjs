@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 
 function makeDocxFile(documentXml: string): Promise<File> {
@@ -8,14 +8,14 @@ function makeDocxFile(documentXml: string): Promise<File> {
   zip.file(
     "word/_rels/document.xml.rels",
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`
+    <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`,
   );
   return zip.generateAsync({ type: "uint8array" }).then((bytes) => {
     const start = bytes.byteOffset;
     const end = bytes.byteOffset + bytes.byteLength;
     return {
       name: "table.docx",
-      arrayBuffer: async () => bytes.buffer.slice(start, end)
+      arrayBuffer: async () => bytes.buffer.slice(start, end),
     } as unknown as File;
   });
 }

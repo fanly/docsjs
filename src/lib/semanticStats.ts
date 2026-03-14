@@ -16,6 +16,11 @@ export interface SemanticStats {
   pageBreakCount: number;
   pageSpacerCount: number;
   textCharCount: number;
+  bookmarkCount: number;
+  footnoteCount: number;
+  endnoteCount: number;
+  hyperlinkCount: number;
+  tableMergeCount: number;
 }
 
 function countElements(root: ParentNode, selector: string): number {
@@ -23,8 +28,12 @@ function countElements(root: ParentNode, selector: string): number {
 }
 
 function isListLikeParagraph(p: Element): boolean {
-  if (p.hasAttribute("data-word-list")) {return true;}
-  if (p.querySelector("span.__word-list-marker")) {return true;}
+  if (p.hasAttribute("data-word-list")) {
+    return true;
+  }
+  if (p.querySelector("span.__word-list-marker")) {
+    return true;
+  }
   const style = (p.getAttribute("style") ?? "").toLowerCase();
   return style.includes("mso-list");
 }
@@ -51,7 +60,12 @@ export function collectSemanticStatsFromDocument(doc: Document): SemanticStats {
     revisionDelCount: countElements(doc, '[data-word-revision="del"]'),
     pageBreakCount: countElements(doc, "[data-word-page-break='1']"),
     pageSpacerCount: countElements(doc, "[data-word-page-spacer='1']"),
-    textCharCount
+    textCharCount,
+    bookmarkCount: countElements(doc, "[data-word-bookmark-id]"),
+    footnoteCount: countElements(doc, "[data-word-footnote-id]"),
+    endnoteCount: countElements(doc, "[data-word-endnote-id]"),
+    hyperlinkCount: countElements(doc, '[data-word-hyperlink="1"]'),
+    tableMergeCount: countElements(doc, "[data-word-merge-id]"),
   };
 }
 

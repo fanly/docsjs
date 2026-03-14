@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -15,7 +15,7 @@ describe("parseDocxToHtmlSnapshot pagination precision", () => {
             <w:r><w:t>First paragraph with orphan control off</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("First paragraph");
@@ -34,7 +34,7 @@ describe("parseDocxToHtmlSnapshot pagination precision", () => {
           </w:p>
           <w:p><w:r><w:t>Next paragraph</w:t></w:r></w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("Keep with next");
@@ -52,7 +52,7 @@ describe("parseDocxToHtmlSnapshot pagination precision", () => {
             <w:r><w:t>Keep lines together</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("Keep lines together");
@@ -72,7 +72,7 @@ describe("parseDocxToHtmlSnapshot pagination precision", () => {
             </w:tr>
           </w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("Row 1");
@@ -94,7 +94,7 @@ describe("parseDocxToHtmlSnapshot pagination precision", () => {
             </w:tr>
           </w:tbl>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
     const html = await parseDocxToHtmlSnapshot(file);
     expect(html).toContain("<table");

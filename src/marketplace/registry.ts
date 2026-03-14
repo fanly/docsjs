@@ -1,33 +1,40 @@
 /**
  * Plugin Marketplace Infrastructure
- * 
+ *
  * Core systems for managing community and commercial plugins.
  */
 
-import type { EnginePlugin, PluginPermissions, PluginMetadata, PluginManifest, InstalledPlugin, PluginVerification } from '../types/plugins';
+import type {
+  EnginePlugin,
+  PluginPermissions,
+  PluginMetadata,
+  PluginManifest,
+  InstalledPlugin,
+  PluginVerification,
+} from "../types/plugins";
 
-export interface PluginRegistryConfig {
+export type PluginRegistryConfig = {
   /** Enable plugin installation/removal */
   allowInstall: boolean;
-  
+
   /** Security policy for unsigned plugins */
   allowUnsigned: boolean;
-  
+
   /** Auto-update policy */
   autoUpdate: boolean;
-  
+
   /** Trusted publisher verification */
   trustedPublishers: string[];
-  
+
   /** Plugin performance limits */
   performanceLimits: {
     maxInstallationSizeMB: number;
     maxMemoryPerPluginMB: number;
     maxCpuTimePerPluginSec: number;
   };
-}
+};
 
-export interface PluginInstallResult {
+export type PluginInstallResult = {
   success: boolean;
   error?: string;
   plugin: EnginePlugin;
@@ -37,9 +44,9 @@ export interface PluginInstallResult {
     securityScanPassed: boolean;
     performanceCompliant: boolean;
   };
-}
+};
 
-export interface MarketplaceEntry {
+export type MarketplaceEntry = {
   id: string;
   version: string;
   name: string;
@@ -56,14 +63,14 @@ export interface MarketplaceEntry {
     maxEngineVersion: string;
   };
   pricing?: {
-    type: 'free' | 'freemium' | 'commercial' | 'open-core';
+    type: "free" | "freemium" | "commercial" | "open-core";
     priceUSD?: number;
   };
-}
+};
 
 /**
  * Secure Plugin Registry
- * 
+ *
  * Handles download, verification, and management of plugins from marketplace.
  */
 export class SecurePluginRegistry {
@@ -76,13 +83,13 @@ export class SecurePluginRegistry {
       allowInstall: true,
       allowUnsigned: false,
       autoUpdate: true,
-      trustedPublishers: ['@coding01', '@docsjs-org', '@community'],
+      trustedPublishers: ["@coding01", "@docsjs-org", "@community"],
       performanceLimits: {
         maxInstallationSizeMB: 10,
         maxMemoryPerPluginMB: 20,
-        maxCpuTimePerPluginSec: 10
+        maxCpuTimePerPluginSec: 10,
       },
-      ...config
+      ...config,
     };
 
     // Pre-populate with known publisher keys in production
@@ -95,42 +102,42 @@ export class SecurePluginRegistry {
     try {
       // 1. Locate plugin in marketplace
       const entry = await this.fetchPluginEntry(pluginId, version);
-      
+
       // 2. Verify plugin authenticity and security
       const verification = await this.verifyPlugin(entry);
       if (!verification.signatureValid || !verification.securityScanPassed) {
         return {
           success: false,
-          error: `Plugin verification failed: ${verification.securityScanPassed ? 'signature issue' : 'security scan failed'}`,
+          error: `Plugin verification failed: ${verification.securityScanPassed ? "signature issue" : "security scan failed"}`,
           plugin: null!,
-          verification
+          verification,
         };
       }
-      
+
       // 3. Download and unpack plugin
       const pluginArchive = await this.downloadPlugin(entry);
-      
+
       // 4. Validate against performance and security limits
       if (!this.validatePluginArchive(pluginArchive)) {
         return {
           success: false,
-          error: 'Plugin violates performance or security constraints',
+          error: "Plugin violates performance or security constraints",
           plugin: null!,
-          verification
+          verification,
         };
       }
-      
+
       // 5. Install to secure location
       const installPath = await this.installToSecureLocation(pluginArchive, entry);
-      
+
       // 6. Load and register plugin
       const plugin = await this.loadPluginFromDisk(installPath);
       this.plugins.set(pluginId, plugin);
-      
+
       return {
         success: true,
         plugin,
-        verification
+        verification,
       };
     } catch (error) {
       return {
@@ -141,28 +148,30 @@ export class SecurePluginRegistry {
           signatureValid: false,
           publisherTrusted: false,
           securityScanPassed: false,
-          performanceCompliant: false
-        }
+          performanceCompliant: false,
+        },
       };
     }
   }
 
   async uninstall(pluginId: string): Promise<boolean> {
     const plugin = this.plugins.get(pluginId);
-    if (!plugin) {return false;}
-    
+    if (!plugin) {
+      return false;
+    }
+
     try {
       // Notify plugin to cleanup resources
       if (plugin.cleanup) {
-        await plugin.cleanup();
+        await Promise.resolve(plugin.cleanup());
       }
-      
+
       // Remove from registry
       this.plugins.delete(pluginId);
-      
+
       // Delete from file system (security)
       await this.deletePluginFiles(plugin);
-      
+
       return true;
     } catch (error) {
       console.error(`Failed to uninstall plugin ${pluginId}:`, error);
@@ -171,14 +180,15 @@ export class SecurePluginRegistry {
   }
 
   listInstalled(): string[] {
-    return Array.from(this.plugins.keys())
-      .filter(id => this.plugins.get(id)?.installed);
+    return Array.from(this.plugins.keys()).filter((id) => this.plugins.get(id)?.installed);
   }
 
   getPluginMetadata(pluginId: string): PluginMetadata | undefined {
     const plugin = this.plugins.get(pluginId);
-    if (!plugin) {return undefined;}
-    
+    if (!plugin) {
+      return undefined;
+    }
+
     return {
       id: pluginId,
       name: plugin.name,
@@ -188,71 +198,90 @@ export class SecurePluginRegistry {
       installed: plugin.installed,
       enabled: plugin.enabled,
       permissions: plugin.permissions,
-      compatibility: (plugin.manifest?.compatibility || []).join(','),
-      metrics: plugin.metrics
+      compatibility: (plugin.manifest?.compatibility || []).join(","),
+      metrics: plugin.metrics,
     };
   }
 
   /**
    * Get trusted plugins for specific security level
    */
-  getTrustedPlugins(minTrustLevel: 'unsigned' | 'signed' | 'verified' | 'enterprise'): EnginePlugin[] {
+  getTrustedPlugins(
+    minTrustLevel: "unsigned" | "signed" | "verified" | "enterprise",
+  ): EnginePlugin[] {
     const levelThreshold = this.trustLevelToScore(minTrustLevel);
-    
+
     return Array.from(this.plugins.values())
-      .filter(plugin => this.calculateTrustScore(plugin) >= levelThreshold)
-      .map(p => p.plugin);
+      .filter((plugin) => this.calculateTrustScore(plugin) >= levelThreshold)
+      .map((p) => p.plugin);
   }
 
   private trustLevelToScore(level: string): number {
-    return level === 'enterprise' ? 400 :
-           level === 'verified' ? 300 : 
-           level === 'signed' ? 200 : 100;
+    return level === "enterprise"
+      ? 400
+      : level === "verified"
+        ? 300
+        : level === "signed"
+          ? 200
+          : 100;
   }
 
   private calculateTrustScore(plugin: InstalledPlugin): number {
     let score = 0;
-    
-    if (plugin.verified) {score += 200;}
-    if (plugin.signatureValid) {score += 100;}
-    if (this.config.trustedPublishers.includes(plugin.publisher)) {score += 150;}
-    if (plugin.rating > 4.0) {score += 50;}
-    
+
+    if (plugin.verified) {
+      score += 200;
+    }
+    if (plugin.signatureValid) {
+      score += 100;
+    }
+    if (this.config.trustedPublishers.includes(plugin.publisher)) {
+      score += 150;
+    }
+    if (plugin.rating > 4.0) {
+      score += 50;
+    }
+
     return score;
   }
 
   private async fetchPluginEntry(pluginId: string, version?: string): Promise<MarketplaceEntry> {
     // This would fetch from marketplace API
-    const url = version 
-      ? `https://marketplace.docsjs.org/api/plugins/${pluginId}/${version}`  
+    const url = version
+      ? `https://marketplace.docsjs.org/api/plugins/${pluginId}/${version}`
       : `https://marketplace.docsjs.org/api/plugins/${pluginId}/latest`;
 
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Plugin not found: ${pluginId}@${version || 'latest'}`);
+      throw new Error(`Plugin not found: ${pluginId}@${version || "latest"}`);
     }
-    
+
     return response.json();
   }
 
-  private async verifyPlugin(entry: MarketplaceEntry): Promise<{ signatureValid: boolean; publisherTrusted: boolean; securityScanPassed: boolean; performanceCompliant: boolean }> {
+  private async verifyPlugin(entry: MarketplaceEntry): Promise<{
+    signatureValid: boolean;
+    publisherTrusted: boolean;
+    securityScanPassed: boolean;
+    performanceCompliant: boolean;
+  }> {
     // Check signature validity
     const signatureValid = await this.verifySignature(entry);
-    
-    // Check publisher is trusted  
+
+    // Check publisher is trusted
     const publisherTrusted = this.config.trustedPublishers.includes(entry.publisher);
-    
-    // Check security scan (simplified) 
+
+    // Check security scan (simplified)
     const securityScanPassed = await this.performSecurityScan(entry);
-    
+
     // Check performance compliance
     const performanceCompliant = this.validatePerformanceCharacteristics(entry);
-    
+
     return {
       signatureValid,
       publisherTrusted,
       securityScanPassed,
-      performanceCompliant
+      performanceCompliant,
     };
   }
 
@@ -260,7 +289,7 @@ export class SecurePluginRegistry {
     if (!entry.manifest.signature) {
       return !this.config.allowUnsigned;
     }
-    
+
     // Real implementation would verify cryptographic signature
     // This is simplified for now
     return true;
@@ -269,24 +298,25 @@ export class SecurePluginRegistry {
   private async performSecurityScan(entry: MarketplaceEntry): Promise<boolean> {
     // Check the plugin manifest for potentially dangerous capabilities
     const manifest = entry.manifest;
-    
+
     // Verify permissions are reasonable
-    if (manifest.permissions?.network && 
-        !(entry as any).publisher?.includes('@official') && 
-        !this.config.trustedPublishers.includes(entry.publisher)) {
+    if (
+      manifest.permissions?.network &&
+      !(entry as any).publisher?.includes("@official") &&
+      !this.config.trustedPublishers.includes(entry.publisher)
+    ) {
       return false; // Untrusted publishers shouldn't access network by default
     }
-    
+
     // Check no dangerous file access patterns
-    if (manifest.permissions?.read?.includes('/') || 
-        manifest.permissions?.read?.includes('..')) {
+    if (manifest.permissions?.read?.includes("/") || manifest.permissions?.read?.includes("..")) {
       return false; // Dangerous path access
     }
-    
+
     if (manifest.permissions?.compute?.maxMemoryMB > 100) {
       return false; // Excessive memory request
     }
-    
+
     return true;
   }
 
@@ -294,8 +324,10 @@ export class SecurePluginRegistry {
     // Check if plugin meets performance criteria
     return (
       (entry.manifest.sizeMB ?? 0) <= this.config.performanceLimits.maxInstallationSizeMB &&
-      (entry.manifest.permissions?.compute?.maxMemoryMB ?? 0) <= this.config.performanceLimits.maxMemoryPerPluginMB &&
-      (entry.manifest.permissions?.compute?.maxCpuSecs ?? 0) <= this.config.performanceLimits.maxCpuTimePerPluginSec
+      (entry.manifest.permissions?.compute?.maxMemoryMB ?? 0) <=
+        this.config.performanceLimits.maxMemoryPerPluginMB &&
+      (entry.manifest.permissions?.compute?.maxCpuSecs ?? 0) <=
+        this.config.performanceLimits.maxCpuTimePerPluginSec
     );
   }
 
@@ -305,19 +337,25 @@ export class SecurePluginRegistry {
     if (!response.ok) {
       throw new Error(`Failed to download plugin ${entry.id}`);
     }
-    
+
     return new Uint8Array(await response.arrayBuffer());
   }
 
   private validatePluginArchive(archive: Uint8Array): boolean {
     // Validate archive format and size before installation
-    return archive.length > 0 && archive.length < (this.config.performanceLimits.maxInstallationSizeMB * 1024 * 1024);
+    return (
+      archive.length > 0 &&
+      archive.length < this.config.performanceLimits.maxInstallationSizeMB * 1024 * 1024
+    );
   }
 
-  private async installToSecureLocation(archive: Uint8Array, entry: MarketplaceEntry): Promise<string> {
+  private async installToSecureLocation(
+    archive: Uint8Array,
+    entry: MarketplaceEntry,
+  ): Promise<string> {
     // Install to application's protected plugin directory
     const installPath = this.getSecurePluginPath(entry.id, entry.version);
-    
+
     // In real implementation, would securely extract and install package
     // For now returning the mock path
     return installPath;
@@ -333,19 +371,19 @@ export class SecurePluginRegistry {
     // Actually load and initialize the plugin (mock for now)
     // Implementation would vary whether we're in browser vs Node
     return {
-      id: path.split('/')[3],
-      name: path.split('/')[3] || 'unknown',
-      version: '1.0.0',
+      id: path.split("/")[3],
+      name: path.split("/")[3] || "unknown",
+      version: "1.0.0",
       path: path,
       plugin: {} as EnginePlugin,
       installed: true,
       enabled: true,
       verified: false,
       signatureValid: false,
-      publisher: 'unknown',
+      publisher: "unknown",
       rating: 0,
       metrics: { downloads: 0 },
-      manifest: { name: "plugin", version: "1.0.0" } as any
+      manifest: { name: "plugin", version: "1.0.0" } as any,
     };
   }
 
@@ -358,7 +396,7 @@ export class SecurePluginRegistry {
 
 /**
  * Mock marketplace API simulator
- * 
+ *
  * In real implementation, this would connect to actual backend
  */
 export class MarketplaceAPISimulator {
@@ -371,135 +409,146 @@ export class MarketplaceAPISimulator {
 
   private initializeExamplePlugins(): void {
     // MathML enhanced processing plugin
-    this.listings.set('math-enhancer', {
-      id: 'math-enhancer',
-      version: '1.2.0',
-      name: 'MathML Enhancer',
-      description: 'Advanced MathML layout preservation',
-      author: 'MathML Consortium',
-      publisher: '@community',
-      tags: ['math', 'fidelity', 'formatting'],
+    this.listings.set("math-enhancer", {
+      id: "math-enhancer",
+      version: "1.2.0",
+      name: "MathML Enhancer",
+      description: "Advanced MathML layout preservation",
+      author: "MathML Consortium",
+      publisher: "@community",
+      tags: ["math", "fidelity", "formatting"],
       rating: 4.8,
       downloads: 12500,
-      lastUpdated: '2024-02-25',
-      manifest: { name: "plugin", version: "1.0.0",
+      lastUpdated: "2024-02-25",
+      manifest: {
+        name: "plugin",
+        version: "1.0.0",
         permissions: {
-          read: ['.'],
-          write: ['.'],
+          read: ["."],
+          write: ["."],
           network: false,
           compute: { maxThreads: 1, maxMemoryMB: 15, maxCpuSecs: 5 },
-          ast: { 
-            canModifySemantics: false, 
-            canAccessOriginal: true, 
-            canExportRawAst: false
+          ast: {
+            canModifySemantics: false,
+            canAccessOriginal: true,
+            canExportRawAst: false,
           },
           export: { canGenerateFiles: true, canUpload: false },
-          misc: { allowUnsafeCode: false }
+          misc: { allowUnsafeCode: false },
         },
-        supportedHooks: ['afterParse', 'beforeRender'] as const,
+        supportedHooks: ["afterParse", "beforeRender"] as const,
         sizeMB: 2.3,
-        signature: 'mock-signature-here'
+        signature: "mock-signature-here",
       },
       compatibility: {
-        minEngineVersion: '2.0.0',
-        maxEngineVersion: '3.0.0'
+        minEngineVersion: "2.0.0",
+        maxEngineVersion: "3.0.0",
       },
-      pricing: { type: 'free' }
+      pricing: { type: "free" },
     });
 
     // Table layout optimization plugin
-    this.listings.set('table-optimizer', {
-      id: 'table-optimizer',
-      version: '2.1.0',
-      name: 'Table Layout Optimizer',
-      description: 'Preserves table structure, formatting, and layout',
-      author: 'Format Optimization Group',
-      publisher: '@community',
-      tags: ['tables', 'layout', 'formatting'],
+    this.listings.set("table-optimizer", {
+      id: "table-optimizer",
+      version: "2.1.0",
+      name: "Table Layout Optimizer",
+      description: "Preserves table structure, formatting, and layout",
+      author: "Format Optimization Group",
+      publisher: "@community",
+      tags: ["tables", "layout", "formatting"],
       rating: 4.6,
       downloads: 8500,
-      lastUpdated: '2024-02-20',
-      manifest: { name: "plugin", version: "1.0.0",
+      lastUpdated: "2024-02-20",
+      manifest: {
+        name: "plugin",
+        version: "1.0.0",
         permissions: {
-          read: ['.'],
-          write: ['.'], 
+          read: ["."],
+          write: ["."],
           network: false,
           compute: { maxThreads: 1, maxMemoryMB: 25, maxCpuSecs: 8 },
-          ast: { 
-            canModifySemantics: true,   // Needs to modify table semantics
+          ast: {
+            canModifySemantics: true, // Needs to modify table semantics
             canAccessOriginal: true,
-            canExportRawAst: false
+            canExportRawAst: false,
           },
           export: { canGenerateFiles: true, canUpload: false },
-          misc: { allowUnsafeCode: false }
+          misc: { allowUnsafeCode: false },
         },
-        supportedHooks: ['afterParse', 'beforeTransform', 'afterTransform'] as const,
+        supportedHooks: ["afterParse", "beforeTransform", "afterTransform"] as const,
         sizeMB: 4.2,
-        signature: 'mock-signature-here'
+        signature: "mock-signature-here",
       },
       compatibility: {
-        minEngineVersion: '2.0.0',
-        maxEngineVersion: '3.0.0'
+        minEngineVersion: "2.0.0",
+        maxEngineVersion: "3.0.0",
       },
-      pricing: { type: 'freemium' }
+      pricing: { type: "freemium" },
     });
 
     // Enterprise security compliance plugin
-    this.listings.set('security-compliance', {
-      id: 'security-compliance',
-      version: '1.0.0',
-      name: 'Enterprise Security Compliance',
-      description: 'Auditing, compliance checking, security enforcement',
-      author: 'Enterprise Security Solutions',
-      publisher: '@enterprise',
-      tags: ['security', 'compliance', 'audit', 'enterprise'],
+    this.listings.set("security-compliance", {
+      id: "security-compliance",
+      version: "1.0.0",
+      name: "Enterprise Security Compliance",
+      description: "Auditing, compliance checking, security enforcement",
+      author: "Enterprise Security Solutions",
+      publisher: "@enterprise",
+      tags: ["security", "compliance", "audit", "enterprise"],
       rating: 4.9,
       downloads: 450,
-      lastUpdated: '2024-02-18',
-      manifest: { name: "plugin", version: "1.0.0",
+      lastUpdated: "2024-02-18",
+      manifest: {
+        name: "plugin",
+        version: "1.0.0",
         permissions: {
-          read: ['.'],
-          write: ['.'],
+          read: ["."],
+          write: ["."],
           network: false, // No network requests for security
-          compute: { maxThreads: 1, maxMemoryMB: 40, maxCpuSecs: 15 },  // Higher for analysis
-          ast: { 
-            canModifySemantics: true,   // Can modify for sanitization
-            canAccessOriginal: true, 
-            canExportRawAst: false      // Security: no exporting raw AST
+          compute: { maxThreads: 1, maxMemoryMB: 40, maxCpuSecs: 15 }, // Higher for analysis
+          ast: {
+            canModifySemantics: true, // Can modify for sanitization
+            canAccessOriginal: true,
+            canExportRawAst: false, // Security: no exporting raw AST
           },
-          export: { 
-            canGenerateFiles: true, 
-            canUpload: false             // Security: no uploads allowed
+          export: {
+            canGenerateFiles: true,
+            canUpload: false, // Security: no uploads allowed
           },
-          misc: { allowUnsafeCode: false }
+          misc: { allowUnsafeCode: false },
         },
         supportedHooks: [
-          'beforeTransform', 'afterTransform', 
-          'beforeRender', 'afterRender'
+          "beforeTransform",
+          "afterTransform",
+          "beforeRender",
+          "afterRender",
         ] as const,
         sizeMB: 12.8,
-        signature: 'mock-enterprise-signature'
+        signature: "mock-enterprise-signature",
       },
       compatibility: {
-        minEngineVersion: '2.1.0',
-        maxEngineVersion: '3.0.0'
+        minEngineVersion: "2.1.0",
+        maxEngineVersion: "3.0.0",
       },
-      pricing: { 
-        type: 'commercial', 
-        priceUSD: 499 
-      }
+      pricing: {
+        type: "commercial",
+        priceUSD: 499,
+      },
     });
   }
 
   search(query: string): MarketplaceEntry[] {
     const allEntries = Array.from(this.listings.values());
-    
-    if (!query) {return allEntries;}
-    
-    return allEntries.filter(entry => 
-      entry.id.includes(query) ||
-      entry.name.toLowerCase().includes(query.toLowerCase()) ||
-      entry.tags.some(tag => tag.includes(query.toLowerCase()))
+
+    if (!query) {
+      return allEntries;
+    }
+
+    return allEntries.filter(
+      (entry) =>
+        entry.id.includes(query) ||
+        entry.name.toLowerCase().includes(query.toLowerCase()) ||
+        entry.tags.some((tag) => tag.includes(query.toLowerCase())),
     );
   }
 
@@ -508,13 +557,12 @@ export class MarketplaceAPISimulator {
       // Would get specific version in real API
       return this.listings.get(id);
     }
-    
+
     // Get latest version
     return this.listings.get(id);
   }
 
   getCategory(category: string): MarketplaceEntry[] {
-    return Array.from(this.listings.values())
-      .filter(entry => entry.tags.includes(category));
+    return Array.from(this.listings.values()).filter((entry) => entry.tags.includes(category));
   }
 }

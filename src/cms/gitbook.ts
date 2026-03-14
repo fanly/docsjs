@@ -1,11 +1,11 @@
 /**
  * GitBook Adapter
- * 
+ *
  * Integration with GitBook for technical documentation.
  */
 
-import type { CMSAdapter, CMSImportOptions, CMSContent } from './adapters';
-import type { ConvertResultData } from '../server/types';
+import type { CMSAdapter, CMSImportOptions, CMSContent } from "./adapters";
+import type { ConvertResultData } from "../server/types";
 
 export interface GitBookOptions extends CMSImportOptions {
   /** GitBook API token */
@@ -47,11 +47,6 @@ export interface GitBlock {
 /** @alias */
 export type GitBookBlock = GitBlock;
 
-
-
-
-
-
 export interface GitBookSpace {
   id: string;
   name: string;
@@ -68,13 +63,13 @@ export interface GitBookVersion {
 }
 
 export class GitBookAdapter implements CMSAdapter {
-  name = 'gitbook';
-  version = '1.0.0';
+  name = "gitbook";
+  version = "1.0.0";
   private options: GitBookOptions;
 
   constructor(options: GitBookOptions) {
     this.options = {
-      apiUrl: 'https://api.gitbook.com',
+      apiUrl: "https://api.gitbook.com",
       ...options,
     };
   }
@@ -82,22 +77,22 @@ export class GitBookAdapter implements CMSAdapter {
   async convert(content: unknown): Promise<ConvertResultData> {
     const page = content as GitBookPage;
     const html = this.gitbookToHtml(page);
-    
+
     return {
       output: html,
-      outputFormat: 'html',
-      profile: 'default',
-      status: 'completed',
+      outputFormat: "html",
+      profile: "default",
+      status: "completed",
     };
   }
 
   async import(content: string, options?: CMSImportOptions): Promise<CMSContent> {
     const extracted = this.extractContent(content);
-    
+
     if (this.options.spaceId) {
       await this.createGitBookPage(extracted);
     }
-    
+
     return extracted;
   }
 
@@ -105,10 +100,9 @@ export class GitBookAdapter implements CMSAdapter {
    * Get space info
    */
   async getSpace(spaceId: string): Promise<GitBookSpace> {
-    const response = await fetch(
-      `${this.options.apiUrl}/v1/spaces/${spaceId}`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.apiUrl}/v1/spaces/${spaceId}`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error(`GitBook API error: ${response.statusText}`);
@@ -121,13 +115,14 @@ export class GitBookAdapter implements CMSAdapter {
    * Get page by path
    */
   async getPage(spaceId: string, path: string): Promise<GitBookPage | null> {
-    const response = await fetch(
-      `${this.options.apiUrl}/v1/spaces/${spaceId}/content/${path}`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.apiUrl}/v1/spaces/${spaceId}/content/${path}`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
-      if (response.status === 404) {return null;}
+      if (response.status === 404) {
+        return null;
+      }
       throw new Error(`GitBook API error: ${response.statusText}`);
     }
 
@@ -143,12 +138,13 @@ export class GitBookAdapter implements CMSAdapter {
 
     do {
       const params = new URLSearchParams();
-      if (cursor) {params.set('cursor', cursor);}
+      if (cursor) {
+        params.set("cursor", cursor);
+      }
 
-      const response = await fetch(
-        `${this.options.apiUrl}/v1/spaces/${spaceId}/pages?${params}`,
-        { headers: this.getHeaders() }
-      );
+      const response = await fetch(`${this.options.apiUrl}/v1/spaces/${spaceId}/pages?${params}`, {
+        headers: this.getHeaders(),
+      });
 
       if (!response.ok) {
         throw new Error(`GitBook API error: ${response.statusText}`);
@@ -168,7 +164,7 @@ export class GitBookAdapter implements CMSAdapter {
   async search(spaceId: string, query: string): Promise<GitBookPage[]> {
     const response = await fetch(
       `${this.options.apiUrl}/v1/spaces/${spaceId}/search?q=${encodeURIComponent(query)}`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
 
     if (!response.ok) {
@@ -183,10 +179,9 @@ export class GitBookAdapter implements CMSAdapter {
    * Get versions
    */
   async getVersions(spaceId: string): Promise<GitBookVersion[]> {
-    const response = await fetch(
-      `${this.options.apiUrl}/v1/spaces/${spaceId}/versions`,
-      { headers: this.getHeaders() }
-    );
+    const response = await fetch(`${this.options.apiUrl}/v1/spaces/${spaceId}/versions`, {
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       throw new Error(`GitBook API error: ${response.statusText}`);
@@ -199,14 +194,20 @@ export class GitBookAdapter implements CMSAdapter {
   /**
    * Get specific version content
    */
-  async getVersionContent(spaceId: string, versionId: string, path: string): Promise<GitBookPage | null> {
+  async getVersionContent(
+    spaceId: string,
+    versionId: string,
+    path: string,
+  ): Promise<GitBookPage | null> {
     const response = await fetch(
       `${this.options.apiUrl}/v1/spaces/${spaceId}/versions/${versionId}/content/${path}`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
 
     if (!response.ok) {
-      if (response.status === 404) {return null;}
+      if (response.status === 404) {
+        return null;
+      }
       throw new Error(`GitBook API error: ${response.statusText}`);
     }
 
@@ -222,14 +223,11 @@ export class GitBookAdapter implements CMSAdapter {
       },
     };
 
-    const response = await fetch(
-      `${this.options.apiUrl}/v1/spaces/${this.options.spaceId}/pages`,
-      {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${this.options.apiUrl}/v1/spaces/${this.options.spaceId}/pages`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(body),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to create GitBook page: ${response.statusText}`);
@@ -240,11 +238,11 @@ export class GitBookAdapter implements CMSAdapter {
 
   private extractContent(html: string): CMSContent {
     const titleMatch = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '') : 'Untitled';
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "") : "Untitled";
 
     let body = html;
     if (titleMatch) {
-      body = body.replace(titleMatch[0], '');
+      body = body.replace(titleMatch[0], "");
     }
 
     const imgMatch = body.match(/<img[^>]+src="([^"]+)"/i);
@@ -259,56 +257,56 @@ export class GitBookAdapter implements CMSAdapter {
 
   private gitbookToHtml(page: GitBookPage): string {
     let html = `<h1>${page.title}</h1>\n`;
-    
+
     if (page.content?.nodes) {
       html += this.nodesToHtml(page.content.nodes);
     }
-    
+
     return html;
   }
 
   private nodesToHtml(nodes: GitBookBlock[]): string {
-    return nodes.map(node => this.blockToHtml(node)).join('\n');
+    return nodes.map((node) => this.blockToHtml(node)).join("\n");
   }
 
   private blockToHtml(block: GitBookBlock): string {
     switch (block.type) {
-      case 'paragraph':
+      case "paragraph":
         return `<p>${this.extractTextFromParagraph(block)}</p>`;
-      case 'heading':
+      case "heading":
         const level = (block as any).level || 1;
         return `<h${level}>${this.extractTextFromHeading(block)}</h${level}>`;
-      case 'code':
-        const code = (block as any).code || '';
-        const lang = (block as any).language || '';
+      case "code":
+        const code = (block as any).code || "";
+        const lang = (block as any).language || "";
         return `<pre><code class="language-${lang}">${code}</code></pre>`;
-      case 'list':
+      case "list":
         return this.listToHtml(block);
-      case 'image':
-        const url = (block as any).url || '';
-        const alt = (block as any).alt || '';
+      case "image":
+        const url = (block as any).url || "";
+        const alt = (block as any).alt || "";
         return `<img src="${url}" alt="${alt}" />`;
       default:
-        return '';
+        return "";
     }
   }
 
   private extractTextFromParagraph(block: any): string {
     const children = block.children || [];
-    return children.map((c: any) => c.text || '').join('');
+    return children.map((c: any) => c.text || "").join("");
   }
 
   private extractTextFromHeading(block: any): string {
     const children = block.children || [];
-    return children.map((c: any) => c.text || '').join('');
+    return children.map((c: any) => c.text || "").join("");
   }
 
   private listToHtml(block: any): string {
     const items = block.children || [];
-    const tag = (block as any).ordered ? 'ol' : 'ul';
-    const listItems = items.map((item: any) => 
-      `<li>${this.nodesToHtml(item.children || [])}</li>`
-    ).join('\n');
+    const tag = (block as any).ordered ? "ol" : "ul";
+    const listItems = items
+      .map((item: any) => `<li>${this.nodesToHtml(item.children || [])}</li>`)
+      .join("\n");
     return `<${tag}>\n${listItems}\n</${tag}>`;
   }
 
@@ -316,35 +314,35 @@ export class GitBookAdapter implements CMSAdapter {
     // Simple HTML to GitBook nodes conversion
     // This is simplified - real implementation would be more robust
     const nodes: GitBookBlock[] = [];
-    
+
     // Parse headings
     const headingMatches = html.matchAll(/<h([1-6])[^>]*>(.*?)<\/h\1>/gi);
     for (const match of headingMatches) {
       nodes.push({
         id: `heading-${nodes.length}`,
-        type: 'heading',
+        type: "heading",
         level: parseInt(match[1]),
         children: [{ text: match[2] }],
       });
     }
-    
+
     // Add remaining content as paragraph
-    const remaining = html.replace(/<h[1-6][^>]*>.*?<\/h[1-6]>/gi, '').trim();
+    const remaining = html.replace(/<h[1-6][^>]*>.*?<\/h[1-6]>/gi, "").trim();
     if (remaining) {
       nodes.push({
         id: `para-${nodes.length}`,
-        type: 'paragraph',
+        type: "paragraph",
         children: [{ text: remaining }],
       });
     }
-    
+
     return nodes;
   }
 
   private getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.options.apiToken}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.options.apiToken}`,
+      "Content-Type": "application/json",
     };
   }
 }

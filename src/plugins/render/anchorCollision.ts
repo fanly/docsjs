@@ -21,13 +21,17 @@ export function createAnchorCollisionPlugin(): TransformPlugin {
     execute() {},
 
     transform(html: string, context: PluginContext): string {
-      if (!context.config.features.anchors) {return html;}
+      if (!context.config.features.anchors) {
+        return html;
+      }
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
       const anchors = doc.querySelectorAll("img[data-word-anchor='1']");
 
-      if (anchors.length < 2) {return html;}
+      if (anchors.length < 2) {
+        return html;
+      }
 
       const anchorInfos: AnchorInfo[] = [];
       anchors.forEach((img, index) => {
@@ -50,27 +54,27 @@ export function createAnchorCollisionPlugin(): TransformPlugin {
           top,
           width,
           height,
-          zIndex
+          zIndex,
         });
       });
 
       const collisions = detectCollisions(anchorInfos);
 
       let result = html;
-      collisions.forEach(collision => {
+      collisions.forEach((collision) => {
         const imgMatches = result.match(/<img([^>]*)data-word-anchor="1"([^>]*)>/g);
         if (imgMatches && imgMatches[collision.index]) {
           const oldTag = imgMatches[collision.index];
           const newTag = oldTag.replace(
             />$/,
-            ` data-word-anchor-collision="${collision.collidesWith.join(",")}">`
+            ` data-word-anchor-collision="${collision.collidesWith.join(",")}">`,
           );
           result = result.replace(oldTag, newTag);
         }
       });
 
       return result;
-    }
+    },
   };
 }
 
@@ -82,10 +86,14 @@ function detectCollisions(anchors: AnchorInfo[]): Array<{ index: number; collide
     const collidesWith: number[] = [];
 
     for (let j = 0; j < anchors.length; j++) {
-      if (i === j) {continue;}
+      if (i === j) {
+        continue;
+      }
       const b = anchors[j];
 
-      if (a.zIndex !== b.zIndex) {continue;}
+      if (a.zIndex !== b.zIndex) {
+        continue;
+      }
 
       const horizontalOverlap = a.left < b.left + b.width && a.left + a.width > b.left;
       const verticalOverlap = a.top < b.top + b.height && a.top + a.height > b.top;

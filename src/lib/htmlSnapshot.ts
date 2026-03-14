@@ -1,4 +1,4 @@
-const SNAPSHOT_SHELL_START = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/>";
+const SNAPSHOT_SHELL_START = '<!DOCTYPE html><html><head><meta charset="utf-8"/>';
 const SNAPSHOT_SHELL_END = "</head><body></body></html>";
 
 export function buildHtmlSnapshot(rawHtml: string): string {
@@ -13,7 +13,7 @@ export function buildHtmlSnapshot(rawHtml: string): string {
 
   return `${SNAPSHOT_SHELL_START}${SNAPSHOT_SHELL_END}`.replace(
     "<body></body>",
-    `<body>${rawHtml}</body>`
+    `<body>${rawHtml}</body>`,
   );
 }
 

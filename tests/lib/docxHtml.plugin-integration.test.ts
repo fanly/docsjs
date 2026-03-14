@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshot } from "../../src/lib/docxHtml";
 import { makeDocxFile } from "./helpers/docxFactory";
 
@@ -13,7 +13,7 @@ describe("docxHtml plugin integration", () => {
             <w:r><w:t>Hello</w:t></w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
 
     const html = await parseDocxToHtmlSnapshot(file);
@@ -35,7 +35,7 @@ describe("docxHtml plugin integration", () => {
             </w:r>
           </w:p>
         </w:body>
-      </w:document>`
+      </w:document>`,
     });
 
     const html = await parseDocxToHtmlSnapshot(file);

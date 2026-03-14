@@ -25,7 +25,7 @@ const lines = [
   `version: ${version}`,
   `tests_passed: ${tests ?? "unknown"}`,
   `quality_gate: npm run verify`,
-  `gap_doc: COMPETITOR_GAP.md`
+  `gap_doc: COMPETITOR_GAP.md`,
 ];
 
 console.log(lines.join("\n"));

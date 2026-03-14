@@ -1,19 +1,21 @@
 // Core exports
 export { defineDocsWordElement, DocsWordElement } from "./core/DocsWordElement";
 
-export { collectSemanticStatsFromDocument, collectSemanticStatsFromHtml } from "./lib/semanticStats";
+export {
+  collectSemanticStatsFromDocument,
+  collectSemanticStatsFromHtml,
+} from "./lib/semanticStats";
 export { calculateFidelityScore } from "./lib/fidelityScore";
 
 export { parseDocxToHtmlSnapshot, parseDocxToHtmlSnapshotWithReport } from "./lib/docxHtml";
 export { DocxPluginPipeline, getGlobalPipeline, createPipeline } from "./lib/pluginPipeline";
 
-export type { 
+export type {
   DocsWordEditorChangeDetail,
   DocsWordEditorElementApi,
-  DocsWordEditorErrorDetail, 
-  DocsWordEditorReadyDetail
+  DocsWordEditorErrorDetail,
+  DocsWordEditorReadyDetail,
 } from "./core/types";
-
 
 export type {
   DocumentNode,
@@ -25,7 +27,7 @@ export type {
   TableNode,
   TextNode,
   HyperlinkNode,
-  ImageNode
+  ImageNode,
 } from "./ast/types";
 
 export { CoreEngine, getGlobalEngine, globalEngine } from "./engine/core";
@@ -34,7 +36,14 @@ export { PipelineManager } from "./pipeline/manager";
 
 export { ProfileManager, SYSTEM_PROFILES } from "./profiles/profile-manager";
 
-export { generateId, serializeAST, deserializeAST, cloneAST, walkAST, extractText } from "./ast/utils";
+export {
+  generateId,
+  serializeAST,
+  deserializeAST,
+  cloneAST,
+  walkAST,
+  extractText,
+} from "./ast/utils";
 
 export { parseDocxToAST } from "./parsers/docx/parser";
 
@@ -43,27 +52,57 @@ export { DocsJSServer } from "./server/server";
 export type { ServerConfig, ConvertRequest, ConvertResponse, ApiResponse } from "./server/types";
 
 // Cloud infrastructure exports
-export { DistributedQueue, BatchProcessor, CDNManager, WebhookManager, EdgeCache, createWebhookEvent } from "./cloud";
+export {
+  DistributedQueue,
+  BatchProcessor,
+  CDNManager,
+  WebhookManager,
+  EdgeCache,
+  createWebhookEvent,
+} from "./cloud";
 export { createLambdaHandler, createVercelHandler, createNetlifyHandler } from "./cloud";
-export type { ServerlessConfig, QueueMessage, BatchJob, WebhookEvent, CDNConfig, ConversionRequest, ConversionResult, RateLimitConfig } from "./cloud";
+export type {
+  ServerlessConfig,
+  QueueMessage,
+  BatchJob,
+  WebhookEvent,
+  CDNConfig,
+  ConversionRequest,
+  ConversionResult,
+  RateLimitConfig,
+} from "./cloud";
 // Enterprise exports
-export { LicenseManager, AuditLogger, SecurityManager, ComplianceManager, createEnterpriseFeatures, ComplianceFramework, ComplianceFeature, OnPremisesDeploymentManager } from "./enterprise";
-export type { LicenseInfo, LicenseValidationResult, ComplianceAuditLog, SecurityConfig } from "./enterprise";
+export {
+  LicenseManager,
+  AuditLogger,
+  SecurityManager,
+  ComplianceManager,
+  createEnterpriseFeatures,
+  ComplianceFramework,
+  ComplianceFeature,
+  OnPremisesDeploymentManager,
+} from "./enterprise";
+export type {
+  LicenseInfo,
+  LicenseValidationResult,
+  ComplianceAuditLog,
+  SecurityConfig,
+} from "./enterprise";
 
 // CMS exports
-export { 
-  createCMSAdapter, 
-  createWordPressAdapter, 
-  createContentfulAdapter, 
+export {
+  createCMSAdapter,
+  createWordPressAdapter,
+  createContentfulAdapter,
   createStrapiAdapter,
   createGhostAdapter,
   createNotionAdapter,
   createConfluenceAdapter,
-  createGitBookAdapter
+  createGitBookAdapter,
 } from "./cms";
-export type { 
-  CMSAdapter, 
-  CMSImportOptions, 
+export type {
+  CMSAdapter,
+  CMSImportOptions,
   CMSContent,
   WordPressOptions,
   ContentfulOptions,
@@ -71,7 +110,7 @@ export type {
   GhostOptions,
   NotionOptions,
   ConfluenceOptions,
-  GitBookOptions
+  GitBookOptions,
 } from "./cms";
 
 // Legacy alias
@@ -81,18 +120,18 @@ export { parseDocxToHtmlSnapshot as legacyParseDocxToHtml } from "./lib/docxHtml
 export { PluginApprovalWorkflow, ApprovalStatus } from "./marketplace/approval";
 export { PluginVersionManager, PluginCompatibilityChecker } from "./marketplace/version";
 export { PluginAnalytics, AnalyticsAggregator, EventType } from "./marketplace/analytics";
-export type { 
-  ReviewCriteria, 
-  SecurityAuditResult, 
+export type {
+  ReviewCriteria,
+  SecurityAuditResult,
   SubmissionResult,
   VersionConstraint,
   UpdateInfo,
   CompatibilityResult,
   UsageEvent,
   DashboardSummary,
-  PerformanceMetrics
+  PerformanceMetrics,
 } from "./marketplace/approval";
-export type { 
+export type {
   PluginVersion,
   PluginMetrics,
   PluginCompatibilityResult,
@@ -100,7 +139,7 @@ export type {
   PluginSearchResult,
   MarketplacePluginBrief,
   PluginSubmissionRequest,
-  PluginApprovalStatus
+  PluginApprovalStatus,
 } from "./marketplace/manager";
 
 // Editor exports
@@ -109,38 +148,46 @@ export { astToSlate, slateToAst } from "./editors/slate";
 export { astToProseMirror, proseMirrorToAst } from "./editors/prosemirror";
 
 // SSO exports
-export { SSOService, createOktaOAuth, createAzureADOAuth, createAuth0OAuth, createOktaSAML, createAzureADSAML } from "./sso";
-export type { 
-  OAuthConfig, 
-  SAMLConfig, 
-  SSOProvider, 
-  SSOSession, 
-  SSOUserProfile 
+export {
+  SSOService,
+  createOktaOAuth,
+  createAzureADOAuth,
+  createAuth0OAuth,
+  createOktaSAML,
+  createAzureADSAML,
 } from "./sso";
+export type { OAuthConfig, SAMLConfig, SSOProvider, SSOSession, SSOUserProfile } from "./sso";
 
 // Structure detection exports
 export { StructureDetector, autoDetectAndApply } from "./structure";
-export type { 
-  DocumentStructureType, 
-  StructureElement, 
-  StructureAnalysis 
-} from "./structure";
+export type { DocumentStructureType, StructureElement, StructureAnalysis } from "./structure";
 
 // Editor profiles exports
-export { EDITOR_PROFILES, getEditorProfile, listEditorProfiles, createCustomEditorProfile } from "./profiles/editor-profiles";
+export {
+  EDITOR_PROFILES,
+  getEditorProfile,
+  listEditorProfiles,
+  createCustomEditorProfile,
+} from "./profiles/editor-profiles";
 export type { EditorProfile } from "./profiles/editor-profiles";
 
 // Diff exports
 export { DocumentDiffer, diffDocuments, compareDocuments } from "./lib/diff";
-export type { DiffResult, DiffChange, ChangeHighlight, ComparisonReport, BlockDiff } from "./lib/diff";
+export type {
+  DiffResult,
+  DiffChange,
+  ChangeHighlight,
+  ComparisonReport,
+  BlockDiff,
+} from "./lib/diff";
 
 // SaaS exports
-export { 
+export {
   OrganizationManager,
   AdminManager,
   BillingManager,
   UsageBillingManager,
-  PLAN_PRICING
+  PLAN_PRICING,
 } from "./saas";
 export type {
   Organization,
@@ -158,7 +205,7 @@ export type {
   SystemHealth,
   PaymentConfig,
   PaymentIntent,
-  CheckoutSession
+  CheckoutSession,
 } from "./saas";
 
 // Embedded SDK exports
@@ -172,11 +219,16 @@ export type {
   WidgetConfig,
   WidgetInstance,
   OEMLicense,
-  LicenseValidation
+  LicenseValidation,
 } from "./embedded";
 
 // AI exports
-export { AIDocumentEngine, ExtractionEngine, AIDocumentComparison, DOCUMENT_TEMPLATES } from "./ai/advanced";
+export {
+  AIDocumentEngine,
+  ExtractionEngine,
+  AIDocumentComparison,
+  DOCUMENT_TEMPLATES,
+} from "./ai/advanced";
 export type {
   GenerationRequest,
   GenerationParams,
@@ -196,11 +248,19 @@ export type {
   DateInfo,
   LinkInfo,
   ComparisonInsight,
-  AIDiffResult
+  AIDiffResult,
 } from "./ai/advanced";
 
 export { SemanticSimilarityEngine, QualityPredictionModel, LayoutOptimizer } from "./ai/similarity";
-export type { SimilarityResult, DocumentCluster, PlagiarismResult, QualityScore, QualityComponents, LayoutAnalysis, LayoutSuggestion } from "./ai/similarity";
+export type {
+  SimilarityResult,
+  DocumentCluster,
+  PlagiarismResult,
+  QualityScore,
+  QualityComponents,
+  LayoutAnalysis,
+  LayoutSuggestion,
+} from "./ai/similarity";
 
 // Plugin economy exports
 export { PluginEconomyManager, REVENUE_SHARE } from "./marketplace/economy";
@@ -211,26 +271,74 @@ export type {
   CreatorPayout,
   CreatorAccount,
   SalesRecord,
-  Review
+  Review,
 } from "./marketplace/economy";
-
 
 // Enterprise Integration Hub
 export { IntegrationHub, createIntegration } from "./enterprise/integration";
-export type { IntegrationConfig, IntegrationType, IntegrationResult, SyncJob } from "./enterprise/integration";
+export type {
+  IntegrationConfig,
+  IntegrationType,
+  IntegrationResult,
+  SyncJob,
+} from "./enterprise/integration";
 
 // LMS exports
 export { ExamQuestionExtractor, GradeBookManager } from "./lms/academic";
-export type { ExamQuestion, QuestionBank, ExtractionResult, GradeBook, GradeEntry, GradeStatistics } from "./lms/academic";
+export type {
+  ExamQuestion,
+  QuestionBank,
+  ExtractionResult,
+  GradeBook,
+  GradeEntry,
+  GradeStatistics,
+} from "./lms/academic";
 
 // i18n Platform exports
-export { TranslationMemory, LocaleDetector, AdvancedI18n, detectContentLanguage, createTranslationMemory, createLocaleDetector, createAdvancedI18n } from "./i18n/platform";
-export type { LanguageDetectionResult, TranslationContext, GenderedTranslation } from "./i18n/platform";
+export {
+  TranslationMemory,
+  LocaleDetector,
+  AdvancedI18n,
+  detectContentLanguage,
+  createTranslationMemory,
+  createLocaleDetector,
+  createAdvancedI18n,
+} from "./i18n/platform";
+export type {
+  LanguageDetectionResult,
+  TranslationContext,
+  GenderedTranslation,
+} from "./i18n/platform";
 
 // Benchmark exports
-export { BenchmarkRunner, createBenchmarkRunner, createRegressionChecker, createStandardBenchmarkSuite } from "./lib/benchmark";
-export type { BenchmarkResult, BenchmarkSuite, BenchmarkDefinition, BenchmarkReport, BenchmarkMetrics, RegressionThreshold } from "./lib/benchmark";
+export {
+  BenchmarkRunner,
+  createBenchmarkRunner,
+  createRegressionChecker,
+  createStandardBenchmarkSuite,
+} from "./lib/benchmark";
+export type {
+  BenchmarkResult,
+  BenchmarkSuite,
+  BenchmarkDefinition,
+  BenchmarkReport,
+  BenchmarkMetrics,
+  RegressionThreshold,
+} from "./lib/benchmark";
 
 // Collaboration exports
-export { CollaborationManager, createCollaborationManager, createPresenceSystem, createLockManager } from "./collaboration";
-export type { CollaborationSession, Participant, CursorPosition, Operation, Lock, CollaborationUser, CollaborationEvent } from "./collaboration";
+export {
+  CollaborationManager,
+  createCollaborationManager,
+  createPresenceSystem,
+  createLockManager,
+} from "./collaboration";
+export type {
+  CollaborationSession,
+  Participant,
+  CursorPosition,
+  Operation,
+  Lock,
+  CollaborationUser,
+  CollaborationEvent,
+} from "./collaboration";

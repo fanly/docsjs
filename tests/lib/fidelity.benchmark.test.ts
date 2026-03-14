@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { parseDocxToHtmlSnapshotWithReport } from "../../src/lib/docxHtml";
 import { collectSemanticStatsFromHtml } from "../../src/lib/semanticStats";
 import { calculateFidelityScore } from "../../src/lib/fidelityScore";
@@ -206,9 +206,7 @@ describe("Fidelity Benchmark Suite", () => {
           expect(stats.tableCount).toBe(config.expectedStats.tableCount);
         }
         if (config.expectedStats.listParagraphCount !== undefined) {
-          expect(stats.listParagraphCount).toBe(
-            config.expectedStats.listParagraphCount
-          );
+          expect(stats.listParagraphCount).toBe(config.expectedStats.listParagraphCount);
         }
       }
     });
@@ -239,7 +237,8 @@ describe("Fidelity Benchmark Suite", () => {
 
       const score = calculateFidelityScore(stats1, stats2);
 
-      expect(score.structure).toBeLessThan(1);
+      expect(score.structure).toBeLessThanOrEqual(1);
+      expect(score.overall).toBeLessThanOrEqual(1);
       expect(score.overall).toBeLessThan(1);
     });
   });

@@ -1,6 +1,6 @@
 /**
  * Auto-structure Detection
- * 
+ *
  * Analyzes document content to automatically detect structure and recommend
  * appropriate processing profiles.
  */
@@ -10,14 +10,14 @@ import type { DocumentNode, BlockNode, ParagraphNode, HeadingNode, TextNode } fr
 /**
  * Detected document structure type
  */
-export type DocumentStructureType = 
-  | "knowledge-base"      // Technical documentation, API docs
-  | "exam-paper"         // Academic exams, quizzes
-  | "business-report"    // Corporate reports, memos
-  | "scientific-paper"   // Academic papers, research
-  | "legal-document"    // Contracts, legal docs
-  | "web-content"        // Blog posts, articles
-  | "general";           // Generic document
+export type DocumentStructureType =
+  | "knowledge-base" // Technical documentation, API docs
+  | "exam-paper" // Academic exams, quizzes
+  | "business-report" // Corporate reports, memos
+  | "scientific-paper" // Academic papers, research
+  | "legal-document" // Contracts, legal docs
+  | "web-content" // Blog posts, articles
+  | "general"; // Generic document
 
 /**
  * Detected structure element
@@ -25,16 +25,16 @@ export type DocumentStructureType =
 export interface StructureElement {
   /** Element type */
   type: "heading" | "list" | "table" | "code" | "image" | "math" | "link" | "blockquote";
-  
+
   /** Confidence score (0-1) */
   confidence: number;
-  
+
   /** Example location (node ID) */
   exampleId?: string;
-  
+
   /** Count of this element type */
   count: number;
-  
+
   /** Additional metadata */
   metadata?: Record<string, unknown>;
 }
@@ -45,48 +45,48 @@ export interface StructureElement {
 export interface StructureAnalysis {
   /** Detected structure type */
   structureType: DocumentStructureType;
-  
+
   /** Confidence in detection (0-1) */
   confidence: number;
-  
+
   /** Detected elements */
   elements: StructureElement[];
-  
+
   /** Recommended profile */
   recommendedProfile: string;
-  
+
   /** Reasoning for detection */
   reasoning: string[];
-  
+
   /** Additional metadata */
   metadata: {
     /** Total paragraphs */
     paragraphCount: number;
-    
+
     /** Total headings */
     headingCount: number;
-    
+
     /** Heading depth distribution */
     headingDepth: number[];
-    
+
     /** Has code blocks */
     hasCodeBlocks: boolean;
-    
+
     /** Has tables */
     hasTables: boolean;
-    
+
     /** Has images */
     hasImages: boolean;
-    
+
     /** Has math formulas */
     hasMathFormulas: boolean;
-    
+
     /** Has hyperlinks */
     hasHyperlinks: boolean;
-    
+
     /** Average paragraph length */
     avgParagraphLength: number;
-    
+
     /** Language hints */
     languageHints: string[];
   };
@@ -105,7 +105,7 @@ export class StructureDetector {
     const type = this.detectType(elements, stats);
     const reasoning = this.generateReasoning(type, elements, stats);
     const profile = this.recommendProfile(type.type);
-    
+
     return {
       structureType: type.type,
       confidence: type.confidence,
@@ -115,13 +115,13 @@ export class StructureDetector {
       metadata: stats,
     };
   }
-  
+
   /**
    * Detect structural elements
    */
   private detectElements(doc: DocumentNode): StructureElement[] {
     const elements: StructureElement[] = [];
-    
+
     let headingCount = 0;
     let listCount = 0;
     let tableCount = 0;
@@ -130,14 +130,16 @@ export class StructureDetector {
     let mathCount = 0;
     let linkCount = 0;
     let blockquoteCount = 0;
-    
+
     const headingIds: string[] = [];
-    
+
     this.walkAST(doc, (node) => {
       switch (node.type) {
         case "heading":
           headingCount++;
-          if (node.id) {headingIds.push(node.id);}
+          if (node.id) {
+            headingIds.push(node.id);
+          }
           break;
         case "list":
           listCount++;
@@ -162,7 +164,7 @@ export class StructureDetector {
           break;
       }
     });
-    
+
     if (headingCount > 0) {
       elements.push({
         type: "heading",
@@ -171,7 +173,7 @@ export class StructureDetector {
         exampleId: headingIds[0],
       });
     }
-    
+
     if (listCount > 0) {
       elements.push({
         type: "list",
@@ -179,7 +181,7 @@ export class StructureDetector {
         count: listCount,
       });
     }
-    
+
     if (tableCount > 0) {
       elements.push({
         type: "table",
@@ -187,7 +189,7 @@ export class StructureDetector {
         count: tableCount,
       });
     }
-    
+
     if (codeCount > 0) {
       elements.push({
         type: "code",
@@ -196,7 +198,7 @@ export class StructureDetector {
         metadata: { languages: this.detectCodeLanguages(doc) },
       });
     }
-    
+
     if (imageCount > 0) {
       elements.push({
         type: "image",
@@ -204,7 +206,7 @@ export class StructureDetector {
         count: imageCount,
       });
     }
-    
+
     if (mathCount > 0) {
       elements.push({
         type: "math",
@@ -212,7 +214,7 @@ export class StructureDetector {
         count: mathCount,
       });
     }
-    
+
     if (linkCount > 0) {
       elements.push({
         type: "link",
@@ -221,7 +223,7 @@ export class StructureDetector {
         metadata: { externalLinks: this.countExternalLinks(doc) },
       });
     }
-    
+
     if (blockquoteCount > 0) {
       elements.push({
         type: "blockquote",
@@ -229,10 +231,10 @@ export class StructureDetector {
         count: blockquoteCount,
       });
     }
-    
+
     return elements;
   }
-  
+
   /**
    * Calculate document statistics
    */
@@ -248,14 +250,14 @@ export class StructureDetector {
     let totalTextLength = 0;
     let textNodeCount = 0;
     const languageHints: string[] = [];
-    
+
     this.walkAST(doc, (node) => {
       if (node.type === "paragraph") {
         paragraphCount++;
         const text = this.extractText(node);
         totalTextLength += text.length;
         textNodeCount++;
-        
+
         // Detect language hints
         if (this.looksLikeCode(text)) {
           languageHints.push("code");
@@ -266,7 +268,7 @@ export class StructureDetector {
           hasMathFormulas = true;
         }
       }
-      
+
       if (node.type === "heading") {
         headingCount++;
         const h = node as HeadingNode;
@@ -274,12 +276,18 @@ export class StructureDetector {
           headingDepth[h.level - 1]++;
         }
       }
-      
-      if (node.type === "table") {hasTables = true;}
-      if (node.type === "image") {hasImages = true;}
-      if (node.type === "hyperlink") {hasHyperlinks = true;}
+
+      if (node.type === "table") {
+        hasTables = true;
+      }
+      if (node.type === "image") {
+        hasImages = true;
+      }
+      if (node.type === "hyperlink") {
+        hasHyperlinks = true;
+      }
     });
-    
+
     return {
       paragraphCount,
       headingCount,
@@ -293,13 +301,13 @@ export class StructureDetector {
       languageHints: [...new Set(languageHints)],
     };
   }
-  
+
   /**
    * Detect document type based on elements and stats
    */
   private detectType(
-    elements: StructureElement[], 
-    stats: StructureAnalysis["metadata"]
+    elements: StructureElement[],
+    stats: StructureAnalysis["metadata"],
   ): { type: DocumentStructureType; confidence: number } {
     const scores: Record<DocumentStructureType, number> = {
       "knowledge-base": 0,
@@ -308,105 +316,165 @@ export class StructureDetector {
       "scientific-paper": 0,
       "legal-document": 0,
       "web-content": 0,
-      "general": 0.1,
+      general: 0.1,
     };
-    
+
     // Knowledge base detection
-    if (stats.hasCodeBlocks) {scores["knowledge-base"] += 0.4;}
-    if (stats.hasTables) {scores["knowledge-base"] += 0.2;}
-    if (this.hasMultipleHeadingLevels(stats.headingDepth)) {scores["knowledge-base"] += 0.2;}
-    if (elements.find(e => e.type === "heading" && e.count > 5)) {scores["knowledge-base"] += 0.2;}
-    
+    if (stats.hasCodeBlocks) {
+      scores["knowledge-base"] += 0.4;
+    }
+    if (stats.hasTables) {
+      scores["knowledge-base"] += 0.2;
+    }
+    if (this.hasMultipleHeadingLevels(stats.headingDepth)) {
+      scores["knowledge-base"] += 0.2;
+    }
+    if (elements.find((e) => e.type === "heading" && e.count > 5)) {
+      scores["knowledge-base"] += 0.2;
+    }
+
     // Exam paper detection
-    if (elements.find(e => e.type === "list" && e.count > 3)) {scores["exam-paper"] += 0.3;}
-    if (stats.hasTables && !stats.hasImages) {scores["exam-paper"] += 0.2;}
-    if (this.hasShortParagraphs(stats.avgParagraphLength)) {scores["exam-paper"] += 0.3;}
-    if (this.containsNumberedQuestions(stats)) {scores["exam-paper"] += 0.3;}
-    
+    if (elements.find((e) => e.type === "list" && e.count > 3)) {
+      scores["exam-paper"] += 0.3;
+    }
+    if (stats.hasTables && !stats.hasImages) {
+      scores["exam-paper"] += 0.2;
+    }
+    if (this.hasShortParagraphs(stats.avgParagraphLength)) {
+      scores["exam-paper"] += 0.3;
+    }
+    if (this.containsNumberedQuestions(stats)) {
+      scores["exam-paper"] += 0.3;
+    }
+
     // Business report detection
-    if (stats.hasTables) {scores["business-report"] += 0.3;}
-    if (stats.hasImages) {scores["business-report"] += 0.2;}
-    if (elements.find(e => e.type === "heading")?.count && 
-        elements.find(e => e.type === "heading")!.count < 10) {scores["business-report"] += 0.2;}
-    if (elements.find(e => e.type === "blockquote")) {scores["business-report"] += 0.1;}
-    
+    if (stats.hasTables) {
+      scores["business-report"] += 0.3;
+    }
+    if (stats.hasImages) {
+      scores["business-report"] += 0.2;
+    }
+    if (
+      elements.find((e) => e.type === "heading")?.count &&
+      elements.find((e) => e.type === "heading")!.count < 10
+    ) {
+      scores["business-report"] += 0.2;
+    }
+    if (elements.find((e) => e.type === "blockquote")) {
+      scores["business-report"] += 0.1;
+    }
+
     // Scientific paper detection
-    if (stats.hasMathFormulas) {scores["scientific-paper"] += 0.5;}
-    if (stats.hasTables && stats.hasImages) {scores["scientific-paper"] += 0.3;}
-    if (this.hasAcademicHeadings(stats.headingDepth)) {scores["scientific-paper"] += 0.2;}
-    
+    if (stats.hasMathFormulas) {
+      scores["scientific-paper"] += 0.5;
+    }
+    if (stats.hasTables && stats.hasImages) {
+      scores["scientific-paper"] += 0.3;
+    }
+    if (this.hasAcademicHeadings(stats.headingDepth)) {
+      scores["scientific-paper"] += 0.2;
+    }
+
     // Legal document detection
-    if (this.containsLegalPhrases(stats)) {scores["legal-document"] += 0.5;}
-    if (!stats.hasCodeBlocks && !stats.hasMathFormulas && 
-        stats.paragraphCount > 20) {scores["legal-document"] += 0.2;}
-    
+    if (this.containsLegalPhrases(stats)) {
+      scores["legal-document"] += 0.5;
+    }
+    if (!stats.hasCodeBlocks && !stats.hasMathFormulas && stats.paragraphCount > 20) {
+      scores["legal-document"] += 0.2;
+    }
+
     // Web content detection
-    if (stats.hasHyperlinks && !stats.hasTables) {scores["web-content"] += 0.3;}
-    if (!stats.hasCodeBlocks && !stats.hasTables && 
-        stats.avgParagraphLength < 200) {scores["web-content"] += 0.3;}
-    if (!stats.hasMathFormulas) {scores["web-content"] += 0.1;}
-    
+    if (stats.hasHyperlinks && !stats.hasTables) {
+      scores["web-content"] += 0.3;
+    }
+    if (!stats.hasCodeBlocks && !stats.hasTables && stats.avgParagraphLength < 200) {
+      scores["web-content"] += 0.3;
+    }
+    if (!stats.hasMathFormulas) {
+      scores["web-content"] += 0.1;
+    }
+
     // Find highest score
     let maxType: DocumentStructureType = "general";
     let maxScore = 0;
-    
+
     for (const [type, score] of Object.entries(scores)) {
       if (score > maxScore) {
         maxScore = score;
         maxType = type as DocumentStructureType;
       }
     }
-    
+
     const confidence = Math.min(0.95, maxScore);
-    
+
     return { type: maxType, confidence };
   }
-  
+
   /**
    * Generate reasoning for detection
    */
   private generateReasoning(
     type: { type: DocumentStructureType; confidence: number },
     elements: StructureElement[],
-    stats: StructureAnalysis["metadata"]
+    stats: StructureAnalysis["metadata"],
   ): string[] {
     const reasoning: string[] = [];
-    
+
     switch (type.type) {
       case "knowledge-base":
-        if (stats.hasCodeBlocks) {reasoning.push("Contains code blocks indicating technical documentation");}
-        if (elements.find(e => e.type === "heading" && e.count > 5)) {reasoning.push("Multiple headings suggest structured documentation");}
+        if (stats.hasCodeBlocks) {
+          reasoning.push("Contains code blocks indicating technical documentation");
+        }
+        if (elements.find((e) => e.type === "heading" && e.count > 5)) {
+          reasoning.push("Multiple headings suggest structured documentation");
+        }
         break;
       case "exam-paper":
-        if (elements.find(e => e.type === "list" && e.count > 3)) {reasoning.push("Multiple lists suggest questions or exercises");}
-        if (this.hasShortParagraphs(stats.avgParagraphLength)) {reasoning.push("Short paragraphs suggest questions or answers");}
+        if (elements.find((e) => e.type === "list" && e.count > 3)) {
+          reasoning.push("Multiple lists suggest questions or exercises");
+        }
+        if (this.hasShortParagraphs(stats.avgParagraphLength)) {
+          reasoning.push("Short paragraphs suggest questions or answers");
+        }
         break;
       case "business-report":
-        if (stats.hasTables) {reasoning.push("Contains tables typical of business reports");}
-        if (stats.hasImages) {reasoning.push("Contains images typical of business documents");}
+        if (stats.hasTables) {
+          reasoning.push("Contains tables typical of business reports");
+        }
+        if (stats.hasImages) {
+          reasoning.push("Contains images typical of business documents");
+        }
         break;
       case "scientific-paper":
-        if (stats.hasMathFormulas) {reasoning.push("Contains mathematical formulas");}
-        if (stats.hasTables && stats.hasImages) {reasoning.push("Contains tables and figures typical of academic papers");}
+        if (stats.hasMathFormulas) {
+          reasoning.push("Contains mathematical formulas");
+        }
+        if (stats.hasTables && stats.hasImages) {
+          reasoning.push("Contains tables and figures typical of academic papers");
+        }
         break;
       case "legal-document":
         reasoning.push("Document structure consistent with legal contracts");
         break;
       case "web-content":
-        if (stats.hasHyperlinks) {reasoning.push("Contains hyperlinks suggesting web content");}
-        if (stats.avgParagraphLength < 200) {reasoning.push("Short paragraphs typical of blog posts");}
+        if (stats.hasHyperlinks) {
+          reasoning.push("Contains hyperlinks suggesting web content");
+        }
+        if (stats.avgParagraphLength < 200) {
+          reasoning.push("Short paragraphs typical of blog posts");
+        }
         break;
       default:
         reasoning.push("No specific structure detected, using general profile");
     }
-    
+
     if (type.confidence < 0.5) {
       reasoning.push("Low confidence - consider manually selecting a profile");
     }
-    
+
     return reasoning;
   }
-  
+
   /**
    * Recommend profile based on detected type
    */
@@ -418,29 +486,32 @@ export class StructureDetector {
       "scientific-paper": "scientific-paper",
       "legal-document": "enterprise",
       "web-content": "default",
-      "general": "default",
+      general: "default",
     };
-    
+
     return profileMap[type];
   }
-  
+
   /**
    * Walk AST and apply function to each node
    */
-  private walkAST(doc: DocumentNode, fn: (node: BlockNode | ParagraphNode | HeadingNode | any) => void): void {
+  private walkAST(
+    doc: DocumentNode,
+    fn: (node: BlockNode | ParagraphNode | HeadingNode | any) => void,
+  ): void {
     for (const section of doc.children) {
       for (const block of section.children) {
         fn(block);
-        
+
         // Walk children
-        if ('children' in block && block.children) {
+        if ("children" in block && block.children) {
           for (const child of block.children) {
             fn(child);
           }
         }
-        
+
         // Walk table cells
-        
+
         // Walk table cells
         if (block.type === "table" && (block as any).rows) {
           for (const row of (block as any).rows) {
@@ -451,7 +522,7 @@ export class StructureDetector {
             }
           }
         }
-        
+
         // Walk list items
         if (block.type === "list" && (block as any).items) {
           for (const item of (block as any).items) {
@@ -463,20 +534,20 @@ export class StructureDetector {
       }
     }
   }
-  
+
   /**
    * Extract text from paragraph
    */
   private extractText(node: BlockNode): string {
     if ("children" in node && node.children) {
       return node.children
-        .filter(c => c.type === "text")
-        .map(c => (c as TextNode).text)
+        .filter((c) => c.type === "text")
+        .map((c) => (c as TextNode).text)
         .join("");
     }
     return "";
   }
-  
+
   /**
    * Detect code languages
    */
@@ -489,7 +560,7 @@ export class StructureDetector {
     });
     return [...new Set(languages)];
   }
-  
+
   /**
    * Count external links
    */
@@ -505,25 +576,27 @@ export class StructureDetector {
     });
     return count;
   }
-  
+
   /**
    * Check if document has multiple heading levels
    */
   private hasMultipleHeadingLevels(depths: number[]): boolean {
     let levelsWithHeadings = 0;
     for (const d of depths) {
-      if (d > 0) {levelsWithHeadings++;}
+      if (d > 0) {
+        levelsWithHeadings++;
+      }
     }
     return levelsWithHeadings >= 3;
   }
-  
+
   /**
    * Check if paragraphs are short (typical of exams)
    */
   private hasShortParagraphs(avgLength: number): boolean {
     return avgLength > 0 && avgLength < 100;
   }
-  
+
   /**
    * Check for numbered questions (exam detection)
    */
@@ -531,16 +604,16 @@ export class StructureDetector {
     // This would need raw text access - simplified for now
     return false;
   }
-  
+
   /**
    * Check for academic heading patterns
    */
   private hasAcademicHeadings(depths: number[]): boolean {
     // Academic papers typically have multiple levels used
-    const usedLevels = depths.filter(d => d > 0).length;
+    const usedLevels = depths.filter((d) => d > 0).length;
     return usedLevels >= 2;
   }
-  
+
   /**
    * Check for legal document phrases
    */
@@ -548,7 +621,7 @@ export class StructureDetector {
     // Would need actual text content - placeholder
     return false;
   }
-  
+
   /**
    * Check if text looks like code
    */
@@ -559,10 +632,10 @@ export class StructureDetector {
       /^\s*(def|class|import|from|if|for|while|return)\s/m,
       /<\/?[a-z]+[^>]*>/i,
     ];
-    
-    return codePatterns.some(p => p.test(text));
+
+    return codePatterns.some((p) => p.test(text));
   }
-  
+
   /**
    * Check if text looks like math
    */
@@ -573,8 +646,8 @@ export class StructureDetector {
       /_[a-zA-Z0-9]/,
       /\\(frac|sqrt|sum|prod|int|lim)/,
     ];
-    
-    return mathPatterns.some(p => p.test(text));
+
+    return mathPatterns.some((p) => p.test(text));
   }
 }
 
@@ -583,12 +656,12 @@ export class StructureDetector {
  */
 export async function autoDetectAndApply(
   doc: DocumentNode,
-  engine: { applyProfile: (profile: string) => Promise<void> }
+  engine: { applyProfile: (profile: string) => Promise<void> },
 ): Promise<StructureAnalysis> {
   const detector = new StructureDetector();
   const analysis = detector.analyze(doc);
-  
+
   await engine.applyProfile(analysis.recommendedProfile);
-  
+
   return analysis;
 }

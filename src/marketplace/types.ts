@@ -1,6 +1,6 @@
 /**
  * Plugin Marketplace Types
- * 
+ *
  * Defines types for the plugin marketplace system.
  */
 
@@ -9,7 +9,7 @@ import type { PluginHooks, PluginPermissions } from "../plugins-v2/types";
 /**
  * Plugin listing in the marketplace
  */
-export interface MarketplacePlugin {
+export type MarketplacePlugin = {
   /** Unique identifier */
   id: string;
   /** Display name */
@@ -46,12 +46,12 @@ export interface MarketplacePlugin {
   premium: boolean;
   /** Price in USD (if premium) */
   price?: number;
-}
+};
 
 /**
  * Plugin author
  */
-export interface PluginAuthor {
+export type PluginAuthor = {
   /** Author name */
   name: string;
   /** Author email */
@@ -60,12 +60,12 @@ export interface PluginAuthor {
   website?: string;
   /** Author type (individual/organization) */
   type: "individual" | "organization";
-}
+};
 
 /**
  * Plugin submission
  */
-export interface PluginSubmission {
+export type PluginSubmission = {
   /** Plugin package (tarball or GitHub URL) */
   package: string | File;
   /** README content */
@@ -78,12 +78,12 @@ export interface PluginSubmission {
   screenshots?: string[];
   /** Custom configuration */
   config?: Record<string, unknown>;
-}
+};
 
 /**
  * Plugin review
  */
-export interface PluginReview {
+export type PluginReview = {
   /** Review ID */
   id: string;
   /** Plugin ID */
@@ -102,12 +102,12 @@ export interface PluginReview {
   verified: boolean;
   /** Helpful votes */
   helpful: number;
-}
+};
 
 /**
  * Plugin search filters
  */
-export interface PluginSearchFilters {
+export type PluginSearchFilters = {
   /** Search query */
   query?: string;
   /** Filter by category/tag */
@@ -126,12 +126,12 @@ export interface PluginSearchFilters {
   sortBy?: "downloads" | "rating" | "updated" | "name";
   /** Sort order */
   sortOrder?: "asc" | "desc";
-}
+};
 
 /**
  * Marketplace configuration
  */
-export interface MarketplaceConfig {
+export type MarketplaceConfig = {
   /** Marketplace API base URL */
   apiBaseUrl: string;
   /** NPM registry URL */
@@ -142,12 +142,12 @@ export interface MarketplaceConfig {
   cacheTtl?: number;
   /** Enable auto-update */
   autoUpdate?: boolean;
-}
+};
 
 /**
  * Plugin installation result
  */
-export interface PluginInstallResult {
+export type PluginInstallResult = {
   /** Whether installation was successful */
   success: boolean;
   /** Installed plugin */
@@ -156,12 +156,19 @@ export interface PluginInstallResult {
   error?: string;
   /** Installation warnings */
   warnings?: string[];
-}
+  /** Verification result (embedded in runtime) */
+  verification: {
+    signatureValid: boolean;
+    publisherTrusted: boolean;
+    securityScanPassed: boolean;
+    performanceCompliant: boolean;
+  };
+};
 
 /**
  * Plugin update info
  */
-export interface PluginUpdateInfo {
+export type PluginUpdateInfo = {
   /** Plugin ID */
   pluginId: string;
   /** Current version */
@@ -172,4 +179,4 @@ export interface PluginUpdateInfo {
   breaking: boolean;
   /** Changelog for update */
   changelog?: string;
-}
+};

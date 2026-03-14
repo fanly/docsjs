@@ -1,2 +1,2 @@
-export { DocsJSServer, default } from './server';
-export * from './types';
+export { DocsJSServer, default } from "./server";
+export * from "./types";
