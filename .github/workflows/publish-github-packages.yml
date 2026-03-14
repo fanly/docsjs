@@ -23,11 +23,17 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install Vite+
+        run: npm install -g vite-plus
 
-      - name: Verify quality gate
-        run: npm run verify
+      - name: Install dependencies
+        run: vp install
+
+      - name: Build
+        run: vp build
+
+      - name: Test
+        run: vp test run
 
       - name: Scope package for GitHub registry
         run: |

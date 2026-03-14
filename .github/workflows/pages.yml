@@ -28,6 +28,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Vite+
+        run: npm install -g vite-plus
+
+      - name: Install dependencies
+        run: vp install
+
+      - name: Build docs
+        run: vp build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
