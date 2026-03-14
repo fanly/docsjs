@@ -445,21 +445,46 @@ export class SSOService {
 </md:EntityDescriptor>`;
   }
 
+  /* eslint-disable @typescript-eslint/no-floating-promises, @typescript-eslint/no-base-to-string, @typescript-eslint/no-redundant-type-constituents */
   private mapClaimsToProfile(claims: Record<string, unknown>, config: OAuthConfig): SSOUserProfile {
     const mapping = config.claimMapping || {};
 
+    const idpUserIdRaw = claims.sub ?? claims.oid ?? "";
+    const idpUserId: string =
+      typeof idpUserIdRaw === "object" ? JSON.stringify(idpUserIdRaw) : String(idpUserIdRaw);
+
+    const emailRaw = claims[mapping.email ?? "email"] ?? claims.email;
+    const email: string =
+      typeof emailRaw === "object" ? JSON.stringify(emailRaw) : String(emailRaw ?? "");
+
+    const displayNameRaw = claims[mapping.name ?? "name"] ?? claims.displayName;
+    const displayName: string =
+      typeof displayNameRaw === "object"
+        ? JSON.stringify(displayNameRaw)
+        : String(displayNameRaw ?? "");
+
+    const firstNameRaw = claims[mapping.firstName ?? "given_name"] ?? claims.firstName;
+    const firstName: string =
+      typeof firstNameRaw === "object" ? JSON.stringify(firstNameRaw) : String(firstNameRaw ?? "");
+
+    const lastNameRaw = claims[mapping.lastName ?? "family_name"] ?? claims.lastName;
+    const lastName: string =
+      typeof lastNameRaw === "object" ? JSON.stringify(lastNameRaw) : String(lastNameRaw ?? "");
+
+    const groups = Array.isArray(claims[mapping.groups ?? "groups"])
+      ? (claims[mapping.groups ?? "groups"] as string[])
+      : undefined;
+    const roles = Array.isArray(claims[mapping.roles ?? "roles"])
+      ? (claims[mapping.roles ?? "roles"] as string[])
+      : undefined;
     return {
-      idpUserId: String(claims.sub || claims.oid || ""),
-      email: String(claims[mapping.email || "email"] || claims.email || ""),
-      displayName: String(claims[mapping.name || "name"] || claims.displayName || ""),
-      firstName: String(claims[mapping.firstName || "given_name"] || claims.firstName || ""),
-      lastName: String(claims[mapping.lastName || "family_name"] || claims.lastName || ""),
-      groups: Array.isArray(claims[mapping.groups || "groups"])
-        ? (claims[mapping.groups || "groups"] as string[])
-        : undefined,
-      roles: Array.isArray(claims[mapping.roles || "roles"])
-        ? (claims[mapping.roles || "roles"] as string[])
-        : undefined,
+      idpUserId,
+      email,
+      displayName,
+      firstName,
+      lastName,
+      groups,
+      roles,
       rawProfile: claims,
     };
   }

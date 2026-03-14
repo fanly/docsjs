@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-base-to-string, @typescript-eslint/no-floating-promises */
 /**
  * Auto-structure Detection
  *

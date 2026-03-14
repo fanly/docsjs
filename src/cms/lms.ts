@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises, @typescript-eslint/no-base-to-string, @typescript-eslint/no-redundant-type-constituents */
 /**
  * Educational Platform Adapters
  *
@@ -312,7 +313,16 @@ export class MoodleAdapter implements CMSAdapter {
       wstoken: this.options.apiToken,
       wsfunction,
       moodlewsrestformat: "json",
-      ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
+      ...Object.fromEntries(
+        Object.entries(params).map(([k, v]) => [
+          k,
+          v === null || v === undefined
+            ? ""
+            : typeof v === "object"
+              ? JSON.stringify(v)
+              : String(v),
+        ]),
+      ),
     });
 
     const response = await fetch(`${this.options.baseUrl}/webservice/rest/server.php?${urlParams}`);

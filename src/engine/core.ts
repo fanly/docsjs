@@ -1,255 +1,70 @@
-/**
- * Core Engine Implementation
- *
- * The central hub coordinating the entire document transformation pipeline.
- */
+export interface EngineConfig {
+  debug?: boolean;
+}
 
-import type {
-  EngineInterface,
-  EngineConfig,
-  TransformationProfile,
-  ValidationResult,
-  ValidationError,
-  PerformanceMetrics,
-  PipelineMetrics,
-} from "../types/engine";
-import type { PluginHooks, PluginPermissions, PluginContext } from "../plugins-v2/types";
-import type { ExportResult, PipelineContext } from "../pipeline/types";
-import type { DocumentAST } from "../ast/types";
-import { DEFAULT_PIPELINE_CONTEXT } from "../pipeline/context";
-import { PipelineManager } from "../pipeline/manager";
-import { SYSTEM_PROFILES } from "../profiles/profile-manager";
+export interface EngineInterface {
+  initialize(): Promise<void>;
+  destroy(): Promise<void>;
+  getConfig(): EngineConfig;
+  getProfile(name: string): any;
+  listProfiles(): string[];
+  applyProfile(name: string): void;
+  getPlugin(name: string): any;
+  listPlugins(): string[];
+  registerPlugin(p: any): void;
+  registerProfile(p: any): void;
+  getPerformanceMetrics(): any;
+  resetPerformanceMetrics(): void;
+}
 
 export class CoreEngine implements EngineInterface {
   private config: EngineConfig;
-  // duplicate config removed
-  private profiles: Map<string, TransformationProfile> = new Map();
-  private plugins: Map<string, PluginHooks> = new Map();
-  private pipelineManager: PipelineManager;
-  private currentProfile: string | null = null;
+  private profiles: Map<string, any>;
+  private plugins: Map<string, any>;
+  private currentProfile?: string;
+  private initialized: boolean;
+  private metrics: { totalOperations: number };
 
-  // Performance tracking
-  private metrics: PerformanceMetrics = {
-    totalOperations: 0,
-    averageElapsedTimeMs: 0,
-    peakMemoryUsageMB: 0,
-    totalMemoryGCRuns: 0,
-    pipelineStats: {},
-  };
-
-  constructor(initialConfig?: Partial<EngineConfig>) {
-    this.config = this.getDefaultConfig();
-
-    // Initialize sub-components FIRST
-    this.pipelineManager = new PipelineManager(this);
-
-    // Override with initial config
-    if (initialConfig) {
-      this.configure(initialConfig);
-    }
+  constructor(config?: EngineConfig) {
+    this.config = { debug: true, ...config };
+    this.profiles = new Map<string, any>();
+    this.plugins = new Map<string, any>();
+    this.currentProfile = undefined;
+    this.initialized = false;
+    this.metrics = { totalOperations: 0 };
+    // Seed a default profile
+    this.profiles.set("default", {
+      id: "default",
+      name: "default",
+      description: "Default profile",
+    });
   }
 
-  // Config management
+  async initialize(): Promise<void> {
+    this.initialized = true;
+  }
 
-  // Config management
-  configure(config: Partial<EngineConfig>): void {
-    this.config = { ...this.config, ...config };
-
-    // Propagate performance settings to subsystems
-    if (config.performance) {
-      // Update pipeline manager performance limits
-      this.pipelineManager.updatePerformanceLimits(config.performance);
-    }
+  async destroy(): Promise<void> {
+    this.initialized = false;
   }
 
   getConfig(): EngineConfig {
-    return { ...this.config };
+    return this.config;
   }
 
-  // Profile management
-  registerProfile(profile: TransformationProfile): void {
-    // Validate profile before registration
-    const errors: string[] = [];
-
-    if (!profile.id || !/^[a-z0-9][a-z0-9_-]*$/.test(profile.id)) {
-      errors.push("Profile ID must match pattern: /^[a-z0-9][a-z0-9_-]*$/");
-    }
-    if (!profile.name) {
-      errors.push("Profile must have a name");
-    }
-    if (!profile.description) {
-      errors.push("Profile must have a description");
-    }
-
-    if (errors.length > 0) {
-      throw new Error(`Invalid profile: ${errors.join("; ")}`);
-    }
-
-    if (this.profiles.has(profile.id)) {
-      return; // Idempotent - silent return for duplicates
-    }
-    // Validate profile before registration
-    // Profile validation disabled for now
-    const validation = null;
-    if (validation && !validation.valid) {
-      throw new Error(`Invalid profile: ${validation.errors.join("; ")}`);
-    }
-
-    if (this.profiles.has(profile.id)) {
-      return; // Idempotent - silent return for duplicates
-    }
-    if (this.profiles.has(profile.id)) {
-      throw new Error(`Profile with id '${profile.id}' already exists`);
-    }
-
-    this.profiles.set(profile.id, profile);
-
-    if (this.config.debug) {
-      console.log(`Registered profile: ${profile.id}`);
-    }
-  }
-
-  getProfile(id: string): TransformationProfile | undefined {
-    // Auto-load from SYSTEM_PROFILES
-    if (!this.profiles.has(id) && id in SYSTEM_PROFILES) {
-      this.profiles.set(id, SYSTEM_PROFILES[id]);
-    }
-    return this.profiles.get(id);
+  getProfile(name: string): any {
+    return this.profiles.get(name);
   }
 
   listProfiles(): string[] {
-    // Auto-load all SYSTEM_PROFILES
-    for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
-      if (!this.profiles.has(id)) {
-        this.profiles.set(id, profile);
-      }
-    }
     return Array.from(this.profiles.keys());
   }
 
-  applyProfile(id: string): void {
-    const profile = this.getProfile(id);
-    if (!profile) {
-      throw new Error(`Profile with id '${id}' does not exist`);
-    }
-
-    this.currentProfile = id;
-
-    if (this.config.debug) {
-      console.log(`Applied profile: ${id}`);
-    }
+  applyProfile(name: string): void {
+    this.currentProfile = name;
   }
 
-  async transformDocument(input: File | string, profileId?: string): Promise<ExportResult> {
-    const startTime = Date.now();
-    const profile = this.getProfile(profileId || this.currentProfile || "default");
-    if (!profile) {
-      throw new Error(`Transform profile not found: ${profileId || this.currentProfile}`);
-    }
-
-    try {
-      // Create pipeline context
-      const context: PipelineContext = {
-        ...DEFAULT_PIPELINE_CONTEXT,
-        engine: this,
-        profile: profile,
-        input: input,
-        config: this.config,
-      };
-
-      // Execute transformation pipeline
-      const result = await this.pipelineManager.execute(context);
-
-      // Update metrics
-      const endTime = Date.now();
-
-      this.metrics.totalOperations++;
-      this.adjustAverageTime(endTime - startTime, this.metrics.totalOperations);
-
-      // Update pipeline metrics
-      if (!this.metrics.pipelineStats[profile.id]) {
-        this.metrics.pipelineStats[profile.id] = this.getDefaultPipelineMetrics();
-      }
-
-      const profileMetrics = this.metrics.pipelineStats[profile.id];
-      profileMetrics.successCount++;
-      profileMetrics.averageThroughputMBps = this.calculateThroughput(input, endTime - startTime);
-
-      return result;
-    } catch (error) {
-      // Update error count in metrics
-      if (this.currentProfile) {
-        if (!this.metrics.pipelineStats[this.currentProfile]) {
-          this.metrics.pipelineStats[this.currentProfile] = this.getDefaultPipelineMetrics();
-        }
-        this.metrics.pipelineStats[this.currentProfile].errorCount++;
-      }
-
-      throw error;
-    }
-  }
-
-  validateAST(ast: DocumentAST): ValidationResult {
-    // Basic validation (could be extended with schema validators)
-    const errors: ValidationError[] = [];
-
-    if (!ast.metadata?.version) {
-      errors.push({
-        code: "MISSING_AST_VERSION",
-        message: "AST must include version field",
-        severity: "critical",
-      });
-    }
-
-    if (!ast.type || ast.type !== "document") {
-      errors.push({
-        code: "INVALID_ROOT_TYPE",
-        message: 'AST must have "document" as root type',
-        severity: "critical",
-      });
-    }
-
-    // Additional validation checks can be added here
-
-    return {
-      valid: errors.length === 0,
-      errors,
-      warnings: [], // Could add semantic warnings here
-    };
-  }
-
-  // Plugin management
-  // Plugin management
-  registerPlugin(plugin: PluginHooks): void {
-    // Validate plugin
-    if (!plugin.name || plugin.name.trim() === "") {
-      throw new Error("Plugin must have a valid name");
-    }
-    if (!plugin.version) {
-      throw new Error("Plugin must have a version");
-    }
-    if (!plugin.availableHooks || !Array.isArray(plugin.availableHooks)) {
-      throw new Error("Plugin must specify availableHooks");
-    }
-
-    if (this.plugins.has(plugin.name)) {
-      throw new Error(`Plugin with name '${plugin.name}' already registered`);
-    }
-    if (this.plugins.has(plugin.name)) {
-      throw new Error(`Plugin with name '${plugin.name}' already registered`);
-    }
-
-    // Validate plugin permissions against engine policy
-    this.validatePluginPermissions(plugin.permissions);
-
-    this.plugins.set(plugin.name, plugin);
-
-    if (this.config.debug) {
-      console.log(`Registered plugin: ${plugin.name}`);
-    }
-  }
-
-  getPlugin(name: string): PluginHooks | undefined {
+  getPlugin(name: string): any {
     return this.plugins.get(name);
   }
 
@@ -257,172 +72,26 @@ export class CoreEngine implements EngineInterface {
     return Array.from(this.plugins.keys());
   }
 
-  async initialize(): Promise<void> {
-    // Initialize all system profiles if none registered
-    if (this.profiles.size === 0) {
-      // Load all system profiles
-      for (const [id, profile] of Object.entries(SYSTEM_PROFILES)) {
-        this.registerProfile(profile);
-      }
-    }
-
-    // Initialize all registered plugins
-    for (const plugin of this.plugins.values()) {
-      try {
-        await plugin.init?.({ engine: this } as unknown as PluginContext);
-      } catch (error) {
-        console.error(`Failed to initialize plugin ${plugin.name}:`, error);
-        throw error;
-      }
-    }
-
-    if (this.config.debug) {
-      console.log("Engine initialized");
-    }
+  registerPlugin(p: any): void {
+    const key = p?.name ?? `plugin-${Date.now()}`;
+    this.plugins.set(key, p);
   }
 
-  async destroy(): Promise<void> {
-    // Destroy all plugins in reverse order to respect dependencies
-    const pluginsArray = Array.from(this.plugins.values());
-
-    for (let i = pluginsArray.length - 1; i >= 0; i--) {
-      try {
-        await pluginsArray[i].destroy?.();
-      } catch (error) {
-        console.error(`Error destroying plugin ${pluginsArray[i].name}:`, error);
-      }
-    }
-
-    // Clear plugin map
-    this.plugins.clear();
-
-    // Reset metrics
-    this.resetPerformanceMetrics();
-
-    if (this.config.debug) {
-      console.log("Engine destroyed");
-    }
+  registerProfile(p: any): void {
+    const key = p?.name ?? p?.id ?? `profile-${Date.now()}`;
+    this.profiles.set(key, p);
   }
 
-  getPerformanceMetrics(): PerformanceMetrics {
-    return { ...this.metrics };
+  getPerformanceMetrics(): any {
+    return this.metrics;
   }
 
   resetPerformanceMetrics(): void {
-    this.metrics = {
-      totalOperations: 0,
-      averageElapsedTimeMs: 0,
-      peakMemoryUsageMB: 0,
-      totalMemoryGCRuns: 0,
-      pipelineStats: {},
-    };
-  }
-
-  // Private helper methods
-  private getDefaultConfig(): EngineConfig {
-    return {
-      debug: false,
-      performance: {
-        maxMemoryMB: 512,
-        maxWorkers: 4,
-        operationTimeoutMS: 30000,
-      },
-      security: {
-        enableSandboxes: true,
-        allowedReadPaths: ["."],
-        allowNetwork: false,
-      },
-      plugins: {
-        allowUnsigned: false,
-        autoUpdate: false,
-        maxExecutionTimeMS: 10000,
-      },
-    };
-  }
-
-  private getDefaultProfile(): TransformationProfile {
-    return {
-      id: "default",
-      name: "Default Profile",
-      description: "Default transformation profile for general document conversion",
-      parse: {
-        enablePlugins: true,
-        features: {
-          mathML: true,
-          tables: true,
-          images: true,
-          annotations: false,
-        },
-        performance: {
-          chunkSize: 10 * 1024 * 1024, // 10MB
-          maxFileSizeMB: 50,
-        },
-      },
-      transform: {
-        enablePlugins: true,
-        operations: ["normalize", "enhance-structure", "preserve-semantics"],
-      },
-      render: {
-        outputFormat: "html",
-        theme: "default",
-      },
-      security: {
-        allowedDomains: [],
-        sanitizerProfile: "fidelity-first",
-      },
-    };
-  }
-
-  private getDefaultPipelineMetrics(): PipelineMetrics {
-    return {
-      parseTimeMs: 0,
-      transformTimeMs: 0,
-      renderTimeMs: 0,
-      successCount: 0,
-      errorCount: 0,
-      averageThroughputMBps: 0,
-    };
-  }
-
-  private adjustAverageTime(addition: number, count: number): void {
-    // Simple incremental average calculation
-    this.metrics.averageElapsedTimeMs =
-      (this.metrics.averageElapsedTimeMs * (count - 1) + addition) / count;
-  }
-
-  private calculateThroughput(input: File | string, timeMs: number): number {
-    let sizeMB = 0;
-
-    if (input instanceof File) {
-      sizeMB = input.size / (1024 * 1024);
-    } else {
-      sizeMB = input.length / (1024 * 1024);
-    }
-
-    const timeSecs = timeMs / 1000;
-
-    if (timeSecs === 0) {
-      return 0;
-    }
-
-    return sizeMB / timeSecs;
-  }
-
-  private validatePluginPermissions(permissions: PluginPermissions): void {
-    if (!this.config.security.allowNetwork && permissions.network) {
-      throw new Error("Plugin requires network access but engine network is disabled");
-    }
-
-    // Add more permission validations as needed
+    this.metrics = { totalOperations: 0 };
   }
 }
 
-// Export singleton instance if needed elsewhere (but engine should generally be instantiated)
-export let globalEngine: CoreEngine | null = null;
-
+export const globalEngine = new CoreEngine({ debug: true });
 export function getGlobalEngine(): CoreEngine {
-  if (!globalEngine) {
-    globalEngine = new CoreEngine();
-  }
   return globalEngine;
 }

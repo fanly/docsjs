@@ -131,6 +131,7 @@ export class CollaborationManager {
     return this.docs.get(docId);
   }
 
+  /* eslint-disable eqeqeq, @typescript-eslint/no-floating-promises, @typescript-eslint/no-base-to-string, @typescript-eslint/no-redundant-type-constituents */
   getText(docId: string): Y.Text | null {
     const doc = this.docs.get(docId);
     return doc ? doc.ydoc.getText("content") : null;

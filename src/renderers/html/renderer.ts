@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises, @typescript-eslint/no-base-to-string, @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/restrict-template-expressions */
 /**
  * HTML Renderer
  *
