@@ -110,11 +110,24 @@ const DEFAULT_OPTIONS: HtmlRenderOptions = {
 
 export class HtmlRenderer {
   private stringifyValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return "";
+    }
     if (typeof value === "object") {
       return JSON.stringify(value);
     }
-    // safely coerce primitive to string
-    return String(value);
+    switch (typeof value) {
+      case "string":
+        return value;
+      case "number":
+      case "boolean":
+      case "bigint":
+        return String(value);
+      case "symbol":
+        return value.toString();
+      default:
+        return "";
+    }
   }
   private options: HtmlRenderOptions;
   private nodeCount = 0;
