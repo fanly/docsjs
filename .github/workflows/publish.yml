@@ -1,6 +1,9 @@
 name: Publish to npm
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
   release:
     types: [created]
   workflow_dispatch:
@@ -23,6 +26,20 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: npm
 
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Validate tag matches package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ steps.version.outputs.VERSION }}"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)."
+            exit 1
+          fi
+
       - name: Install Vite+
         run: npm install -g vite-plus
 
@@ -35,25 +52,5 @@ jobs:
       - name: Test
         run: vp test run
 
-      - name: Publish to npm (Trusted Publisher with token fallback)
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          set +e
-          npm publish --provenance --access public 2>&1 | tee /tmp/npm-publish.log
-          status=${PIPESTATUS[0]}
-          set -e
-
-          if [ "$status" -eq 0 ]; then
-            exit 0
-          fi
-
-          if grep -q "npm error code E404" /tmp/npm-publish.log && [ -n "${NPM_TOKEN:-}" ]; then
-            echo "Trusted Publisher not active for this package yet; retrying with NPM_TOKEN bootstrap publish."
-            printf "//registry.npmjs.org/:_authToken=%s\n" "$NPM_TOKEN" > "$HOME/.npmrc"
-            npm publish --access public
-            exit 0
-          fi
-
-          exit "$status"
+      - name: Publish to npm
+        run: npm publish --provenance --access public
