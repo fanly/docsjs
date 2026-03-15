@@ -1,6 +1,6 @@
 {
   "name": "@coding01/docsjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Render-first Word fidelity component with Web Component core and React/Vue adapters",
   "keywords": [
     "docx",
@@ -25,9 +25,8 @@
     "docsjs": "./bin/docsjs.js"
   },
   "files": [
-    "dist/*.js",
-    "dist/*.cjs",
-    "dist/*.d.ts"
+    "dist/**/*",
+    "bin/docsjs.js"
   ],
   "type": "module",
   "sideEffects": false,
