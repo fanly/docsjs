@@ -70,7 +70,7 @@
     "docs:preview": "vitepress preview docs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run sizecheck && npm run sizecheck:pkg",
     "prepublishOnly": "npm run verify",
-    "prepare": "vp config"
+    "prepare": "node -e \"if (process.env.CI) process.exit(0)\" && vp config"
   },
   "dependencies": {
     "jszip": "^3.10.1",
