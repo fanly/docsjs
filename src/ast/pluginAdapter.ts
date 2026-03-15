@@ -414,8 +414,8 @@ export class PluginASTAdapter {
   /**
    * Register a plugin (legacy or AST-aware)
    */
-  register(plugin: DocxPlugin | ASTAwarePlugin): void {
-    if ("outputsAST" in plugin && plugin.outputsAST) {
+  register(plugin: DocxPlugin): void {
+    if ((plugin as ASTAwarePlugin).outputsAST) {
       this.astPlugins.push(plugin as ASTAwarePlugin);
     } else {
       this.legacyPlugins.push(plugin);
@@ -472,7 +472,7 @@ export class PluginASTAdapter {
   /**
    * Get all registered plugins
    */
-  getAllPlugins(): (DocxPlugin | ASTAwarePlugin)[] {
+  getAllPlugins(): DocxPlugin[] {
     return [...this.legacyPlugins, ...this.astPlugins];
   }
 }

@@ -328,7 +328,7 @@ export class CoreEngine implements EngineInterface {
     } else if (input && typeof (input as any).text === "function") {
       content = await (input as any).text();
     } else {
-      content = String(input);
+      content = JSON.stringify(input);
     }
 
     const activeProfile = profileId ?? this.currentProfile ?? "default";

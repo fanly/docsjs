@@ -31,7 +31,7 @@ export class PluginRegistry {
     return this.plugins.delete(name);
   }
 
-  get(name: string): DocxPlugin | undefined {
+  get(name: string) {
     return this.plugins.get(name);
   }
 
