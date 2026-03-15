@@ -40,6 +40,8 @@ export default defineConfig({
               },
             ],
           },
+          { text: "Editor ↗", link: "https://editor.docsjs.coding01.cn" },
+          { text: "Markdown ↗", link: "https://markdown.docsjs.coding01.cn" },
         ],
         editLink: {
           pattern: "https://github.com/fanly/docsjs/edit/main/docs/:path",
@@ -124,6 +126,8 @@ export default defineConfig({
               },
             ],
           },
+          { text: "Editor ↗", link: "https://editor.docsjs.coding01.cn" },
+          { text: "Markdown ↗", link: "https://markdown.docsjs.coding01.cn" },
         ],
         editLink: {
           pattern: "https://github.com/fanly/docsjs/edit/main/docs/:path",

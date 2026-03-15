@@ -158,11 +158,11 @@ const onChange = ({ htmlSnapshot }) => {
 
 ## Ecosystem
 
-| Package                                                                              | Description                                              |
-| ------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| [@coding01/docsjs](https://www.npmjs.com/package/@coding01/docsjs)                   | Core package with Web Component, React, and Vue adapters |
-| [@coding01/docsjs-markdown](https://www.npmjs.com/package/@coding01/docsjs-markdown) | Markdown output conversion                               |
-| [@coding01/docsjs-editor](https://www.npmjs.com/package/@coding01/docsjs-editor)     | Multi-editor runtime switching                           |
+| Package                                                          | Description                                              |
+| ---------------------------------------------------------------- | -------------------------------------------------------- |
+| [@coding01/docsjs](https://docsjs.coding01.cn)                   | Core package with Web Component, React, and Vue adapters |
+| [@coding01/docsjs-markdown](https://markdown.docsjs.coding01.cn) | Markdown output conversion                               |
+| [@coding01/docsjs-editor](https://editor.docsjs.coding01.cn)     | Multi-editor runtime switching                           |
 
 ## Sponsors
 
