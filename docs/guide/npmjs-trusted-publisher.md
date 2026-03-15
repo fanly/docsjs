@@ -2,6 +2,31 @@
 
 本文是 `@coding01/docsjs`、`@coding01/docsjs-editor`、`@coding01/docsjs-markdown` 的发布复盘与最终标准方案。目标是：后续发布只走一条稳定路径，不再重复踩坑。
 
+## 产品矩阵与链接
+
+### 1) `@coding01/docsjs`（核心引擎）
+
+Word/DOCX 高保真导入与渲染核心，提供 Web Component + React/Vue 适配能力。
+
+1. 官网：[https://docsjs.coding01.cn/](https://docsjs.coding01.cn/)
+2. GitHub：[https://github.com/fanly/docsjs](https://github.com/fanly/docsjs)
+3. npmjs：[https://www.npmjs.com/package/@coding01/docsjs](https://www.npmjs.com/package/@coding01/docsjs)
+
+### 2) `@coding01/docsjs-editor`（编辑器桥接层）
+
+面向多编辑器（如 CKEditor/Tiptap 等）的集成桥接层，负责快照注入、读回与适配切换。
+
+1. GitHub：[https://github.com/fanly/docsjs-editor](https://github.com/fanly/docsjs-editor)
+2. npmjs：[https://www.npmjs.com/package/@coding01/docsjs-editor](https://www.npmjs.com/package/@coding01/docsjs-editor)
+
+### 3) `@coding01/docsjs-markdown`（Markdown 转换层）
+
+将 docsjs HTML 快照或 DOCX 转换为 Markdown（Standard/GFM/frontmatter）。
+
+1. 产品页：[https://fanly.github.io/docsjs-markdown/](https://fanly.github.io/docsjs-markdown/)
+2. GitHub：[https://github.com/fanly/docsjs-markdown](https://github.com/fanly/docsjs-markdown)
+3. npmjs：[https://www.npmjs.com/package/@coding01/docsjs-markdown](https://www.npmjs.com/package/@coding01/docsjs-markdown)
+
 ## 1. 最终发布架构
 
 只保留一条 npmjs 发布链路：
@@ -144,3 +169,9 @@
 3. 所有失败都能映射到单一责任面（代码、workflow、npm 绑定）
 
 按本文执行，可以稳定避免本轮出现过的 `E404`、`ENEEDAUTH`、workflow 语法错误和 lint 启动异常。
+
+## 附录：三个产品入口
+
+1. docsjs: [GitHub](https://github.com/fanly/docsjs) | [npmjs](https://www.npmjs.com/package/@coding01/docsjs) | [官网](https://docsjs.coding01.cn/)
+2. docsjs-editor: [GitHub](https://github.com/fanly/docsjs-editor) | [npmjs](https://www.npmjs.com/package/@coding01/docsjs-editor)
+3. docsjs-markdown: [GitHub](https://github.com/fanly/docsjs-markdown) | [npmjs](https://www.npmjs.com/package/@coding01/docsjs-markdown) | [产品页](https://fanly.github.io/docsjs-markdown/)
