@@ -31,8 +31,11 @@ jobs:
       - name: Lint
         run: vp lint .
 
+      - name: Format check
+        run: vp check --no-lint
+
       - name: Type check
-        run: vp check
+        run: npm run typecheck
 
       - name: Build
         run: vp build
