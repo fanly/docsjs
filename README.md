@@ -1,6 +1,6 @@
 # 📄 DocsJS v2 - Document Transformation Platform
 
-> A PicGo-inspired document processing platform with plugin ecosystem and configurable profiles. Transform documents with security, fidelity, and extensibility.
+> Transform documents with security, fidelity, and extensibility.
 
 [![npm version](https://img.shields.io/npm/v/@coding01/docsjs)](https://www.npmjs.com/package/@coding01/docsjs)
 [![License](https://img.shields.io/npm/l/@coding01/docsjs)](LICENSE)
@@ -44,7 +44,7 @@ vp pack             # Package library for distribution
 
 ## 🏗️ Core Architecture
 
-The new 3-tier PicGo-inspired architecture:
+The new 3-tier architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -310,4 +310,4 @@ MIT License - Free for commercial and personal use.
 
 ---
 
-Transform documents with unprecedented fidelity and extensibility. Platform-grade security. PicGo-inspired extensibility. Ready for the next generation of document processing workflows.
+Transform documents with unprecedented fidelity and extensibility. Platform-grade security. Ready for the next generation of document processing workflows.

@@ -8,7 +8,7 @@ Understand the DocsJS core architecture and design decisions.
 
 ## Three-Tier Architecture
 
-DocsJS uses a PicGo-inspired three-tier architecture:
+DocsJS uses a three-tier architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐

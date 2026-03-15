@@ -19,7 +19,7 @@ DocsJS provides:
 
 ## Core Architecture
 
-The new 3-tier PicGo-inspired architecture:
+The new 3-tier architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
