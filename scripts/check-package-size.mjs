@@ -15,7 +15,7 @@ if (!existsSync(CACHE_DIR)) {
 }
 
 const raw = execSync(
-  `npm_config_cache=${CACHE_DIR} npm pack --json --pack-destination ${PACK_DIR}`,
+  `npm_config_cache=${CACHE_DIR} npm pack --json --ignore-scripts --pack-destination ${PACK_DIR}`,
   {
     encoding: "utf8",
   },
