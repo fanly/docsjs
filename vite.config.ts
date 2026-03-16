@@ -1393,7 +1393,7 @@ export default defineConfig({
         react: "src/react.ts",
         vue: "src/vue.ts",
       },
-      formats: ["es", "cjs"],
+      formats: ["es"],
     },
     rollupOptions: {
       external: [
@@ -1409,20 +1409,12 @@ export default defineConfig({
         "path",
         "os",
       ],
-      output: [
-        {
-          format: "es",
-          entryFileNames: "[name].js",
-          chunkFileNames: "chunks/[name]-[hash].js",
-          assetFileNames: "assets/[name]-[hash][extname]",
-        },
-        {
-          format: "cjs",
-          entryFileNames: "[name].cjs",
-          chunkFileNames: "chunks/[name]-[hash].cjs",
-          assetFileNames: "assets/[name]-[hash][extname]",
-        },
-      ],
+      output: {
+        format: "es",
+        entryFileNames: "[name].js",
+        chunkFileNames: "chunks/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
     },
   },
 });
