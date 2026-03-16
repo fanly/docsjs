@@ -88,6 +88,20 @@ import { defineDocsWordElement, CoreEngine } from "@coding01/docsjs";
 import type { PluginConfig, ProfileConfig } from "@coding01/docsjs";
 ```
 
+## 体积友好的引入方式
+
+按场景选择最小入口：
+
+- React：`@coding01/docsjs/react`
+- Vue：`@coding01/docsjs/vue`
+- 仅 Web Component 内核：`@coding01/docsjs/core`
+
+建议优先使用 ESM `import`，并对低频重能力使用懒加载：
+
+```ts
+const { BillingManager } = await import("@coding01/docsjs");
+```
+
 ## 下一步
 
 - [快速开始](/zh/guide/quick-start) - 学习如何使用 DocsJS

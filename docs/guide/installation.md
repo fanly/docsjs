@@ -88,6 +88,20 @@ import { defineDocsWordElement, CoreEngine } from "@coding01/docsjs";
 import type { PluginConfig, ProfileConfig } from "@coding01/docsjs";
 ```
 
+## Bundle-Size Friendly Imports
+
+Use the narrowest entrypoint for your use-case:
+
+- React: `@coding01/docsjs/react`
+- Vue: `@coding01/docsjs/vue`
+- Web component core only: `@coding01/docsjs/core`
+
+Prefer ESM `import` and lazy-load heavy, low-frequency features:
+
+```ts
+const { BillingManager } = await import("@coding01/docsjs");
+```
+
 ## Next Steps
 
 - [Quick Start](/guide/quick-start) - Learn how to use DocsJS

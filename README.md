@@ -67,6 +67,20 @@ The new 3-tier architecture:
 npm install @coding01/docsjs
 ```
 
+## 📦 Bundle Size Tips (User-Focused)
+
+Use the smallest entry for your actual scenario:
+
+- React app: `@coding01/docsjs/react`
+- Vue app: `@coding01/docsjs/vue`
+- Web component only: `@coding01/docsjs/core`
+
+Prefer ESM `import` and lazy-load low-frequency features:
+
+```ts
+const { BillingManager } = await import("@coding01/docsjs");
+```
+
 ### Web Component
 
 ```html
